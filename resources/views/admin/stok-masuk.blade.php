@@ -4,10 +4,10 @@
 
 @section('content')
 
-<div class="card" style="display:block; padding: 2rem;">
-    <h3 class="fw-bold-700 mb-4">Catat Stok Masuk</h3>
+<div class="card block p-8">
+    <h3 class="font-bold text-xl mb-6 text-slate-800">Catat Stok Masuk</h3>
     <form id="form-stok-masuk">
-        <div class="form-grid-2">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div class="form-group">
                 <label>Produk *</label>
                 <select id="stok-produk" class="form-control" style="appearance:auto" required>
@@ -29,12 +29,12 @@
                 <label>Nomor Referensi</label>
                 <input type="text" id="stok-referensi" class="form-control" placeholder="Contoh: SM-2024-001">
             </div>
-            <div class="form-group" style="grid-column: 1 / -1;">
+            <div class="form-group col-span-1 md:col-span-2">
                 <label>Catatan</label>
                 <textarea id="stok-catatan" class="form-control" placeholder="Catatan tambahan..." rows="3" style="resize:vertical;"></textarea>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-2">Catat Stok Masuk</button>
+        <button type="submit" class="btn btn-primary mt-6">Catat Stok Masuk</button>
     </form>
 </div>
 

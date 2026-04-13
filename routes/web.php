@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransaksiController;
 
 // Auth routes (guest only)
 Route::middleware('guest')->group(function () {
@@ -18,7 +19,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Superadmin routes
 Route::middleware(['role:Superadmin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
-    Route::get('/transactions', fn() => view('transactions'));
+    Route::get('/transactions', [TransaksiController::class, 'index']);
 
     // User CRUD
     Route::get('/users', [UserController::class, 'index']);

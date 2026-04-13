@@ -9,56 +9,58 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <!-- Vite CSS -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex antialiased">
     @if(Request::is('/'))
         @yield('content')
     @else
-        <div class="layout">
-            <aside class="sidebar">
-                <div class="sidebar-logo">
-                    <h2>J I S</h2>
-                    <span class="sub-logo">JoFresh Inventory System</span>
+        <div class="flex w-full">
+            <aside class="w-[260px] bg-blue-50 flex flex-col z-10 border-r border-blue-200 shadow-[0_2px_4px_rgba(30,58,138,0.05)]">
+                <div class="px-6 py-9 text-center border-b border-blue-200">
+                    <h2 class="font-serif tracking-[8px] mb-1 text-[1.75rem] font-bold">J I S</h2>
+                    <span class="text-[0.7rem] tracking-[1px] text-slate-600">JoFresh Inventory System</span>
                 </div>
                 
-                <div class="user-profile">
-                    <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
-                    <div class="user-info">
-                        <div class="fw-bold">{{ Auth::user()->name }}</div>
-                        <div class="text-muted fs-sm">Owner JoFresh</div>
+                <div class="flex items-center px-6 py-7 border-b border-blue-200">
+                    <div class="w-11 h-11 rounded-full bg-blue-300 text-blue-900 flex items-center justify-center font-bold text-[1.1rem] mr-4">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                    <div>
+                        <div class="font-bold text-base">{{ Auth::user()->name }}</div>
+                        <div class="text-slate-600 text-sm">Owner JoFresh</div>
                     </div>
                 </div>
 
-                <ul class="nav-menu">
-                    <a href="{{ url('/dashboard') }}" class="nav-item {{ Request::is('dashboard') ? 'active' : '' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <ul class="px-4 py-6 flex-grow flex flex-col gap-2">
+                    <a href="{{ url('/dashboard') }}" class="flex items-center px-5 py-3.5 rounded-xl font-medium transition-all duration-200 text-base {{ Request::is('dashboard') ? 'bg-blue-100 text-blue-900 font-semibold' : 'text-slate-600 hover:bg-blue-100 hover:text-blue-900 hover:translate-x-1.5' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[22px] h-[22px] mr-3.5 transition-transform duration-400">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
                         </svg>
                         Dashboard
                     </a>
-                    <a href="{{ url('/transactions') }}" class="nav-item {{ Request::is('transactions') ? 'active' : '' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+
+                    <a href="{{ url('/transactions') }}" class="flex items-center px-5 py-3.5 rounded-xl font-medium transition-all duration-200 text-base {{ Request::is('transactions') ? 'bg-blue-100 text-blue-900 font-semibold' : 'text-slate-600 hover:bg-blue-100 hover:text-blue-900 hover:translate-x-1.5' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[22px] h-[22px] mr-3.5 transition-transform duration-400">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                         Riwayat Transaksi
                     </a>
-                    <a href="{{ url('/users') }}" class="nav-item {{ Request::is('users') ? 'active' : '' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+
+                    <a href="{{ url('/users') }}" class="flex items-center px-5 py-3.5 rounded-xl font-medium transition-all duration-200 text-base {{ Request::is('users') ? 'bg-blue-100 text-blue-900 font-semibold' : 'text-slate-600 hover:bg-blue-100 hover:text-blue-900 hover:translate-x-1.5' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[22px] h-[22px] mr-3.5 transition-transform duration-400">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                         </svg>
                         Kelola Pengguna
                     </a>
                 </ul>
 
-                <div class="sidebar-footer">
+                <div class="px-5 pb-5">
                     <form action="{{ url('/logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn-logout">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <button type="submit" class="flex items-center w-full px-5 py-3.5 bg-transparent border border-blue-200 rounded-xl cursor-pointer font-medium text-base text-slate-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600 hover:border-red-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-3">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
                             </svg>
                             Keluar
@@ -66,12 +68,12 @@
                     </form>
                 </div>
             </aside>
-            <main class="main-content">
-                <header class="main-header">
-                    <h2>@yield('title')</h2>
-                    <div class="text-muted fs-sm" id="header-date"></div>
+            <main class="flex-grow flex flex-col max-w-[calc(100%-260px)]">
+                <header class="h-20 px-10 flex items-center justify-between bg-slate-50 border-b border-blue-200 flex-shrink-0">
+                    <h2 class="text-2xl font-bold">@yield('title')</h2>
+                    <div class="text-slate-600 text-sm" id="header-date"></div>
                 </header>
-                <div class="content-body">
+                <div class="p-10 flex-grow overflow-y-auto">
                     @yield('content')
                 </div>
             </main>

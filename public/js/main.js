@@ -318,27 +318,123 @@ document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------
     // Dashboard Charts (Chart.js)
     // -------------------------------------------------------
+    const dash = window._dashboardData || {};
+    
     const ctxTrend = document.getElementById('chartTrend');
     if (ctxTrend) {
         new Chart(ctxTrend, {
             type: 'line',
             data: {
-                labels: ['07 Apr', '08 Apr', '09 Apr', '10 Apr', '11 Apr', '12 Apr', '13 Apr'],
-                datasets: [{ label: 'Penjualan', data: [0,0,0,0,0,0,0], borderColor: '#ccc', fill: false, tension: 0.1, pointBackgroundColor: '#fff', pointBorderColor: '#ccc' }]
+                labels: dash.trendLabels || ['07 Apr', '08 Apr', '09 Apr', '10 Apr', '11 Apr', '12 Apr', '13 Apr'],
+                datasets: [{ 
+                    label: 'Penjualan (Rp)', 
+                    data: dash.trendData || [0,0,0,0,0,0,0], 
+                    borderColor: '#1e3a8a', 
+                    backgroundColor: 'rgba(30, 58, 138, 0.08)',
+                    fill: true, 
+                    tension: 0.4, 
+                    pointBackgroundColor: '#1e3a8a', 
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 4, ticks: { stepSize: 1 } } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } }, 
+                scales: { 
+                    y: { 
+                        beginAtZero: true, 
+                        ticks: { stepSize: 1 } 
+                    } 
+                } 
+            }
         });
     }
 
     const ctxDist = document.getElementById('chartDist');
     if (ctxDist) {
+        const palette = ['#1e3a8a', '#93c5fd', '#fbcfe8', '#bbf7d0', '#fed7aa', '#e9d5ff'];
+        const labelsData = dash.distLabels || ['Ayam Broiler', 'Ayam Kampung', 'Bebek'];
+        const valData = dash.distData || [0,0,0];
+        
         new Chart(ctxDist, {
             type: 'bar',
             data: {
-                labels: ['Ayam Broiler', 'Ayam Kampung', 'Bebek'],
-                datasets: [{ label: 'Penjualan', data: [0,0,0], backgroundColor: ['#8c6a5e', '#b89d91', '#d4c5bd'] }]
+                labels: labelsData,
+                datasets: [{ 
+                    label: 'Penjualan', 
+                    data: valData, 
+                    backgroundColor: labelsData.map((_, i) => palette[i % palette.length]),
+                    borderRadius: 6
+                }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } }, scales: { y: { beginAtZero: true, max: 4, ticks: { stepSize: 1 } } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } }, 
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } 
+            }
+        });
+        });
+    }
+
+    // -------------------------------------------------------
+    // IGLOO.INC STYLE ANIMATIONS (GSAP)
+    // -------------------------------------------------------
+    if (typeof gsap !== 'undefined') {
+        // 1. Staggered Entrance Animations (Igloo style page reveal)
+        gsap.from('.card', {
+            y: 40, opacity: 0, duration: 0.8, stagger: 0.1, ease: 'back.out(1.7)'
+        });
+        
+        gsap.from('tbody tr', {
+            y: 20, opacity: 0, duration: 0.6, stagger: 0.05, ease: 'power2.out', delay: 0.2
+        });
+
+        // 2. Interactive Mascot (Dashboard Duck)
+        const dashDuck = document.getElementById('dashboard-duck');
+        if (dashDuck) {
+            // Breathing / idle animation
+            gsap.to('.dash-duck-body', { y: -5, duration: 2, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+            gsap.to('.dash-duck-wing', { rotation: -15, transformOrigin: 'top right', duration: 0.8, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+
+            // Eye tracking / Magnetic look
+            document.addEventListener('mousemove', (e) => {
+                const rect = dashDuck.getBoundingClientRect();
+                const duckX = rect.left + rect.width / 2;
+                const duckY = rect.top + rect.height / 2;
+                const deltaX = e.clientX - duckX;
+                const deltaY = e.clientY - duckY;
+                
+                // Move duck body slightly towards mouse
+                gsap.to(dashDuck, {
+                    x: deltaX * 0.05,
+                    y: deltaY * 0.05,
+                    rotation: deltaX * 0.02,
+                    duration: 1.5,
+                    ease: 'power2.out'
+                });
+            });
+            
+            // Interaction on click
+            dashDuck.addEventListener('click', () => {
+                gsap.fromTo(dashDuck, { scale: 0.7, rotation: 20 }, { scale: 1, rotation: 0, duration: 0.8, ease: 'elastic.out(1, 0.3)' });
+            });
+        }
+
+        // 3. Magnetic Hover Items (Igloo style UI)
+        document.querySelectorAll('.btn-primary, .nav-item, .btn-icon').forEach(item => {
+            item.addEventListener('mousemove', (e) => {
+                const rect = item.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                gsap.to(item, { x: x * 0.2, y: y * 0.2, duration: 0.4, ease: 'power2.out' });
+            });
+            item.addEventListener('mouseleave', () => {
+                gsap.to(item, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.3)' });
+            });
         });
     }
 });
