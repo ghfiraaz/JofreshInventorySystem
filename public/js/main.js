@@ -11,6 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------------------------------------------
+    // Sidebar Toggle Logic
+    // -------------------------------------------------------
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    if (sidebarToggle && sidebar) {
+        // Initial state for sidebar transition speed is handled in tailwind
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-collapsed');
+        });
+    }
+
+    // -------------------------------------------------------
     // Shared Modal Logic (close on button / backdrop click)
     // -------------------------------------------------------
     document.querySelectorAll('[data-close-modal]').forEach(btn => {
@@ -46,6 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnSubmit) btnSubmit.textContent = 'Simpan Pengguna';
         if (fPass) fPass.required = true;
         if (pwdHint) pwdHint.textContent = '';
+        
+        // Ensure fields are editable for new users
+        if (fName)  fName.disabled = false;
+        if (fEmail) fEmail.disabled = false;
+        if (fRole)  fRole.disabled = false;
     }
 
     if (btnTambahPengguna && modalPengguna) {
@@ -86,9 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 fRole.value  = tr.querySelector('.row-role').textContent.trim();
                 fPass.value  = ''; fPass.required = false;
                 pwdHint.textContent = '*Kosongkan jika tidak ingin mengubah password';
-                modalTitle.textContent = 'Edit Pengguna';
-                modalDesc.textContent  = 'Perbarui informasi akun pengguna.';
+                modalTitle.textContent = 'Edit Kata Sandi Pengguna';
+                modalDesc.textContent  = 'Nama, Email, dan Role tidak dapat diubah di form ini.';
                 btnSubmit.textContent  = 'Simpan Perubahan';
+                
+                // Disable other fields per user request
+                fName.disabled = true;
+                fEmail.disabled = true;
+                fRole.disabled = true;
+                
                 modalPengguna.classList.add('active');
             }
         });
@@ -376,7 +399,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } }, 
                 scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } 
             }
-        });
         });
     }
 

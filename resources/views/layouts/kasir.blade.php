@@ -14,10 +14,11 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex antialiased">
 <div class="flex w-full">
-    <aside class="w-[260px] bg-blue-50 flex flex-col z-10 border-r border-blue-200 shadow-[0_2px_4px_rgba(30,58,138,0.05)]">
-        <div class="px-6 py-9 text-center border-b border-blue-200">
-            <h2 class="font-serif tracking-[8px] mb-1 text-[1.75rem] font-bold">J I S</h2>
-            <span class="text-[0.7rem] tracking-[1px] text-slate-600">JoFresh Inventory System</span>
+    <aside id="sidebar" class="w-[260px] flex-shrink-0 bg-blue-50 flex flex-col z-10 border-r border-blue-200 shadow-[0_2px_4px_rgba(30,58,138,0.05)] transition-all duration-300 overflow-hidden">
+        <div class="px-6 py-6 text-center border-b border-blue-200 flex justify-center">
+            <div class="jis-box-sidebar">
+                <h2>J I S</h2>
+            </div>
         </div>
 
         <div class="flex items-center px-6 py-7 border-b border-blue-200">
@@ -62,9 +63,16 @@
         </div>
     </aside>
 
-    <main class="flex-grow flex flex-col max-w-[calc(100%-260px)]">
+    <main class="flex-grow flex flex-col w-full min-w-0 transition-all duration-300">
         <header class="h-20 px-10 flex items-center justify-between bg-slate-50 border-b border-blue-200 flex-shrink-0">
-            <h2 class="text-2xl font-bold">@yield('title')</h2>
+            <div class="flex items-center gap-4">
+                <button id="sidebar-toggle" class="p-2 -ml-2 rounded-lg text-slate-500 hover:bg-blue-100/50 hover:text-blue-900 transition-colors cursor-pointer border-none bg-transparent outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+                <h2 class="text-2xl font-bold">@yield('title')</h2>
+            </div>
             <div class="text-slate-600 text-sm" id="header-date"></div>
         </header>
         <div class="p-10 flex-grow overflow-y-auto">
@@ -73,7 +81,7 @@
     </main>
 </div>
 
-<script src="{{ asset('js/main.js') }}"></script>
+<script src="{{ asset('js/main.js') }}?v={{ time() }}"></script>
 <script>
     const d = new Date();
     const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];

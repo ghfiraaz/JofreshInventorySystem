@@ -91,6 +91,8 @@
                 <select id="user-role" class="form-control" required style="appearance: auto">
                     <option value="Kasir">Kasir</option>
                     <option value="Admin">Admin</option>
+                    <option value="Superadmin" hidden>Superadmin</option>
+                    <option value="Owner" hidden>Owner</option>
                 </select>
             </div>
             <div class="mt-8 flex justify-end gap-3">

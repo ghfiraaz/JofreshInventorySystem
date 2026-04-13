@@ -79,6 +79,17 @@
     .jis-box {
         @apply w-auto py-4 px-12 h-20 bg-gradient-to-br from-blue-900 to-blue-800 inline-flex items-center justify-center mx-auto mb-6 rounded-[20px] shadow-[0_10px_25px_rgba(30,58,138,0.3)];
     }
+    
+    .jis-box-sidebar {
+        @apply h-11 px-10 bg-gradient-to-br from-blue-900 to-blue-800 inline-flex items-center justify-center rounded-xl shadow-sm mb-0;
+    }
+    .jis-box-sidebar h2 {
+        @apply font-sans font-extrabold tracking-[10px] text-lg text-white -mr-[10px] !mb-0;
+    }
+
+    .sidebar-collapsed {
+        @apply -ml-[260px] opacity-0 pointer-events-none;
+    }
 
     .form-grid-2 {
         @apply grid grid-cols-1 md:grid-cols-2 gap-x-6;

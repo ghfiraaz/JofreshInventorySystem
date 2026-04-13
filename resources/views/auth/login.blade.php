@@ -6,7 +6,7 @@
 <div class="min-h-screen flex flex-col items-center justify-center w-full bg-slate-50 p-6">
     
     <div class="z-10 relative w-full max-w-md">
-        <div class="text-center mb-12 auth-logo">
+        <div class="text-center mb-12 auth-logo mt-6 md:mt-0">
             <div class="jis-box">
                 <h2>J I S</h2>
             </div>

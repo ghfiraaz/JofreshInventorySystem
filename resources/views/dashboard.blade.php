@@ -63,13 +63,13 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-7">
     <div class="bg-white border border-blue-200 rounded-2xl p-8 shadow-[0_2px_4px_rgba(30,58,138,0.05)] transition-all duration-300 hover:shadow-[0_4px_12px_rgba(30,58,138,0.08)]">
-        <h4 class="font-bold text-[1.25rem] mb-6 text-slate-800">Tren Penjualan (7 Hari Terakhir)</h4>
+        <h4 class="font-bold text-[1.25rem] mb-6 text-slate-800">Tren Penjualan</h4>
         <div class="h-[300px]">
            <canvas id="chartTrend"></canvas>
         </div>
     </div>
     <div class="bg-white border border-blue-200 rounded-2xl p-8 shadow-[0_2px_4px_rgba(30,58,138,0.05)] transition-all duration-300 hover:shadow-[0_4px_12px_rgba(30,58,138,0.08)]">
-        <h4 class="font-bold text-[1.25rem] mb-6 text-slate-800">Distribusi Penjualan Produk (7 Hari Terakhir)</h4>
+        <h4 class="font-bold text-[1.25rem] mb-6 text-slate-800">Produk Terlaris</h4>
         <div class="h-[300px]">
            <canvas id="chartDist"></canvas>
         </div>

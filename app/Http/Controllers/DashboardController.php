@@ -15,6 +15,8 @@ class DashboardController extends Controller
         $totalTransaksi    = 0;  // Will be updated when transactions exist
         $totalMitra        = Mitra::count();
         $totalStok         = Produk::sum('stok');
+        $stokRendahCount   = Produk::whereColumn('stok', '<', 'stok_minimal')->count();
+        $isStokRendah      = $stokRendahCount > 0;
 
         // --- Chart: Tren Penjualan (7 hari terakhir) ---
         $trendLabels = [];
@@ -35,6 +37,8 @@ class DashboardController extends Controller
             'totalTransaksi',
             'totalMitra',
             'totalStok',
+            'isStokRendah',
+            'stokRendahCount',
             'trendLabels',
             'trendData',
             'distLabels',
