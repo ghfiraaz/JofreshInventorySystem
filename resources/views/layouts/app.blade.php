@@ -26,10 +26,10 @@
                 </div>
                 
                 <div class="user-profile">
-                    <div class="user-avatar">O</div>
+                    <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
                     <div class="user-info">
-                        <div class="fw-bold">Owner JoFresh</div>
-                        <div class="text-muted fs-sm">Superadmin</div>
+                        <div class="fw-bold">{{ Auth::user()->name }}</div>
+                        <div class="text-muted fs-sm">Owner JoFresh</div>
                     </div>
                 </div>
 
@@ -69,7 +69,7 @@
             <main class="main-content">
                 <header class="main-header">
                     <h2>@yield('title')</h2>
-                    <div class="text-muted fs-sm">Sen, 13 Apr 2026</div>
+                    <div class="text-muted fs-sm" id="header-date"></div>
                 </header>
                 <div class="content-body">
                     @yield('content')
@@ -79,5 +79,12 @@
     @endif
     <!-- Main JS -->
     <script src="{{ asset('js/main.js') }}"></script>
+    <script>
+        const _d = new Date();
+        const _days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+        const _months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+        const _el = document.getElementById('header-date');
+        if (_el) _el.textContent = `${_days[_d.getDay()]}, ${_d.getDate()} ${_months[_d.getMonth()]} ${_d.getFullYear()}`;
+    </script>
 </body>
 </html>

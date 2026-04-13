@@ -20,12 +20,13 @@
         </div>
 
         <div class="user-profile">
-            <div class="user-avatar">A</div>
+            <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
             <div class="user-info">
-                <div class="fw-bold">Admin JoFresh</div>
-                <div class="text-muted fs-sm">Admin</div>
+                <div class="fw-bold">{{ Auth::user()->name }}</div>
+                <div class="text-muted fs-sm">Admin JoFresh</div>
             </div>
         </div>
+
 
         <ul class="nav-menu">
             <a href="{{ url('/admin/produk') }}" class="nav-item {{ Request::is('admin/produk') ? 'active' : '' }}">

@@ -7,7 +7,7 @@
     <div class="card">
         <div class="card-content">
             <span class="text-muted fs-sm">Penjualan Hari Ini</span>
-            <h3 class="fw-bold-700">Rp 0</h3>
+            <h3 class="fw-bold-700">Rp {{ number_format($penjualanHariIni, 0, ',', '.') }}</h3>
         </div>
         <div class="card-icon icon-trend">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:24px;height:24px;">
@@ -18,7 +18,7 @@
     <div class="card">
         <div class="card-content">
             <span class="text-muted fs-sm">Total Transaksi</span>
-            <h3 class="fw-bold-700">2</h3>
+            <h3 class="fw-bold-700">{{ $totalTransaksi }}</h3>
         </div>
         <div class="card-icon icon-cart">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:24px;height:24px;">
@@ -29,7 +29,7 @@
     <div class="card">
         <div class="card-content">
             <span class="text-muted fs-sm">Total Mitra</span>
-            <h3 class="fw-bold-700">3</h3>
+            <h3 class="fw-bold-700">{{ $totalMitra }}</h3>
         </div>
         <div class="card-icon icon-users">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:24px;height:24px;">
@@ -40,7 +40,7 @@
     <div class="card">
         <div class="card-content">
             <span class="text-muted fs-sm">Total Stok</span>
-            <h3 class="fw-bold-700">405 kg</h3>
+            <h3 class="fw-bold-700">{{ number_format($totalStok, 0, ',', '.') }} kg</h3>
         </div>
         <div class="card-icon icon-stock">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:24px;height:24px;">
@@ -75,4 +75,14 @@
         </div>
     </div>
 </div>
+
+{{-- Pass PHP data to JS --}}
+<script>
+    window._dashboardData = {
+        trendLabels: @json($trendLabels),
+        trendData:   @json($trendData),
+        distLabels:  @json($distLabels),
+        distData:    @json($distData),
+    };
+</script>
 @endsection
