@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return 'Rp ' + parseInt(num).toLocaleString('id-ID');
     }
 
+    const EDIT_SVG   = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/></svg>`;
+    const DELETE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>`;
+
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = `fixed bottom-8 right-8 px-6 py-4 rounded-xl shadow-2xl z-[100] transform transition-all duration-500 translate-y-20 opacity-0 flex items-center gap-3 font-medium ${
@@ -35,31 +38,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
+    let confirmCallback = null;
+    const modalConfirm = document.getElementById('modal-confirm');
+    const btnConfirmYes = document.getElementById('btn-confirm-yes');
+    const btnConfirmNo  = document.getElementById('btn-confirm-no');
+
+    if (btnConfirmYes) {
+        btnConfirmYes.addEventListener('click', () => {
+            if (confirmCallback) confirmCallback();
+            modalConfirm.classList.remove('active');
+            modalConfirm.querySelector('div')?.classList.remove('active');
+            confirmCallback = null;
+        });
+    }
+    if (btnConfirmNo) {
+        btnConfirmNo.addEventListener('click', () => {
+            modalConfirm.classList.remove('active');
+            modalConfirm.querySelector('div')?.classList.remove('active');
+            confirmCallback = null;
+        });
+    }
+
     function showConfirm(title, message, onYes) {
-        const modal = document.getElementById('modal-confirm');
-        if (!modal) return;
-        
+        if (!modalConfirm) return;
         const titleEl   = document.getElementById('confirm-title');
         const messageEl = document.getElementById('confirm-message');
-        const btnNo     = document.getElementById('btn-confirm-no');
-        const btnYes    = document.getElementById('btn-confirm-yes');
-        
+        const childEl   = modalConfirm.querySelector('div');
         if (title)   titleEl.textContent   = title;
         if (message) messageEl.textContent = message;
-        
-        modal.classList.add('active');
-        
-        const close = () => {
-            modal.classList.remove('active');
-            btnYes.replaceWith(btnYes.cloneNode(true));
-            btnNo.replaceWith(btnNo.cloneNode(true));
-        };
-        
-        document.getElementById('btn-confirm-no').addEventListener('click', close);
-        document.getElementById('btn-confirm-yes').addEventListener('click', () => {
-            onYes();
-            close();
-        });
+        confirmCallback = onYes;
+        modalConfirm.classList.add('active');
+        if (childEl) childEl.classList.add('active');
     }
 
     function buildUserRow(u) {
@@ -78,8 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </td>
             <td class="row-date">${date}</td>
             <td>
-                <button class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit" title="Edit text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg p-2 transition-colors cursor-pointer border-none bg-transparent">${EDIT_SVG}</button>
-                <button class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent ml-2 btn-delete text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg p-2 transition-colors cursor-pointer border-none bg-transparent">${DELETE_SVG}</button>
+                <button class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit" title="Edit">${EDIT_SVG}</button>
+                <button class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent ml-2 btn-delete" title="Hapus">${DELETE_SVG}</button>
             </td>`;
         return tr;
     }
@@ -173,36 +182,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (usersTableBody) {
-        usersTableBody.addEventListener('click', (e) => {
-            if (e.target.closest('.btn-delete')) {
-                const tr = e.target.closest('tr');
-                showConfirm('Hapus Pengguna', 'Apakah Anda yakin ingin menghapus pengguna ini?', () => {
-                    fetch(`/users/${tr.getAttribute('data-id')}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
-                    .then(r => { if (r.ok) tr.remove(); else alert("Gagal menghapus pengguna."); });
+    document.addEventListener('click', (e) => {
+        // Delete User
+        const btnDelete = e.target.closest('.btn-delete');
+        if (btnDelete && document.getElementById('usersTable')?.contains(btnDelete)) {
+            const tr = btnDelete.closest('tr');
+            showConfirm('Hapus Pengguna', 'Apakah Anda yakin ingin menghapus data pengguna ini?', () => {
+                fetch(`/users/${tr.getAttribute('data-id')}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
+                .then(r => { 
+                    if (r.ok) {
+                        tr.remove();
+                        showToast('data pengguna berhasil di hapus');
+                    } else {
+                        alert("Gagal menghapus pengguna."); 
+                    }
                 });
-            }
-            if (e.target.closest('.btn-edit')) {
-                const tr = e.target.closest('tr');
-                fId.value = tr.getAttribute('data-id');
-                fName.value  = tr.querySelector('.row-name').textContent;
-                fEmail.value = tr.querySelector('.row-email').textContent;
-                fRole.value  = tr.querySelector('.row-role').textContent.trim();
-                fPass.value  = ''; fPass.required = false;
-                pwdHint.textContent = '*Kosongkan jika tidak ingin mengubah password';
-                modalTitle.textContent = 'Edit Kata Sandi Pengguna';
-                modalDesc.textContent  = 'Nama, Email, dan Role tidak dapat diubah di form ini.';
-                btnSubmit.textContent  = 'Simpan Perubahan';
-                
-                // Disable other fields per user request
-                fName.disabled = true;
-                fEmail.disabled = true;
-                fRole.disabled = true;
-                
-                modalPengguna.classList.add('active');
-            }
-        });
-    }
+            });
+        }
+
+        // Edit User
+        const btnEdit = e.target.closest('.btn-edit');
+        if (btnEdit && document.getElementById('usersTable')?.contains(btnEdit)) {
+            const tr = btnEdit.closest('tr');
+            fId.value = tr.getAttribute('data-id');
+            fName.value  = tr.querySelector('.row-name').textContent;
+            fEmail.value = tr.querySelector('.row-email').textContent;
+            fRole.value  = tr.querySelector('.row-role').textContent.trim();
+            fPass.value  = ''; fPass.required = false;
+            pwdHint.textContent = '*Kosongkan jika tidak ingin mengubah password';
+            modalTitle.textContent = 'Edit Kata Sandi Pengguna';
+            modalDesc.textContent  = 'Nama, Email, dan Role tidak dapat diubah di form ini.';
+            btnSubmit.textContent  = 'Simpan Perubahan';
+            
+            fName.disabled = true;
+            fEmail.disabled = true;
+            fRole.disabled = true;
+            
+            modalPengguna.classList.add('active');
+        }
+    });
 
     // -------------------------------------------------------
     // Admin: Produk Page (DB-backed via Fetch API)
@@ -219,8 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return                       { text: 'Tersedia',    cls: 'badge-tersedia' };
     }
 
-    const EDIT_SVG   = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/></svg>`;
-    const DELETE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>`;
 
     function buildProdukRow(p) {
         const st     = produkStatusInfo(p.stok, p.stok_minimal);
