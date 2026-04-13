@@ -36,11 +36,9 @@
         <thead>
             <tr>
                 <th>Nama Produk</th>
-                <th>Kategori</th>
                 <th>Stok Saat Ini</th>
                 <th>Stok Minimal</th>
-                <th>Satuan</th>
-                <th>Harga/Satuan</th>
+                <th>Harga (per ekor)</th>
                 <th>Status</th>
                 <th>Aksi</th>
             </tr>
@@ -49,10 +47,8 @@
             @forelse($produk as $p)
             <tr data-id="{{ $p->id }}">
                 <td class="font-bold row-nama">{{ $p->nama }}</td>
-                <td class="row-kategori">{{ $p->kategori }}</td>
                 <td class="row-stok">{{ $p->stok }}</td>
                 <td class="row-minimal">{{ $p->stok_minimal }}</td>
-                <td class="row-satuan">{{ $p->satuan }}</td>
                 <td class="row-harga">{{ $p->harga_format }}</td>
                 <td><span class="px-3 py-1.5 rounded-full text-xs font-semibold {{ $p->status === 'Tersedia' ? 'bg-green-100 text-green-700' : ($p->status === 'Stok Rendah' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">{{ $p->status }}</span></td>
                 <td>
@@ -80,8 +76,8 @@
 </div>
 
 {{-- Modal Tambah/Edit Produk --}}
-<div class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto" id="modal-produk">
-    <div class="bg-white rounded-2xl w-full max-w-2xl p-8 shadow-2xl relative transform scale-95 transition-transform duration-300 [&.active]:scale-100">
+<div class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto modal-overlay" id="modal-produk">
+    <div class="bg-white rounded-2xl w-full max-w-lg p-8 shadow-2xl relative transform scale-95 transition-transform duration-300 [&.active]:scale-100">
         <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer bg-transparent border-none" data-close-modal>&times;</button>
         <div class="mb-6">
             <h3 id="modal-produk-title" class="text-xl font-bold text-slate-800">Tambah Produk</h3>
@@ -89,33 +85,17 @@
         </div>
         <form id="form-produk">
             <input type="hidden" id="produk-edit-id" value="">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                <div class="form-group">
+            <div class="flex flex-col gap-4">
+                <div class="form-group mb-0">
                     <label>Nama Produk *</label>
                     <input type="text" id="produk-nama" class="form-control" placeholder="Nama produk" required>
                 </div>
-                <div class="form-group">
-                    <label>Kategori *</label>
-                    <input type="text" id="produk-kategori" class="form-control" placeholder="Misal: Unggas" required>
+                <div class="form-group mb-0">
+                    <label>Stok Minimal (peringatan) *</label>
+                    <input type="number" id="produk-minimal" class="form-control" placeholder="Misal: 10" required min="0">
                 </div>
-                <div class="form-group">
-                    <label>Stok Saat Ini *</label>
-                    <input type="number" id="produk-stok" class="form-control" placeholder="0" required min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label>Stok Minimal *</label>
-                    <input type="number" id="produk-minimal" class="form-control" placeholder="0" required min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label>Satuan *</label>
-                    <select id="produk-satuan" class="form-control" style="appearance:auto">
-                        <option>KG</option>
-                        <option>Ekor</option>
-                        <option>Gram</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Harga/Satuan (Rp) *</label>
+                <div class="form-group mb-0">
+                    <label>Harga per ekor (Rp) *</label>
                     <input type="number" id="produk-harga" class="form-control" placeholder="0" required min="0">
                 </div>
             </div>

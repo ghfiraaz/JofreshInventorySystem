@@ -10,6 +10,31 @@ document.addEventListener('DOMContentLoaded', () => {
         return 'Rp ' + parseInt(num).toLocaleString('id-ID');
     }
 
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-8 right-8 px-6 py-4 rounded-xl shadow-2xl z-[100] transform transition-all duration-500 translate-y-20 opacity-0 flex items-center gap-3 font-medium ${
+            type === 'success' ? 'bg-blue-900 text-white' : 'bg-red-600 text-white'
+        }`;
+        
+        const icon = type === 'success' 
+            ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" /></svg>'
+            : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" /></svg>';
+
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        document.body.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => {
+            toast.classList.remove('translate-y-20', 'opacity-0');
+        }, 10);
+
+        // Remove after 3s
+        setTimeout(() => {
+            toast.classList.add('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+
     // -------------------------------------------------------
     // Sidebar Toggle Logic
     // -------------------------------------------------------
@@ -144,15 +169,13 @@ document.addEventListener('DOMContentLoaded', () => {
         tr.setAttribute('data-id', p.id);
         tr.innerHTML = `
             <td class="fw-bold row-nama">${p.nama}</td>
-            <td class="row-kategori">${p.kategori}</td>
             <td class="row-stok">${p.stok}</td>
             <td class="row-minimal">${p.stok_minimal}</td>
-            <td class="row-satuan">${p.satuan}</td>
             <td class="row-harga">${harga}</td>
             <td><span class="badge ${badge}">${status}</span></td>
             <td>
-                <button class="btn-icon btn-edit-produk" title="Edit">${EDIT_SVG}</button>
-                <button class="btn-icon danger ms-2 btn-delete-produk" title="Hapus">${DELETE_SVG}</button>
+                <button class="btn-icon btn-edit-produk" title="Edit text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg p-2 transition-colors cursor-pointer border-none bg-transparent">${EDIT_SVG}</button>
+                <button class="btn-icon danger ms-2 btn-delete-produk text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg p-2 transition-colors cursor-pointer border-none bg-transparent">${DELETE_SVG}</button>
             </td>`;
         return tr;
     }
@@ -174,10 +197,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const editId  = document.getElementById('produk-edit-id').value;
             const payload = {
                 nama:         document.getElementById('produk-nama').value,
-                kategori:     document.getElementById('produk-kategori').value,
-                stok:         document.getElementById('produk-stok').value,
+                kategori:     'Unggas',
+                stok:         editId ? undefined : 0, // Only set initially
                 stok_minimal: document.getElementById('produk-minimal').value,
-                satuan:       document.getElementById('produk-satuan').value,
+                satuan:       'Ekor',
                 harga:        document.getElementById('produk-harga').value,
             };
             const url = editId ? `/admin/produk/${editId}` : '/admin/produk';
@@ -190,10 +213,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (editId) {
                     const old = document.querySelector(`#produkTable tr[data-id="${editId}"]`);
                     if (old) old.replaceWith(buildProdukRow(data.produk));
+                    showToast('Produk berhasil diubah');
                 } else {
                     const empty = produkTbody?.querySelector('td[colspan]');
                     if (empty) empty.closest('tr').remove();
                     produkTbody?.prepend(buildProdukRow(data.produk));
+                    showToast('Produk berhasil ditambahkan');
                 }
                 modalProduk.classList.remove('active');
                 btn.disabled = false; btn.textContent = 'Simpan Produk';
@@ -214,10 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const tr = e.target.closest('tr');
             document.getElementById('produk-edit-id').value   = tr.getAttribute('data-id');
             document.getElementById('produk-nama').value      = tr.querySelector('.row-nama').textContent;
-            document.getElementById('produk-kategori').value  = tr.querySelector('.row-kategori').textContent;
-            document.getElementById('produk-stok').value      = tr.querySelector('.row-stok').textContent;
             document.getElementById('produk-minimal').value   = tr.querySelector('.row-minimal').textContent;
-            document.getElementById('produk-satuan').value    = tr.querySelector('.row-satuan').textContent;
             document.getElementById('produk-harga').value     = tr.querySelector('.row-harga').textContent.replace(/[Rp\s.]/g, '').replace(',','.');
             document.getElementById('modal-produk-title').textContent = 'Edit Produk';
             document.getElementById('modal-produk-desc').textContent  = 'Perbarui informasi produk.';
@@ -244,9 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const arrow    = tipe === 'Stok Masuk' ? '↑' : '↓';
             const dateStr  = tanggal ? new Date(tanggal).toLocaleDateString('id-ID') : '-';
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${dateStr}</td><td class="fw-bold">${produk}</td><td><span class="badge ${badgeCls}">${arrow} ${tipe}</span></td><td>${jumlah} kg</td><td>${ref}</td><td class="text-muted">${catatan}</td>`;
+            tr.innerHTML = `<td>${dateStr}</td><td class="fw-bold">${produk}</td><td><span class="badge ${badgeCls}">${arrow} ${tipe}</span></td><td>${jumlah} ekor</td><td>${ref}</td><td class="text-muted">${catatan}</td>`;
             stokTbody.prepend(tr);
             formStok.reset();
+            showToast('Stok berhasil dicatat');
         });
     }
 
@@ -304,10 +327,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (editId) {
                     const old = document.querySelector(`#mitraTable tr[data-id="${editId}"]`);
                     if (old) old.replaceWith(buildMitraRow(data.mitra));
+                    showToast('Mitra berhasil diubah');
                 } else {
                     const empty = mitraTbody.querySelector('td[colspan]');
                     if (empty) empty.closest('tr').remove();
                     mitraTbody.prepend(buildMitraRow(data.mitra));
+                    showToast('Mitra berhasil ditambahkan');
                 }
                 modalMitra.classList.remove('active');
                 btn.disabled = false; btn.textContent = 'Simpan Mitra';

@@ -37,12 +37,23 @@
             </svg>
         </div>
     </div>
-    <div class="card group">
+    <div class="card group {{ $isStokRendah ? '!border-red-300 !bg-red-50' : '' }}">
         <div>
-            <span class="text-slate-600 text-[0.9rem]">Total Stok</span>
-            <h3 class="font-bold text-[1.75rem] mt-2 text-slate-800">{{ number_format($totalStok, 0, ',', '.') }} kg</h3>
+            <span class="{{ $isStokRendah ? 'text-red-600' : 'text-slate-600' }} text-[0.9rem]">Total Stok</span>
+            <div class="flex items-baseline gap-2">
+                <h3 class="font-bold text-[1.75rem] mt-2 {{ $isStokRendah ? 'text-red-700' : 'text-slate-800' }}">{{ number_format($totalStok, 0, ',', '.') }}</h3>
+                <span class="{{ $isStokRendah ? 'text-red-600' : 'text-slate-500' }} text-sm font-medium">ekor</span>
+            </div>
+            @if($isStokRendah)
+                <div class="flex items-center gap-1 mt-1 text-red-600 animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-[0.75rem] font-bold uppercase tracking-tight">Stok Menipis! ({{ $stokRendahCount }})</span>
+                </div>
+            @endif
         </div>
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-green-100 text-green-700 group-hover:scale-110 transition-transform duration-300">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center {{ $isStokRendah ? 'bg-red-200 text-red-800' : 'bg-green-100 text-green-700' }} group-hover:scale-110 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
             </svg>
