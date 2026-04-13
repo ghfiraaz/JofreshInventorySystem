@@ -35,6 +35,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
+    function showConfirm(title, message, onYes) {
+        const modal = document.getElementById('modal-confirm');
+        if (!modal) return;
+        
+        const titleEl   = document.getElementById('confirm-title');
+        const messageEl = document.getElementById('confirm-message');
+        const btnNo     = document.getElementById('btn-confirm-no');
+        const btnYes    = document.getElementById('btn-confirm-yes');
+        
+        if (title)   titleEl.textContent   = title;
+        if (message) messageEl.textContent = message;
+        
+        modal.classList.add('active');
+        
+        const close = () => {
+            modal.classList.remove('active');
+            btnYes.replaceWith(btnYes.cloneNode(true));
+            btnNo.replaceWith(btnNo.cloneNode(true));
+        };
+        
+        document.getElementById('btn-confirm-no').addEventListener('click', close);
+        document.getElementById('btn-confirm-yes').addEventListener('click', () => {
+            onYes();
+            close();
+        });
+    }
+
+    function buildUserRow(u) {
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-id', u.id);
+        const date = u.created_at ? new Date(u.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) : new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const roleClass = u.role === 'Admin' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700';
+        
+        tr.innerHTML = `
+            <td class="font-bold row-name">${u.name}</td>
+            <td class="row-email">${u.email}</td>
+            <td>
+                <span class="px-3 py-1.5 rounded-full text-xs font-semibold ${roleClass} row-role">
+                    ${u.role}
+                </span>
+            </td>
+            <td class="row-date">${date}</td>
+            <td>
+                <button class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit" title="Edit text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg p-2 transition-colors cursor-pointer border-none bg-transparent">${EDIT_SVG}</button>
+                <button class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent ml-2 btn-delete text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg p-2 transition-colors cursor-pointer border-none bg-transparent">${DELETE_SVG}</button>
+            </td>`;
+        return tr;
+    }
+
     // -------------------------------------------------------
     // Sidebar Toggle Logic
     // -------------------------------------------------------
@@ -106,7 +155,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ name: fName.value, email: fEmail.value, password: fPass.value, role: fRole.value })
             })
             .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
-            .then(() => window.location.reload())
+            .then(data => {
+                if (isEdit) {
+                    const old = document.querySelector(`#usersTable tr[data-id="${fId.value}"]`);
+                    if (old) old.replaceWith(buildUserRow(data.user));
+                    showToast('Data pengguna berhasil di perbaharui');
+                } else {
+                    const empty = usersTableBody.querySelector('td[colspan]');
+                    if (empty) empty.closest('tr').remove();
+                    usersTableBody.prepend(buildUserRow(data.user));
+                    showToast('Pengguna berhasil di tambahkan');
+                }
+                modalPengguna.classList.remove('active');
+                btnSubmit.disabled = false; btnSubmit.textContent = 'Simpan Pengguna';
+            })
             .catch(() => { alert("Gagal menyimpan pengguna. Pastikan email unik & password minimal 8 huruf."); btnSubmit.disabled = false; btnSubmit.textContent = 'Simpan Pengguna'; });
         });
     }
@@ -114,11 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (usersTableBody) {
         usersTableBody.addEventListener('click', (e) => {
             if (e.target.closest('.btn-delete')) {
-                if (confirm('Hapus pengguna ini?')) {
-                    const tr = e.target.closest('tr');
+                const tr = e.target.closest('tr');
+                showConfirm('Hapus Pengguna', 'Apakah Anda yakin ingin menghapus pengguna ini?', () => {
                     fetch(`/users/${tr.getAttribute('data-id')}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
                     .then(r => { if (r.ok) tr.remove(); else alert("Gagal menghapus pengguna."); });
-                }
+                });
             }
             if (e.target.closest('.btn-edit')) {
                 const tr = e.target.closest('tr');

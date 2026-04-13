@@ -87,6 +87,23 @@
             </main>
         </div>
     @endif
+    <!-- Global Confirmation Modal -->
+    <div id="modal-confirm" class="fixed inset-0 bg-slate-900/50 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 modal-overlay font-sans">
+        <div class="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl relative transform scale-95 transition-transform duration-300">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 text-red-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+            </div>
+            <h3 id="confirm-title" class="text-xl font-bold text-slate-800 text-center uppercase tracking-tight">Konfirmasi</h3>
+            <p id="confirm-message" class="text-slate-600 text-center mt-3 text-base">Apakah Anda yakin?</p>
+            <div class="mt-10 flex justify-center gap-4">
+                <button type="button" class="btn btn-outline min-w-[120px]" id="btn-confirm-no">Tidak</button>
+                <button type="button" class="btn bg-red-600 text-white hover:bg-red-700 shadow-[0_4px_14px_rgba(220,38,38,0.4)] min-w-[120px]" id="btn-confirm-yes">Ya</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main JS -->
     <script src="{{ asset('js/main.js') }}?v={{ time() }}"></script>
     <script>

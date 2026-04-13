@@ -64,7 +64,7 @@
 </div>
 
 <!-- Modal Form Pengguna -->
-<div class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto" id="modal-tambah-pengguna">
+<div class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto modal-overlay" id="modal-tambah-pengguna">
     <div class="bg-white rounded-2xl w-full max-w-lg p-8 shadow-2xl relative transform scale-95 transition-transform duration-300 [&.active]:scale-100">
         <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer bg-transparent border-none" data-close-modal>&times;</button>
         <div class="mb-6">
