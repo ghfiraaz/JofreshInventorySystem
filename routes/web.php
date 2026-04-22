@@ -7,6 +7,7 @@ use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\KasirController;
 
 // Auth routes (guest only)
 Route::middleware('guest')->group(function () {
@@ -30,12 +31,10 @@ Route::middleware(['role:Superadmin'])->group(function () {
 
 // Admin routes
 Route::middleware(['role:Admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+    
     Route::get('/produk', [ProdukController::class, 'index']);
-    Route::post('/produk', [ProdukController::class, 'store']);
-    Route::put('/produk/{id}', [ProdukController::class, 'update']);
-    Route::delete('/produk/{id}', [ProdukController::class, 'destroy']);
-
-    Route::get('/stok-masuk', fn() => view('admin.stok-masuk'));
+    Route::post('/produk/{id}/stok', [ProdukController::class, 'tambahStok']);
 
     Route::get('/mitra', [MitraController::class, 'index']);
     Route::post('/mitra', [MitraController::class, 'store']);
@@ -47,7 +46,11 @@ Route::middleware(['role:Admin'])->prefix('admin')->group(function () {
 
 // Kasir routes
 Route::middleware(['role:Kasir'])->prefix('kasir')->group(function () {
-    Route::get('/', fn() => view('kasir.dashboard'));
-    Route::get('/transaksi', fn() => view('kasir.transaksi'));
-    Route::get('/riwayat', fn() => view('kasir.riwayat'));
+    Route::get('/', fn() => redirect('/kasir/dashboard'));
+    Route::get('/dashboard', [KasirController::class, 'dashboard']);
+    Route::get('/transaksi', [KasirController::class, 'transaksi']);
+    Route::post('/transaksi', [KasirController::class, 'storeTransaksi']);
+    Route::get('/riwayat', [KasirController::class, 'riwayat']);
+    Route::get('/tagihan', [KasirController::class, 'tagihan']);
+    Route::post('/tagihan/bayar', [KasirController::class, 'bayarTagihan']);
 });

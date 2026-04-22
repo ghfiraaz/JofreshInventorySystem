@@ -1,0 +1,217 @@
+@startuml JoFresh_Inventory_System_UseCase
+
+' ============================================================
+' USE CASE DIAGRAM - JoFresh Inventory System (JIS)
+' ============================================================
+
+skinparam backgroundColor #FAFAFA
+skinparam handwritten false
+
+skinparam usecase {
+    BackgroundColor #E8F0FE
+    BorderColor #1A56DB
+    FontColor #1E293B
+    FontSize 11
+    ArrowColor #475569
+    StereotypeFontColor #6366F1
+    StereotypeFontSize 10
+}
+
+skinparam actor {
+    BackgroundColor #1A56DB
+    BorderColor #1E40AF
+    FontColor #1E293B
+    FontSize 12
+}
+
+skinparam rectangle {
+    BackgroundColor #F8FAFC
+    BorderColor #94A3B8
+    FontColor #334155
+    FontSize 13
+    RoundCorner 15
+    BorderStyle dashed
+}
+
+skinparam package {
+    BackgroundColor #FFFFFF
+    BorderColor #CBD5E1
+    FontColor #475569
+    FontSize 12
+    FontStyle bold
+}
+
+' ============================================================
+' ACTORS
+' ============================================================
+
+actor "Owner\n(Superadmin)" as Owner <<Superadmin>>
+actor "Admin" as Admin
+actor "Kasir" as Kasir
+actor "Midtrans\n(Payment Gateway)" as Midtrans <<External System>>
+
+' ============================================================
+' SYSTEM BOUNDARY
+' ============================================================
+
+rectangle "JoFresh Inventory System (JIS)" {
+
+    ' ----------------------------------------------------------
+    ' PACKAGE: AUTENTIKASI
+    ' ----------------------------------------------------------
+    package "Autentikasi" {
+        usecase "Login" as UC_Login
+        usecase "Logout" as UC_Logout
+    }
+
+    ' ----------------------------------------------------------
+    ' PACKAGE: MONITORING & USER MANAGEMENT (Owner)
+    ' ----------------------------------------------------------
+    package "Monitoring & User Management" {
+        usecase "Melihat Dashboard" as UC_Dashboard
+        usecase "Melihat Semua\nTransaksi" as UC_LihatTransaksi
+        usecase "Mengelola Akun\nPengguna" as UC_KelolaAkun
+    }
+
+    ' ----------------------------------------------------------
+    ' PACKAGE: MASTER DATA (Admin)
+    ' ----------------------------------------------------------
+    package "Master Data" {
+        usecase "Mengelola Produk" as UC_KelolaProduk
+        usecase "Mengelola Mitra" as UC_KelolaMitra
+        usecase "Mengelola Stok\nBarang Masuk" as UC_KelolaStok
+    }
+
+    ' ----------------------------------------------------------
+    ' PACKAGE: TRANSAKSI (Kasir)
+    ' ----------------------------------------------------------
+    package "Transaksi" {
+        usecase "Membuat Transaksi\nBaru" as UC_BuatTransaksi
+        usecase "Menambah Item\nke Transaksi" as UC_TambahItem
+        usecase "Checkout\nTransaksi" as UC_Checkout
+        usecase "Memilih Mitra" as UC_PilihMitra
+        usecase "Melihat Riwayat\nTransaksi" as UC_Riwayat
+    }
+
+    ' ----------------------------------------------------------
+    ' PACKAGE: TAGIHAN BULANAN (Kasir)
+    ' ----------------------------------------------------------
+    package "Tagihan Bulanan" {
+        usecase "Generate Tagihan\nBulanan" as UC_GenTagihan
+        usecase "Mengambil Data\nTransaksi" as UC_AmbilData
+        usecase "Mengelompokkan\nTransaksi per Mitra" as UC_KelompokMitra
+        usecase "Menghitung Total\nTagihan" as UC_HitungTagihan
+        usecase "Membuat Invoice" as UC_BuatInvoice
+        usecase "Generate QR Code" as UC_GenQR
+    }
+
+    ' ----------------------------------------------------------
+    ' PACKAGE: PEMBAYARAN
+    ' ----------------------------------------------------------
+    package "Pembayaran" {
+        usecase "Verifikasi\nPembayaran" as UC_VerifBayar
+        usecase "Update Status\nPembayaran" as UC_UpdateStatus
+        usecase "Melihat Status\nPembayaran" as UC_LihatStatus
+    }
+}
+
+' ============================================================
+' RELASI: AUTENTIKASI (semua actor kecuali Midtrans)
+' ============================================================
+
+Owner --> UC_Login
+Owner --> UC_Logout
+
+Admin --> UC_Login
+Admin --> UC_Logout
+
+Kasir --> UC_Login
+Kasir --> UC_Logout
+
+' ============================================================
+' RELASI: OWNER → Monitoring & User Management
+' ============================================================
+
+Owner --> UC_Dashboard
+Owner --> UC_LihatTransaksi
+Owner --> UC_KelolaAkun
+
+' ============================================================
+' RELASI: ADMIN → Master Data
+' ============================================================
+
+Admin --> UC_KelolaProduk
+Admin --> UC_KelolaMitra
+Admin --> UC_KelolaStok
+
+' ============================================================
+' RELASI: KASIR → Transaksi
+' ============================================================
+
+Kasir --> UC_BuatTransaksi
+Kasir --> UC_Riwayat
+
+' ============================================================
+' RELASI: KASIR → Tagihan
+' ============================================================
+
+Kasir --> UC_GenTagihan
+
+' ============================================================
+' RELASI: KASIR → Pembayaran (monitoring)
+' ============================================================
+
+Kasir --> UC_LihatStatus
+
+' ============================================================
+' RELASI: MIDTRANS → Use Cases (external system)
+' ============================================================
+
+Midtrans --> UC_GenQR
+Midtrans --> UC_VerifBayar
+
+' ============================================================
+' RELASI <<include>> - Proses Wajib
+' ============================================================
+
+' -- Transaksi includes --
+UC_BuatTransaksi ..> UC_TambahItem : <<include>>
+UC_BuatTransaksi ..> UC_Checkout : <<include>>
+
+' -- Tagihan includes --
+UC_GenTagihan ..> UC_AmbilData : <<include>>
+UC_GenTagihan ..> UC_KelompokMitra : <<include>>
+UC_GenTagihan ..> UC_HitungTagihan : <<include>>
+UC_GenTagihan ..> UC_BuatInvoice : <<include>>
+UC_GenTagihan ..> UC_GenQR : <<include>>
+
+' -- Pembayaran includes --
+UC_VerifBayar ..> UC_UpdateStatus : <<include>>
+
+' ============================================================
+' RELASI <<extend>> - Proses Opsional
+' ============================================================
+
+UC_PilihMitra ..> UC_BuatTransaksi : <<extend>>
+
+' ============================================================
+' NOTES
+' ============================================================
+
+note right of UC_PilihMitra
+    Opsional: hanya jika
+    pelanggan adalah mitra
+end note
+
+note right of Midtrans
+    External System:
+    Payment Gateway
+end note
+
+note bottom of UC_GenQR
+    Digunakan oleh proses
+    Generate Tagihan &
+    Midtrans Payment Gateway
+end note
+
+@enduml
