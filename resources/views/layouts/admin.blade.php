@@ -59,7 +59,7 @@
         </ul>
 
         <div class="px-5 pb-5">
-            <form action="{{ url('/logout') }}" method="POST">
+            <form action="{{ url('/logout') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');">
                 @csrf
                 <button type="submit" class="flex items-center w-full px-5 py-3.5 bg-transparent border border-blue-200 rounded-xl cursor-pointer font-medium text-base text-slate-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600 hover:border-red-300">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-3">

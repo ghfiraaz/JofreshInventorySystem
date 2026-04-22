@@ -108,7 +108,25 @@
                         </div>
                         <div class="flex items-center gap-4">
                             <span class="text-sm font-bold text-gray-800">Rp {{ number_format($mt['total'], 0, ',', '.') }}</span>
-                            <button type="button" class="btn-bayar-qr px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm" data-mitra="{{ $mt['mitra']->id }}" data-nama="{{ $mt['mitra']->nama }}" data-total="Rp {{ number_format($mt['total'], 0, ',', '.') }}" onclick="event.stopPropagation(); openQrModal(this)">Bayar & QR</button>
+                            @php
+                                $allItems = [];
+                                foreach($mt['transaksi'] as $tx) {
+                                    foreach($tx->items as $item) {
+                                        $name = $item->nama_produk;
+                                        if(!isset($allItems[$name])) {
+                                            $allItems[$name] = [
+                                                'nama' => $name,
+                                                'qty' => 0,
+                                                'subtotal' => 0
+                                            ];
+                                        }
+                                        $allItems[$name]['qty'] += $item->jumlah;
+                                        $allItems[$name]['subtotal'] += $item->subtotal;
+                                    }
+                                }
+                                $itemsJson = json_encode(array_values($allItems));
+                            @endphp
+                            <button type="button" class="btn-bayar-qr px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none" data-mitra="{{ $mt['mitra']->id }}" data-nama="{{ $mt['mitra']->nama }}" data-total="Rp {{ number_format($mt['total'], 0, ',', '.') }}" data-items="{{ $itemsJson }}" onclick="event.stopPropagation(); openQrModal(this)">Bayar & QR</button>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-gray-400 tagihan-expand-icon transition-transform duration-200">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                             </svg>
@@ -158,25 +176,42 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
             </button>
         </div>
-        <div class="p-6 text-center">
-            <h4 class="font-bold text-gray-800 text-lg mb-1" id="qr-mitra-nama">Nama Mitra</h4>
-            <p class="text-sm text-gray-500 mb-4">Total Tagihan: <span id="qr-total" class="font-bold text-gray-800">Rp 0</span></p>
+        <div class="p-6 text-center flex flex-col max-h-[85vh]">
+            <div class="flex-shrink-0">
+                <h4 class="font-bold text-gray-800 text-lg mb-1" id="qr-mitra-nama">Nama Mitra</h4>
+                <p class="text-sm text-gray-500 mb-4">Total Tagihan: <span id="qr-total" class="font-bold text-gray-800">Rp 0</span></p>
+            </div>
             
-            <div class="bg-gray-50 p-4 rounded-xl inline-block mb-6 border border-gray-200">
-                <img id="qr-img" src="" alt="QR Code" class="w-48 h-48 object-contain">
+            <div class="text-left bg-gray-50 border border-gray-100 rounded-lg p-3 mb-4 flex-1 overflow-y-auto hidden scrollbar-hide" id="qr-items-container">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 sticky top-0 bg-gray-50 pb-1">Rincian Pembelian</div>
+                <div id="qr-items-list" class="space-y-2"></div>
             </div>
 
-            <form action="{{ url('/kasir/tagihan/bayar') }}" method="POST" id="form-bayar-tagihan">
+            <div class="flex-shrink-0">
+                <div class="bg-gray-50 p-4 rounded-xl inline-block mb-6 border border-gray-200">
+                    <img id="qr-img" src="" alt="QR Code" class="w-48 h-48 object-contain">
+                </div>
+
+                <form action="{{ url('/kasir/tagihan/bayar') }}" method="POST" id="form-bayar-tagihan" onsubmit="handlePayment(event)">
                 @csrf
                 <input type="hidden" name="mitra_id" id="input-mitra-id">
                 <input type="hidden" name="bulan" value="{{ $bulan }}">
                 <input type="hidden" name="tahun" value="{{ $tahun }}">
-                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-200 flex items-center justify-center gap-2 cursor-pointer border-none">
+                <button type="submit" id="btn-konfirmasi-qr" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-200 flex items-center justify-center gap-2 cursor-pointer border-none">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                    Konfirmasi Pembayaran
+                    <span>Konfirmasi Pembayaran</span>
                 </button>
             </form>
             <p class="text-xs text-gray-400 mt-3">*Tombol ini adalah simulasi webhook Midtrans (Sudah Dibayar)</p>
+
+            {{-- Success Overlay --}}
+            <div id="payment-success-overlay" class="absolute inset-0 bg-white/95 z-10 flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-300">
+                <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-green-200 scale-0 transition-transform duration-500 delay-100" id="payment-success-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-8 h-8 text-white"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-1 translate-y-4 opacity-0 transition-all duration-500 delay-200" id="payment-success-text">Pembayaran Berhasil!</h3>
+                <p class="text-sm text-gray-500 translate-y-4 opacity-0 transition-all duration-500 delay-300" id="payment-success-sub">Mengalihkan ke riwayat transaksi...</p>
+            </div>
         </div>
     </div>
 </div>
@@ -186,10 +221,29 @@
         const mitraId = btn.getAttribute('data-mitra');
         const nama = btn.getAttribute('data-nama');
         const total = btn.getAttribute('data-total');
+        const items = JSON.parse(btn.getAttribute('data-items') || '[]');
         
         document.getElementById('qr-mitra-nama').textContent = nama;
         document.getElementById('qr-total').textContent = total;
         document.getElementById('input-mitra-id').value = mitraId;
+
+        const container = document.getElementById('qr-items-container');
+        const list = document.getElementById('qr-items-list');
+        list.innerHTML = '';
+        
+        if(items.length > 0) {
+            items.forEach(item => {
+                list.innerHTML += `
+                    <div class="flex items-start justify-between text-xs border-b border-gray-200/50 pb-1.5 last:border-0 last:pb-0">
+                        <div class="text-gray-600 font-medium pr-2 leading-tight">${item.nama} <span class="text-gray-400">x${item.qty}</span></div>
+                        <div class="font-bold text-gray-800 whitespace-nowrap">Rp ${parseInt(item.subtotal).toLocaleString('id-ID')}</div>
+                    </div>
+                `;
+            });
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+        }
         
         // Generate a random QR Code from API for visual demo
         document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=MIDTRANS_DEMO_${mitraId}_${Date.now()}`;
@@ -210,6 +264,65 @@
         setTimeout(() => {
             modal.classList.add('hidden');
         }, 300);
+    }
+
+    function handlePayment(e) {
+        e.preventDefault();
+        const form = e.target;
+        const btn = document.getElementById('btn-konfirmasi-qr');
+        const span = btn.querySelector('span');
+        
+        btn.disabled = true;
+        span.textContent = 'Memproses...';
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if(response.ok) {
+                showSuccessAnimation();
+            } else {
+                alert('Gagal mengkonfirmasi pembayaran.');
+                btn.disabled = false;
+                span.textContent = 'Konfirmasi Pembayaran';
+            }
+        })
+        .catch(err => {
+            alert('Terjadi kesalahan jaringan.');
+            btn.disabled = false;
+            span.textContent = 'Konfirmasi Pembayaran';
+        });
+    }
+
+    function showSuccessAnimation() {
+        const overlay = document.getElementById('payment-success-overlay');
+        const icon = document.getElementById('payment-success-icon');
+        const text = document.getElementById('payment-success-text');
+        const sub = document.getElementById('payment-success-sub');
+
+        overlay.classList.remove('hidden');
+        
+        // Trigger animations
+        setTimeout(() => {
+            overlay.classList.remove('opacity-0');
+            
+            setTimeout(() => {
+                icon.classList.remove('scale-0');
+                text.classList.remove('translate-y-4', 'opacity-0');
+                sub.classList.remove('translate-y-4', 'opacity-0');
+            }, 150);
+            
+            // Redirect after delay
+            setTimeout(() => {
+                window.location.href = "{{ url('/kasir/riwayat') }}";
+            }, 2000);
+            
+        }, 10);
     }
 </script>
 

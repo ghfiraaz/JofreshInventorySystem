@@ -607,6 +607,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const selectProdukKasir = document.getElementById('kasir-produk');
+    const stokInfoKasir = document.getElementById('kasir-stok-info');
+    if (selectProdukKasir && stokInfoKasir) {
+        selectProdukKasir.addEventListener('change', function() {
+            const opt = this.options[this.selectedIndex];
+            if (opt && opt.value) {
+                stokInfoKasir.querySelector('span').textContent = opt.dataset.stok;
+                stokInfoKasir.classList.remove('hidden');
+            } else {
+                stokInfoKasir.classList.add('hidden');
+            }
+        });
+    }
+
     if (btnTambahKeranjang) {
         btnTambahKeranjang.addEventListener('click', () => {
             const sel = document.getElementById('kasir-produk');

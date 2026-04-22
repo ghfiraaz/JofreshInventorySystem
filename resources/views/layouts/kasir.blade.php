@@ -38,33 +38,38 @@
                 Dashboard
             </a>
 
-            <div class="px-4 py-2 mt-2 text-[11px] font-bold tracking-wider text-gray-400 uppercase">
-                Transaksi
+            @php
+                $isTransaksiOpen = Request::is('kasir/transaksi') || Request::is('kasir/riwayat') || Request::is('kasir/tagihan') || Request::is('kasir');
+            @endphp
+            <div class="mt-1">
+                <button type="button" onclick="document.getElementById('transaksi-submenu').classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('rotate-180')" class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 text-gray-600 hover:bg-gray-100 cursor-pointer border-none bg-transparent">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px] mr-3 flex-shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                        </svg>
+                        Transaksi
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3 chevron transition-transform {{ $isTransaksiOpen ? 'rotate-180' : '' }}">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </button>
+                <div id="transaksi-submenu" class="pl-9 pr-2 mt-1 space-y-1 {{ $isTransaksiOpen ? '' : 'hidden' }}">
+                    <a href="{{ url('/kasir/transaksi') }}" class="block px-3 py-2 rounded-lg text-xs font-medium transition-colors {{ Request::is('kasir/transaksi') || Request::is('kasir') ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50' }}">
+                        Input Transaksi
+                    </a>
+                    <a href="{{ url('/kasir/tagihan') }}" class="block px-3 py-2 rounded-lg text-xs font-medium transition-colors {{ Request::is('kasir/tagihan') ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50' }}">
+                        Daftar Belum Dibayar
+                    </a>
+                    <a href="{{ url('/kasir/riwayat') }}" class="block px-3 py-2 rounded-lg text-xs font-medium transition-colors {{ Request::is('kasir/riwayat') ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50' }}">
+                        Riwayat Transaksi
+                    </a>
+                </div>
             </div>
-            
-            <a href="{{ url('/kasir/transaksi') }}" class="flex items-center px-4 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 {{ Request::is('kasir/transaksi') || Request::is('kasir') ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px] mr-3 flex-shrink-0">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                </svg>
-                Input Transaksi
-            </a>
-            <a href="{{ url('/kasir/riwayat') }}" class="flex items-center px-4 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 {{ Request::is('kasir/riwayat') ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px] mr-3 flex-shrink-0">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-                Riwayat Transaksi
-            </a>
-            <a href="{{ url('/kasir/tagihan') }}" class="flex items-center px-4 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 {{ Request::is('kasir/tagihan') ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px] mr-3 flex-shrink-0">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
-                </svg>
-                Daftar Belum Dibayar
-            </a>
         </nav>
 
         {{-- Logout --}}
         <div class="px-3 pb-5 mt-auto">
-            <form action="{{ url('/logout') }}" method="POST">
+            <form action="{{ url('/logout') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');">
                 @csrf
                 <button type="submit" class="flex items-center w-full px-4 py-2.5 bg-transparent border-none rounded-lg cursor-pointer text-[13px] font-medium text-gray-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px] mr-3 flex-shrink-0">

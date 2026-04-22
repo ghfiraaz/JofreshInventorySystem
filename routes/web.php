@@ -21,6 +21,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['role:Superadmin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/transactions', [TransaksiController::class, 'index']);
+    Route::get('/owner/laporan-harian', [DashboardController::class, 'laporanHarian']);
 
     // User CRUD
     Route::get('/users', [UserController::class, 'index']);
@@ -51,6 +52,7 @@ Route::middleware(['role:Kasir'])->prefix('kasir')->group(function () {
     Route::get('/transaksi', [KasirController::class, 'transaksi']);
     Route::post('/transaksi', [KasirController::class, 'storeTransaksi']);
     Route::get('/riwayat', [KasirController::class, 'riwayat']);
+    Route::get('/transaksi/{id}/invoice', [KasirController::class, 'invoice']);
     Route::get('/tagihan', [KasirController::class, 'tagihan']);
     Route::post('/tagihan/bayar', [KasirController::class, 'bayarTagihan']);
 });

@@ -20,6 +20,7 @@ class KasirController extends Controller
         $hariIni = today();
         $transaksiHariIni = Transaksi::whereDate('created_at', $hariIni)
             ->where('user_id', Auth::id())
+            ->where('status_pembayaran', 'Sudah Dibayar')
             ->get();
             
         $totalPenjualan = $transaksiHariIni->sum('total_harga');
@@ -199,6 +200,19 @@ class KasirController extends Controller
                 'updated_at'        => now()
             ]);
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['message' => 'Pembayaran berhasil dikonfirmasi.']);
+        }
+
         return redirect('/kasir/riwayat')->with('success', 'Pembayaran berhasil dikonfirmasi.');
+    }
+
+    /**
+     * Tampilkan invoice digital untuk transaksi tertentu
+     */
+    public function invoice($id)
+    {
+        $transaksi = Transaksi::with(['mitra', 'items'])->where('user_id', Auth::id())->findOrFail($id);
+        return view('kasir.invoice', compact('transaksi'));
     }
 }
