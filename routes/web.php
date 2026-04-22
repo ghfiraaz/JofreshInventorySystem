@@ -22,6 +22,7 @@ Route::middleware(['role:Superadmin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/transactions', [TransaksiController::class, 'index']);
     Route::get('/owner/laporan-harian', [DashboardController::class, 'laporanHarian']);
+    Route::get('/owner/laporan-transaksi', [DashboardController::class, 'laporanTransaksi']);
 
     // User CRUD
     Route::get('/users', [UserController::class, 'index']);
@@ -42,7 +43,7 @@ Route::middleware(['role:Admin'])->prefix('admin')->group(function () {
     Route::put('/mitra/{id}', [MitraController::class, 'update']);
     Route::delete('/mitra/{id}', [MitraController::class, 'destroy']);
 
-    Route::get('/pembayaran-mitra', fn() => view('admin.pembayaran-mitra'));
+    Route::get('/transactions', [TransaksiController::class, 'index']);
 });
 
 // Kasir routes

@@ -4,67 +4,60 @@
 
 @section('content')
 
-@if(Auth::user()->role === 'Superadmin')
-<div class="mb-6 flex justify-end">
-    <a href="{{ url('/owner/laporan-harian') }}" target="_blank" class="px-5 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200 flex items-center gap-2 hover:bg-blue-700 transition-colors no-underline">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-        Download Laporan Hari Ini (PDF)
-    </a>
-</div>
-@endif
-
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-7 mb-10">
-    <div class="card group">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center justify-between group hover:border-slate-300 transition-colors">
         <div>
-            <span class="text-slate-600 text-[0.9rem]">Penjualan Hari Ini</span>
-            <h3 class="font-bold text-[1.75rem] mt-2 text-slate-800">Rp {{ number_format($penjualanHariIni, 0, ',', '.') }}</h3>
+            <span class="text-slate-500 text-[0.85rem] font-medium tracking-wide">Penjualan Hari Ini</span>
+            <div class="flex items-center gap-2 mt-1">
+                <h3 class="font-bold text-2xl text-slate-800">Rp {{ number_format($penjualanHariIni, 0, ',', '.') }}</h3>
+            </div>
         </div>
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-blue-100 text-blue-900 group-hover:scale-110 transition-transform duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600 group-hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
         </div>
     </div>
-    <div class="card group">
+    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center justify-between group hover:border-slate-300 transition-colors">
         <div>
-            <span class="text-slate-600 text-[0.9rem]">Total Transaksi</span>
-            <h3 class="font-bold text-[1.75rem] mt-2 text-slate-800">{{ $totalTransaksi }}</h3>
+            <span class="text-slate-500 text-[0.85rem] font-medium tracking-wide">Total Transaksi</span>
+            <h3 class="font-bold text-2xl mt-1 text-slate-800">{{ $totalTransaksi }}</h3>
         </div>
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-pink-100 text-pink-700 group-hover:scale-110 transition-transform duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 group-hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
             </svg>
         </div>
     </div>
-    <div class="card group">
+    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center justify-between group hover:border-slate-300 transition-colors">
         <div>
-            <span class="text-slate-600 text-[0.9rem]">Total Mitra</span>
-            <h3 class="font-bold text-[1.75rem] mt-2 text-slate-800">{{ $totalMitra }}</h3>
+            <span class="text-slate-500 text-[0.85rem] font-medium tracking-wide">Total Mitra</span>
+            <h3 class="font-bold text-2xl mt-1 text-slate-800">{{ $totalMitra }}</h3>
         </div>
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-yellow-100 text-yellow-700 group-hover:scale-110 transition-transform duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-600 group-hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
             </svg>
         </div>
     </div>
-    <div class="card group {{ $isStokRendah ? '!border-red-300 !bg-red-50' : '' }}">
+    <div class="bg-white rounded-2xl p-6 border {{ $isStokRendah ? 'border-red-200 bg-red-50/30' : 'border-slate-200' }} shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center justify-between group hover:border-slate-300 transition-colors relative overflow-hidden">
+        @if($isStokRendah)
+            <div class="absolute top-0 right-0 w-2 h-full bg-red-500 animate-pulse"></div>
+        @endif
         <div>
-            <span class="{{ $isStokRendah ? 'text-red-600' : 'text-slate-600' }} text-[0.9rem]">Total Stok</span>
-            <div class="flex items-baseline gap-2">
-                <h3 class="font-bold text-[1.75rem] mt-2 {{ $isStokRendah ? 'text-red-700' : 'text-slate-800' }}">{{ number_format($totalStok, 0, ',', '.') }}</h3>
-                <span class="{{ $isStokRendah ? 'text-red-600' : 'text-slate-500' }} text-sm font-medium">ekor</span>
+            <span class="{{ $isStokRendah ? 'text-red-500' : 'text-slate-500' }} text-[0.85rem] font-medium tracking-wide">Total Stok</span>
+            <div class="flex items-baseline gap-1 mt-1">
+                <h3 class="font-bold text-2xl {{ $isStokRendah ? 'text-red-700' : 'text-slate-800' }}">{{ number_format($totalStok, 0, ',', '.') }}</h3>
+                <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider ml-1">Ekor</span>
             </div>
             @if($isStokRendah)
-                <div class="flex items-center gap-1 mt-1 text-red-600 animate-pulse">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="text-[0.75rem] font-bold uppercase tracking-tight">Stok Menipis! ({{ $stokRendahCount }})</span>
+                <div class="flex items-center gap-1 mt-1.5 text-red-600">
+                    <span class="text-[0.7rem] font-bold uppercase tracking-wider bg-red-100 px-2 py-0.5 rounded text-red-700">Peringatan: Stok Tipis ({{ $stokRendahCount }})</span>
                 </div>
             @endif
         </div>
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center {{ $isStokRendah ? 'bg-red-200 text-red-800' : 'bg-green-100 text-green-700' }} group-hover:scale-110 transition-transform duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center {{ $isStokRendah ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-600' }} group-hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
             </svg>
         </div>
@@ -83,14 +76,14 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-7">
-    <div class="bg-white border border-blue-200 rounded-2xl p-8 shadow-[0_2px_4px_rgba(30,58,138,0.05)] transition-all duration-300 hover:shadow-[0_4px_12px_rgba(30,58,138,0.08)]">
-        <h4 class="font-bold text-[1.25rem] mb-6 text-slate-800">Tren Penjualan</h4>
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <h4 class="font-bold text-[1.15rem] mb-6 text-slate-800">Tren Penjualan</h4>
         <div class="h-[300px]">
            <canvas id="chartTrend"></canvas>
         </div>
     </div>
-    <div class="bg-white border border-blue-200 rounded-2xl p-8 shadow-[0_2px_4px_rgba(30,58,138,0.05)] transition-all duration-300 hover:shadow-[0_4px_12px_rgba(30,58,138,0.08)]">
-        <h4 class="font-bold text-[1.25rem] mb-6 text-slate-800">Produk Terlaris</h4>
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+        <h4 class="font-bold text-[1.15rem] mb-6 text-slate-800">Produk Terlaris</h4>
         <div class="h-[300px]">
            <canvas id="chartDist"></canvas>
         </div>

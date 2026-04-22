@@ -44,14 +44,18 @@
     </div>
 
     {{-- Ringkasan --}}
-    <div class="grid grid-cols-2 gap-8 mb-10">
-        <div class="p-6 bg-blue-50 rounded-xl border border-blue-100">
-            <div class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">Total Transaksi (Lunas)</div>
-            <div class="font-bold text-gray-800 text-3xl">{{ count($transaksi) }} <span class="text-base text-gray-500">transaksi</span></div>
+    <div class="grid grid-cols-3 gap-6 mb-10">
+        <div class="p-5 bg-blue-50 rounded-xl border border-blue-100">
+            <div class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">Total Transaksi</div>
+            <div class="font-bold text-gray-800 text-3xl">{{ count($transaksi) }} <span class="text-base text-gray-500 font-medium">transaksi</span></div>
         </div>
-        <div class="p-6 bg-green-50 rounded-xl border border-green-100">
+        <div class="p-5 bg-green-50 rounded-xl border border-green-100">
             <div class="text-xs font-bold text-green-500 uppercase tracking-wider mb-2">Total Pendapatan</div>
             <div class="font-bold text-green-700 text-3xl">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</div>
+        </div>
+        <div class="p-5 bg-orange-50 rounded-xl border border-orange-100">
+            <div class="text-xs font-bold text-orange-500 uppercase tracking-wider mb-2">Sisa Stok Keseluruhan</div>
+            <div class="font-bold text-orange-700 text-3xl">{{ $stokTersedia->sum('stok') }} <span class="text-base text-orange-600/80 font-medium">ekor</span></div>
         </div>
     </div>
 

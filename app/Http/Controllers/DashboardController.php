@@ -6,6 +6,7 @@ use App\Models\Mitra;
 use App\Models\Produk;
 use App\Models\Transaksi;
 use App\Models\TransaksiItem;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
@@ -66,9 +67,9 @@ class DashboardController extends Controller
         ));
     }
 
-    public function laporanHarian()
+    public function laporanHarian(Request $request)
     {
-        $hariIni = today();
+        $hariIni = $request->has('date') ? Carbon::parse($request->date) : today();
         
         $transaksi = Transaksi::with(['items', 'mitra'])
             ->whereDate('created_at', $hariIni)
@@ -90,5 +91,43 @@ class DashboardController extends Controller
         $totalPendapatan = $transaksi->sum('total_harga');
 
         return view('admin.laporan-harian', compact('transaksi', 'stokKeluar', 'stokTersedia', 'totalPendapatan', 'hariIni'));
+    }
+
+    public function laporanTransaksi(Request $request)
+    {
+        $bulan = $request->input('bulan', '');
+        $tahun = $request->input('tahun', date('Y'));
+
+        $query = Transaksi::with(['mitra', 'items'])->where('status_pembayaran', 'Sudah Dibayar');
+        
+        if (!empty($bulan) && $bulan !== 'all') {
+            $query->whereMonth('created_at', $bulan);
+        }
+        if (!empty($tahun)) {
+            $query->whereYear('created_at', $tahun);
+        }
+
+        $transaksiRaw = $query->orderBy('created_at', 'desc')->get();
+
+        // Group by date
+        $grouped = [];
+        foreach ($transaksiRaw as $tx) {
+            $dateKey = $tx->created_at->format('Y-m-d');
+            if (!isset($grouped[$dateKey])) {
+                $grouped[$dateKey] = [
+                    'date' => $tx->created_at,
+                    'total_transaksi' => 0,
+                    'total_item' => 0,
+                    'total_harga' => 0,
+                    'transaksi' => []
+                ];
+            }
+            $grouped[$dateKey]['total_transaksi'] += 1;
+            $grouped[$dateKey]['total_item'] += $tx->total_item;
+            $grouped[$dateKey]['total_harga'] += $tx->total_harga;
+            $grouped[$dateKey]['transaksi'][] = $tx;
+        }
+
+        return view('admin.laporan-transaksi', compact('grouped', 'bulan', 'tahun'));
     }
 }
