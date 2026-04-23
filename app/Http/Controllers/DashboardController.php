@@ -11,8 +11,8 @@ class DashboardController extends Controller
     public function index()
     {
         // --- Summary cards ---
-        $penjualanHariIni  = 0;  // Will be updated when transactions exist
-        $totalTransaksi    = 0;  // Will be updated when transactions exist
+        $penjualanHariIni  = 0;  // ini akan di update saat transaksi udh ada
+        $totalTransaksi    = 0;  // ini akan di update saat transaksi udh ada
         $totalMitra        = Mitra::count();
         $totalStok         = Produk::sum('stok');
         $stokRendahCount   = Produk::whereColumn('stok', '<', 'stok_minimal')->count();
