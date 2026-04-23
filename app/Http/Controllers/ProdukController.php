@@ -15,57 +15,23 @@ class ProdukController extends Controller
         return view('admin.produk', compact('produk', 'stokRendahCount', 'stokHabisCount'));
     }
 
-    public function store(Request $request)
+    public function tambahStok(Request $request, $id)
     {
         $request->validate([
-            'nama'        => 'required|string|max:255',
-            'kategori'    => 'required|string|max:255',
-            'stok'        => 'required|numeric|min:0',
-            'stok_minimal'=> 'required|numeric|min:0',
-            'satuan'      => 'required|string',
-            'harga'       => 'required|numeric|min:0',
+            'jumlah' => 'required|numeric|min:1',
         ]);
 
-        $produk = Produk::create($request->only('nama','kategori','stok','stok_minimal','satuan','harga'));
-
-        return response()->json([
-            'message' => 'Produk berhasil ditambahkan',
-            'produk'  => array_merge($produk->toArray(), [
-                'status'       => $produk->status,
-                'status_badge' => $produk->status_badge,
-                'harga_format' => $produk->harga_format,
-            ]),
-        ], 201);
-    }
-
-    public function update(Request $request, $id)
-    {
         $produk = Produk::findOrFail($id);
-
-        $request->validate([
-            'nama'        => 'required|string|max:255',
-            'kategori'    => 'required|string|max:255',
-            'stok'        => 'required|numeric|min:0',
-            'stok_minimal'=> 'required|numeric|min:0',
-            'satuan'      => 'required|string',
-            'harga'       => 'required|numeric|min:0',
-        ]);
-
-        $produk->update($request->only('nama','kategori','stok','stok_minimal','satuan','harga'));
+        $produk->stok += $request->jumlah;
+        $produk->save();
 
         return response()->json([
-            'message' => 'Produk berhasil diperbarui',
+            'message' => 'Stok berhasil ditambahkan',
             'produk'  => array_merge($produk->toArray(), [
                 'status'       => $produk->status,
                 'status_badge' => $produk->status_badge,
                 'harga_format' => $produk->harga_format,
             ]),
         ]);
-    }
-
-    public function destroy($id)
-    {
-        Produk::findOrFail($id)->delete();
-        return response()->json(['message' => 'Produk berhasil dihapus']);
     }
 }

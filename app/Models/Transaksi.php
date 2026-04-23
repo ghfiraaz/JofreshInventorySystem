@@ -13,4 +13,14 @@ class Transaksi extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function mitra()
+    {
+        return $this->belongsTo(Mitra::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(TransaksiItem::class);
+    }
 }

@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnDelete = e.target.closest('.btn-delete');
         if (btnDelete && document.getElementById('usersTable')?.contains(btnDelete)) {
             const tr = btnDelete.closest('tr');
-            showConfirm('Hapus Pengguna', 'Apakah Anda yakin ingin menghapus data pengguna ini?', () => {
+            showConfirm('Hapus Pengguna', 'Apakah Anda yakin ingin menghapus pengguna ini?', () => {
                 fetch(`/users/${tr.getAttribute('data-id')}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
                 .then(r => { 
                     if (r.ok) {
@@ -210,13 +210,15 @@ document.addEventListener('DOMContentLoaded', () => {
             fRole.value  = tr.querySelector('.row-role').textContent.trim();
             fPass.value  = ''; fPass.required = false;
             pwdHint.textContent = '*Kosongkan jika tidak ingin mengubah password';
-            modalTitle.textContent = 'Edit Kata Sandi Pengguna';
-            modalDesc.textContent  = 'Nama, Email, dan Role tidak dapat diubah di form ini.';
+            modalTitle.textContent = 'Edit Pengguna';
+            modalDesc.textContent  = 'Edit data akun pengguna. Anda dapat mengganti role menjadi Kasir atau Admin.';
             btnSubmit.textContent  = 'Simpan Perubahan';
             
-            fName.disabled = true;
-            fEmail.disabled = true;
-            fRole.disabled = true;
+            fName.disabled = false;
+            fEmail.disabled = false;
+            
+            // Allow changing role, but keep Superadmin/Owner options hidden in dropdown
+            fRole.disabled = false;
             
             modalPengguna.classList.add('active');
         }
@@ -252,8 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <td class="row-harga">${harga}</td>
             <td><span class="badge ${badge}">${status}</span></td>
             <td>
-                <button class="btn-icon btn-edit-produk" title="Edit text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg p-2 transition-colors cursor-pointer border-none bg-transparent">${EDIT_SVG}</button>
-                <button class="btn-icon danger ms-2 btn-delete-produk text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg p-2 transition-colors cursor-pointer border-none bg-transparent">${DELETE_SVG}</button>
+                <button class="bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer border border-blue-200 btn-tambah-stok">
+                    + Tambah Stok
+                </button>
             </td>`;
         return tr;
     }
@@ -305,16 +308,70 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // -------------------------------------------------------
+    // Admin: Tambah Stok
+    // -------------------------------------------------------
+    const btnSubmitStok = document.getElementById('btn-submit-stok');
+    const formTambahStok = document.getElementById('form-tambah-stok');
+    const modalTambahStok = document.getElementById('modal-tambah-stok');
+
+    if (formTambahStok) {
+        formTambahStok.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('stok-produk-id').value;
+            const jumlah = document.getElementById('stok-jumlah-input').value;
+            
+            if (!id || !jumlah) return;
+
+            btnSubmitStok.disabled = true;
+            btnSubmitStok.textContent = 'Menyimpan...';
+
+            fetch(`/admin/produk/${id}/stok`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-CSRF-TOKEN': csrfToken, 
+                    'Accept': 'application/json' 
+                },
+                body: JSON.stringify({ jumlah: jumlah })
+            })
+            .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
+            .then(data => {
+                const oldRow = document.querySelector(`#produkTable tr[data-id="${id}"]`);
+                if (oldRow) {
+                    oldRow.replaceWith(buildProdukRow(data.produk));
+                    // re-attach local listener for the new + tambah stok button because of replaceWith
+                    // We can just rely on event delegation which is better! We'll just define logic in the listener below.
+                }
+                modalTambahStok.classList.remove('active');
+                formTambahStok.reset();
+                showToast(data.message || 'Stok berhasil ditambahkan');
+            })
+            .catch(err => {
+                showToast(err.message || 'Gagal menambahkan stok', 'error');
+            })
+            .finally(() => {
+                btnSubmitStok.disabled = false;
+                btnSubmitStok.textContent = 'Simpan Stok';
+            });
+        });
+    }
+
     produkTbody?.addEventListener('click', (e) => {
-        if (e.target.closest('.btn-delete-produk')) {
+        const btnDelete = e.target.closest('.btn-delete-produk');
+        const btnEdit = e.target.closest('.btn-edit-produk');
+        const btnStok = e.target.closest('.btn-tambah-stok');
+
+        if (btnDelete) {
             if (confirm('Hapus produk ini dari database?')) {
-                const tr = e.target.closest('tr');
+                const tr = btnDelete.closest('tr');
                 fetch(`/admin/produk/${tr.getAttribute('data-id')}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
                 .then(r => { if (r.ok) tr.remove(); });
             }
         }
-        if (e.target.closest('.btn-edit-produk')) {
-            const tr = e.target.closest('tr');
+        
+        if (btnEdit) {
+            const tr = btnEdit.closest('tr');
             document.getElementById('produk-edit-id').value   = tr.getAttribute('data-id');
             document.getElementById('produk-nama').value      = tr.querySelector('.row-nama').textContent;
             document.getElementById('produk-minimal').value   = tr.querySelector('.row-minimal').textContent;
@@ -324,32 +381,15 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('btn-submit-produk').textContent  = 'Simpan Perubahan';
             modalProduk.classList.add('active');
         }
-    });
 
-    // -------------------------------------------------------
-    // Admin: Stok Masuk Page (visual-only for now)
-    // -------------------------------------------------------
-    const formStok  = document.getElementById('form-stok-masuk');
-    const stokTbody = document.getElementById('stok-tbody');
-    if (formStok && stokTbody) {
-        formStok.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const produk   = document.getElementById('stok-produk').value;
-            const tipe     = document.getElementById('stok-tipe').value;
-            const jumlah   = document.getElementById('stok-jumlah').value;
-            const tanggal  = document.getElementById('stok-tanggal').value;
-            const ref      = document.getElementById('stok-referensi').value || '-';
-            const catatan  = document.getElementById('stok-catatan').value || '-';
-            const badgeCls = tipe === 'Stok Masuk' ? 'badge-stok-masuk' : 'badge-stok-keluar';
-            const arrow    = tipe === 'Stok Masuk' ? '↑' : '↓';
-            const dateStr  = tanggal ? new Date(tanggal).toLocaleDateString('id-ID') : '-';
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${dateStr}</td><td class="fw-bold">${produk}</td><td><span class="badge ${badgeCls}">${arrow} ${tipe}</span></td><td>${jumlah} ekor</td><td>${ref}</td><td class="text-muted">${catatan}</td>`;
-            stokTbody.prepend(tr);
-            formStok.reset();
-            showToast('Stok berhasil dicatat');
-        });
-    }
+        if (btnStok && modalTambahStok) {
+            const tr = btnStok.closest('tr');
+            const nama = tr.querySelector('.row-nama').textContent;
+            document.getElementById('stok-produk-id').value = tr.getAttribute('data-id');
+            document.getElementById('stok-nama-produk').textContent = nama;
+            modalTambahStok.classList.add('active');
+        }
+    });
 
     // -------------------------------------------------------
     // Admin: Mitra Page (DB-backed via Fetch API)
@@ -360,18 +400,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const mitraTbody     = document.querySelector('#mitraTable tbody');
 
     function buildMitraRow(m) {
-        const terdaftar = m.created_at ? new Date(m.created_at).toLocaleDateString('id-ID') : new Date().toLocaleDateString('id-ID');
+        const terdaftar = m.created_at ? new Date(m.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'}) : new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'});
         const tr = document.createElement('tr');
         tr.setAttribute('data-id', m.id);
+        tr.className = 'hover:bg-slate-50/60 transition-colors';
         tr.innerHTML = `
-            <td class="fw-bold row-nama-mitra">${m.nama}</td>
-            <td class="row-kontak">${m.kontak || '-'}</td>
-            <td class="row-alamat">${m.alamat || '-'}</td>
-            <td><span class="badge badge-aktif">${m.status || 'Aktif'}</span></td>
-            <td>${terdaftar}</td>
-            <td>
-                <button class="btn-icon btn-edit-mitra" title="Edit">${EDIT_SVG}</button>
-                <button class="btn-icon danger ms-2 btn-delete-mitra" title="Hapus">${DELETE_SVG}</button>
+            <td class="py-3.5 px-5 font-semibold text-slate-800 text-sm row-nama-mitra">${m.nama}</td>
+            <td class="py-3.5 px-5 text-sm text-slate-600 row-kontak">${m.kontak || '-'}</td>
+            <td class="py-3.5 px-5 text-sm text-slate-600 row-alamat">${m.alamat || '-'}</td>
+            <td class="py-3.5 px-5"><span class="px-3 py-1 rounded-full text-xs font-semibold row-status-mitra" style="background:#dbeafe;color:#1d4ed8;">${m.status || 'Aktif'}</span></td>
+            <td class="py-3.5 px-5 text-sm text-slate-500 row-terdaftar">${terdaftar}</td>
+            <td class="py-3.5 px-5">
+                <div class="flex items-center gap-1">
+                    <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-mitra" title="Edit">${EDIT_SVG}</button>
+                    <button class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-delete-mitra" title="Hapus">${DELETE_SVG}</button>
+                </div>
             </td>`;
         return tr;
     }
@@ -420,11 +463,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mitraTbody.addEventListener('click', (e) => {
             if (e.target.closest('.btn-delete-mitra')) {
-                if (confirm('Hapus mitra ini dari database?')) {
-                    const tr = e.target.closest('tr');
+                const tr = e.target.closest('tr');
+                const nama = tr.querySelector('.row-nama-mitra')?.textContent || 'mitra';
+                showConfirm('Hapus Mitra', `Apakah Anda yakin ingin menghapus mitra "${nama}"?`, () => {
                     fetch(`/admin/mitra/${tr.getAttribute('data-id')}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
-                    .then(r => { if (r.ok) tr.remove(); });
-                }
+                    .then(r => {
+                        if (r.ok) {
+                            tr.remove();
+                            showToast('Mitra berhasil dihapus');
+                        }
+                    });
+                });
             }
             if (e.target.closest('.btn-edit-mitra')) {
                 const tr = e.target.closest('tr');
@@ -504,6 +553,265 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // -------------------------------------------------------
+    // Kasir: POS Transaksi Penjualan
+    // -------------------------------------------------------
+    const btnTambahKeranjang = document.getElementById('btn-tambah-keranjang');
+    const cartTbody   = document.getElementById('cart-tbody');
+    const cartEmpty   = document.getElementById('cart-empty');
+    const cartItems   = document.getElementById('cart-items');
+    const cartCount   = document.getElementById('cart-count');
+    const cartCountSummary = document.getElementById('cart-count-summary');
+    const cartTotal   = document.getElementById('cart-total');
+    const btnCheckout = document.getElementById('btn-checkout');
+    const btnClearCart = document.getElementById('btn-clear-cart');
+
+    let kasirCart = [];
+
+    function updateCartUI() {
+        if (!cartTbody) return;
+        const count = kasirCart.reduce((s, i) => s + i.jumlah, 0);
+        const total = kasirCart.reduce((s, i) => s + (i.harga * i.jumlah), 0);
+
+        if (cartCount) cartCount.textContent = count;
+        if (cartCountSummary) cartCountSummary.textContent = count;
+        if (cartTotal) cartTotal.textContent = formatRupiah(total);
+
+        if (kasirCart.length === 0) {
+            if (cartEmpty) cartEmpty.classList.remove('hidden');
+            if (cartItems) cartItems.classList.add('hidden');
+            if (btnClearCart) btnClearCart.classList.add('hidden');
+            if (btnCheckout) btnCheckout.disabled = true;
+        } else {
+            if (cartEmpty) cartEmpty.classList.add('hidden');
+            if (cartItems) cartItems.classList.remove('hidden');
+            if (btnClearCart) btnClearCart.classList.remove('hidden');
+            if (btnCheckout) btnCheckout.disabled = false;
+        }
+
+        cartTbody.innerHTML = '';
+        kasirCart.forEach((item, idx) => {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-gray-100 group';
+            tr.innerHTML = `
+                <td class="py-3 pr-4">
+                    <div class="text-sm font-medium text-gray-800">${item.nama}</div>
+                    <div class="text-xs text-gray-400">Rp ${parseInt(item.harga).toLocaleString('id-ID')} / item</div>
+                </td>
+                <td class="py-3 text-center">
+                    <div class="inline-flex items-center gap-1">
+                        <button type="button" class="w-7 h-7 rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-100 cursor-pointer flex items-center justify-center text-sm font-bold cart-minus transition-all" data-idx="${idx}">−</button>
+                        <span class="w-8 text-center text-sm font-semibold text-gray-800">${item.jumlah}</span>
+                        <button type="button" class="w-7 h-7 rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-100 cursor-pointer flex items-center justify-center text-sm font-bold cart-plus transition-all" data-idx="${idx}">+</button>
+                    </div>
+                </td>
+                <td class="py-3 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                        <span class="text-sm font-semibold text-gray-800">${formatRupiah(item.harga * item.jumlah)}</span>
+                        <button type="button" class="w-6 h-6 rounded-full flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 cursor-pointer bg-transparent border-none cart-remove transition-all opacity-0 group-hover:opacity-100" data-idx="${idx}">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                </td>`;
+            cartTbody.appendChild(tr);
+        });
+    }
+
+    const selectProdukKasir = document.getElementById('kasir-produk');
+    const stokInfoKasir = document.getElementById('kasir-stok-info');
+    if (selectProdukKasir && stokInfoKasir) {
+        selectProdukKasir.addEventListener('change', function() {
+            const opt = this.options[this.selectedIndex];
+            if (opt && opt.value) {
+                stokInfoKasir.querySelector('span').textContent = opt.dataset.stok;
+                stokInfoKasir.classList.remove('hidden');
+            } else {
+                stokInfoKasir.classList.add('hidden');
+            }
+        });
+    }
+
+    if (btnTambahKeranjang) {
+        btnTambahKeranjang.addEventListener('click', () => {
+            const sel = document.getElementById('kasir-produk');
+            const opt = sel.options[sel.selectedIndex];
+            const jumlahInput = document.getElementById('kasir-jumlah');
+            const jumlah = parseInt(jumlahInput.value) || 1;
+
+            if (!opt || !opt.value) {
+                showToast('Pilih produk terlebih dahulu', 'error');
+                sel.focus();
+                return;
+            }
+
+            const produkId = parseInt(opt.value);
+            const nama     = opt.dataset.nama;
+            const harga    = parseFloat(opt.dataset.harga);
+            const stok     = parseInt(opt.dataset.stok);
+
+            const existing = kasirCart.find(i => i.produk_id === produkId);
+            const currentQty = existing ? existing.jumlah : 0;
+
+            if (currentQty + jumlah > stok) {
+                showToast(`Stok ${nama} tidak cukup. Tersisa: ${stok}`, 'error');
+                return;
+            }
+
+            if (existing) {
+                existing.jumlah += jumlah;
+            } else {
+                kasirCart.push({ produk_id: produkId, nama, harga, jumlah, stok });
+            }
+
+            updateCartUI();
+            sel.value = '';
+            jumlahInput.value = 1;
+            showToast(`${nama} ditambahkan ke keranjang`);
+        });
+    }
+
+    if (btnClearCart) {
+        btnClearCart.addEventListener('click', () => {
+            if (confirm('Kosongkan seluruh keranjang?')) {
+                kasirCart = [];
+                updateCartUI();
+                showToast('Keranjang dikosongkan');
+            }
+        });
+    }
+
+    if (cartTbody) {
+        cartTbody.addEventListener('click', (e) => {
+            const minusBtn  = e.target.closest('.cart-minus');
+            const plusBtn   = e.target.closest('.cart-plus');
+            const removeBtn = e.target.closest('.cart-remove');
+
+            if (minusBtn) {
+                const idx = parseInt(minusBtn.dataset.idx);
+                if (kasirCart[idx].jumlah > 1) kasirCart[idx].jumlah--;
+                else kasirCart.splice(idx, 1);
+                updateCartUI();
+            }
+            if (plusBtn) {
+                const idx = parseInt(plusBtn.dataset.idx);
+                if (kasirCart[idx].jumlah < kasirCart[idx].stok) kasirCart[idx].jumlah++;
+                else showToast('Stok tidak mencukupi', 'error');
+                updateCartUI();
+            }
+            if (removeBtn) {
+                const idx = parseInt(removeBtn.dataset.idx);
+                kasirCart.splice(idx, 1);
+                updateCartUI();
+            }
+        });
+    }
+
+    if (btnCheckout) {
+        btnCheckout.addEventListener('click', () => {
+            const mitraId = document.getElementById('kasir-mitra')?.value;
+            if (!mitraId) {
+                showToast('Pilih mitra terlebih dahulu', 'error');
+                document.getElementById('kasir-mitra').focus();
+                return;
+            }
+            if (kasirCart.length === 0) {
+                showToast('Keranjang masih kosong', 'error');
+                return;
+            }
+
+            btnCheckout.disabled = true;
+            const originalText = btnCheckout.textContent;
+            btnCheckout.textContent = 'Memproses...';
+
+            fetch('/kasir/transaksi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    mitra_id: mitraId,
+                    items: kasirCart.map(i => ({ produk_id: i.produk_id, jumlah: i.jumlah })),
+                }),
+            })
+            .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
+            .then(data => {
+                showToast(`Transaksi ${data.transaksi.no_transaksi} berhasil!`);
+                kasirCart = [];
+                updateCartUI();
+                document.getElementById('kasir-mitra').value = '';
+
+                data.transaksi.items.forEach(item => {
+                    const opt = document.querySelector(`#kasir-produk option[value="${item.produk_id}"]`);
+                    if (opt) {
+                        const newStok = parseInt(opt.dataset.stok) - item.jumlah;
+                        opt.dataset.stok = newStok;
+                        if (newStok <= 0) opt.remove();
+                    }
+                });
+
+                btnCheckout.disabled = true;
+                btnCheckout.textContent = originalText;
+            })
+            .catch(err => {
+                showToast(err.message || 'Gagal menyimpan transaksi', 'error');
+                btnCheckout.disabled = false;
+                btnCheckout.textContent = originalText;
+            });
+        });
+    }
+
+    // -------------------------------------------------------
+    // Kasir: Riwayat Transaksi (expand rows + search)
+    // -------------------------------------------------------
+    document.querySelectorAll('.riwayat-row').forEach(row => {
+        row.addEventListener('click', () => {
+            const id = row.dataset.id;
+            const detail = document.querySelector(`.detail-row[data-parent="${id}"]`);
+            const icon = row.querySelector('.expand-icon');
+            if (detail) {
+                const isHidden = detail.classList.contains('hidden');
+                // Close others
+                document.querySelectorAll('.detail-row').forEach(d => {
+                    if (d !== detail) {
+                        d.classList.add('hidden');
+                        const pId = d.dataset.parent;
+                        const pIcon = document.querySelector(`.riwayat-row[data-id="${pId}"] .expand-icon`);
+                        if (pIcon) pIcon.style.transform = '';
+                    }
+                });
+                detail.classList.toggle('hidden');
+                if (icon) icon.style.transform = isHidden ? 'rotate(180deg)' : '';
+            }
+        });
+    });
+
+    const searchRiwayat = document.getElementById('search-riwayat');
+    if (searchRiwayat) {
+        searchRiwayat.addEventListener('input', () => {
+            const q = searchRiwayat.value.toLowerCase();
+            document.querySelectorAll('.riwayat-row').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const show = text.includes(q);
+                row.style.display = show ? '' : 'none';
+                const detail = document.querySelector(`.detail-row[data-parent="${row.dataset.id}"]`);
+                if (detail && !show) detail.classList.add('hidden');
+            });
+        });
+    }
+
+    // -------------------------------------------------------
+    // Kasir: Tagihan Bulanan (expand mitra sections)
+    // -------------------------------------------------------
+    document.querySelectorAll('.tagihan-mitra-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const detail = header.nextElementSibling;
+            const icon = header.querySelector('.tagihan-expand-icon');
+            if (detail && detail.classList.contains('tagihan-mitra-detail')) {
+                const isHidden = detail.classList.contains('hidden');
+                detail.classList.toggle('hidden');
+                if (icon) icon.style.transform = isHidden ? 'rotate(180deg)' : '';
+            }
+        });
+    });
 
     // -------------------------------------------------------
     // IGLOO.INC STYLE ANIMATIONS (GSAP)

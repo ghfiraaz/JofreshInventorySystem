@@ -29,7 +29,7 @@ class AuthController extends Controller
             return $this->redirectByRole(Auth::user()->role);
         }
 
-        return back()->with('error', 'Akun tidak terdaftar')->withInput($request->only('email'));
+        return back()->with('error', 'Email/Password salah, silahkan coba lagi')->withInput($request->only('email'));
     }
 
     public function logout(Request $request)
