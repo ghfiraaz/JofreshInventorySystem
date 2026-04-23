@@ -89,7 +89,14 @@
                         <h2 class="text-2xl font-bold">@yield('title')</h2>
                     </div>
                     <div class="flex items-center gap-6">
-                        <div class="text-slate-600 text-sm font-medium" id="header-date"></div>
+                        <div class="flex items-center gap-3">
+                            <div id="header-date" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 shadow-sm">
+                                <span id="hd-day" class="text-xs font-bold text-indigo-400 uppercase tracking-widest"></span>
+                                <span id="hd-date" class="text-sm font-bold text-slate-700"></span>
+                                <span class="w-px h-4 bg-blue-200"></span>
+                                <span id="hd-time" class="text-sm font-bold text-blue-600 tabular-nums" style="font-variant-numeric:tabular-nums;"></span>
+                            </div>
+                        </div>
                         
                         @if(Auth::user()->role === 'Superadmin')
                         <div class="relative">
@@ -134,41 +141,17 @@
     <!-- Logout Modal (Psychological UI) -->
     <div id="modal-logout" class="fixed inset-0 bg-slate-900/50 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 modal-overlay font-sans [&.active]:opacity-100 [&.active]:pointer-events-auto">
         <div class="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300 modal-content relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-rose-500"></div>
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-900 to-indigo-700"></div>
             <div class="text-center">
-                <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-red-500">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-slate-800 mb-2">Keluar Sistem?</h3>
-                <p class="text-slate-600 mb-8">Apakah Anda yakin ingin mengakhiri sesi dan keluar dari aplikasi?</p>
-                <div class="mt-8 flex flex-row-reverse justify-center gap-4">
-                    <button type="button" onclick="document.getElementById('modal-logout').classList.remove('active'); document.getElementById('modal-logout').querySelector('.modal-content').classList.remove('scale-100')" class="px-6 py-2.5 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 shadow-[0_4px_14px_rgba(220,38,38,0.4)] transition-all min-w-[120px] cursor-pointer border-none outline-none">
-                        Tidak, Tetap Disini
-                    </button>
-                    <button type="button" onclick="document.getElementById('form-logout').submit()" class="px-6 py-2.5 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all min-w-[100px] cursor-pointer border-none outline-none">
-                        Ya, Keluar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Logout Modal (Psychological UI) -->
-    <div id="modal-logout" class="fixed inset-0 bg-slate-900/50 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 modal-overlay font-sans [&.active]:opacity-100 [&.active]:pointer-events-auto">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300 modal-content relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-rose-500"></div>
-            <div class="text-center">
-                <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-red-500">
+                <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-blue-900">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
                     </svg>
                 </div>
                 <h3 class="text-2xl font-bold text-slate-800 mb-2">Keluar Sistem?</h3>
                 <p class="text-slate-600 mb-8">Apakah Anda yakin ingin mengakhiri sesi dan keluar dari aplikasi?</p>
                 <div class="mt-8 flex flex-col gap-3">
-                    <button type="button" onclick="document.getElementById('modal-logout').classList.remove('active'); document.getElementById('modal-logout').querySelector('.modal-content').classList.remove('scale-100')" class="w-full px-6 py-3 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 shadow-[0_4px_14px_rgba(220,38,38,0.4)] transition-all cursor-pointer border-none outline-none">
+                    <button type="button" onclick="document.getElementById('modal-logout').classList.remove('active'); document.getElementById('modal-logout').querySelector('.modal-content').classList.remove('scale-100')" class="w-full px-6 py-3 rounded-xl font-bold text-white transition-all cursor-pointer border-none outline-none" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">
                         Tidak, Tetap Disini
                     </button>
                     <button type="button" onclick="document.getElementById('form-logout').submit()" class="w-full px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all cursor-pointer border-none outline-none">
@@ -190,8 +173,8 @@
             <h3 id="confirm-title" class="text-xl font-bold text-slate-800 text-center uppercase tracking-tight">Konfirmasi</h3>
             <p id="confirm-message" class="text-slate-600 text-center mt-3 text-base">Apakah Anda yakin?</p>
             <div class="mt-10 flex justify-center gap-4">
-                <button type="button" class="btn btn-outline min-w-[120px]" id="btn-confirm-no">Tidak</button>
-                <button type="button" class="btn bg-red-600 text-white hover:bg-red-700 shadow-[0_4px_14px_rgba(220,38,38,0.4)] min-w-[120px]" id="btn-confirm-yes">Ya</button>
+                <button type="button" id="btn-confirm-no" class="min-w-[120px] px-6 py-3 rounded-xl font-bold text-white border-none cursor-pointer transition-all" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">Tidak</button>
+                <button type="button" id="btn-confirm-yes" class="min-w-[120px] px-6 py-3 rounded-xl font-bold bg-gray-200 text-gray-600 hover:bg-gray-300 border-none cursor-pointer transition-all">Ya</button>
             </div>
         </div>
     </div>
@@ -207,11 +190,23 @@
             }, 10);
         }
 
-        const _d = new Date();
         const _days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
         const _months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-        const _el = document.getElementById('header-date');
-        if (_el) _el.textContent = `${_days[_d.getDay()]}, ${_d.getDate()} ${_months[_d.getMonth()]} ${_d.getFullYear()}`;
+        function _updateClock() {
+            const _d = new Date();
+            const dayEl = document.getElementById('hd-day');
+            const dateEl = document.getElementById('hd-date');
+            const timeEl = document.getElementById('hd-time');
+            if (dayEl) dayEl.textContent = _days[_d.getDay()];
+            if (dateEl) dateEl.textContent = `${_d.getDate()} ${_months[_d.getMonth()]} ${_d.getFullYear()}`;
+            if (timeEl) {
+                const hh = String(_d.getHours()).padStart(2,'0');
+                const mm = String(_d.getMinutes()).padStart(2,'0');
+                timeEl.textContent = `${hh}:${mm}`;
+            }
+        }
+        _updateClock();
+        setInterval(_updateClock, 1000);
     </script>
 </body>
 </html>

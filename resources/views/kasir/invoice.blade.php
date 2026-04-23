@@ -11,16 +11,17 @@
     <style>
         body { background-color: #f3f4f6; }
         @media print {
-            body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 0; margin: 0; }
             .no-print { display: none !important; }
             .print-shadow-none { box-shadow: none !important; border: none !important; }
-            @page { margin: 0; }
+            @page { margin: 10mm; size: A4; }
+            .invoice-wrap { padding: 24px !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
         }
     </style>
 </head>
 <body class="font-sans text-gray-800 antialiased py-10">
 
-<div class="max-w-3xl mx-auto bg-white p-10 rounded-2xl shadow-xl border border-gray-100 print-shadow-none relative">
+<div class="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100 print-shadow-none invoice-wrap relative">
     
     {{-- Watermark Lunas --}}
     @if($transaksi->status_pembayaran === 'Sudah Dibayar')
@@ -39,10 +40,10 @@
     </div>
 
     {{-- Header --}}
-    <div class="flex justify-between items-start mb-12">
+    <div class="flex justify-between items-start mb-8">
         <div>
             <h1 class="text-3xl font-extrabold tracking-[4px] text-blue-900 mb-2">J I S</h1>
-            <p class="text-sm text-gray-500">JoFresh Inventory System<br>Jl. Peternakan Unggas No. 123</p>
+            <p class="text-sm text-gray-500">JoFresh Inventory System<br>Jl. Bintaro Raya</p>
         </div>
         <div class="text-right">
             <h2 class="text-2xl font-black text-gray-800 uppercase tracking-widest mb-2">INVOICE</h2>
@@ -52,7 +53,7 @@
     </div>
 
     {{-- Billing Info --}}
-    <div class="grid grid-cols-2 gap-8 mb-10 p-6 bg-gray-50 rounded-xl border border-gray-100">
+    <div class="grid grid-cols-2 gap-6 mb-6 p-5 bg-gray-50 rounded-xl border border-gray-100">
         <div>
             <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Ditagihkan Kepada</div>
             <div class="font-bold text-gray-800 text-lg mb-1">{{ $transaksi->mitra->nama ?? 'Mitra (Terhapus)' }}</div>
@@ -73,7 +74,7 @@
     </div>
 
     {{-- Items --}}
-    <div class="mb-10 border border-gray-200 rounded-xl overflow-hidden">
+    <div class="mb-6 border border-gray-200 rounded-xl overflow-hidden">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-gray-50 border-b border-gray-200">
@@ -97,7 +98,7 @@
     </div>
 
     {{-- Summary --}}
-    <div class="flex justify-end mb-16">
+    <div class="flex justify-end mb-8">
         <div class="w-1/2">
             <div class="flex justify-between py-2 border-b border-gray-100">
                 <span class="text-sm font-medium text-gray-500">Total Item</span>

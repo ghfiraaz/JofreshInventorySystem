@@ -11,9 +11,10 @@ use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $hariIni = today();
+        $filterDate = $request->input('filter_date', null);
+        $hariIni    = $filterDate ? Carbon::parse($filterDate) : today();
 
         // --- Summary cards ---
         $transaksiHariIni = Transaksi::whereDate('created_at', $hariIni)
@@ -28,29 +29,29 @@ class DashboardController extends Controller
         $stokRendahCount   = Produk::whereColumn('stok', '<', 'stok_minimal')->count();
         $isStokRendah      = $stokRendahCount > 0;
 
-        // --- Chart: Tren Penjualan (7 hari terakhir) ---
+        // --- Chart: Tren Penjualan (7 hari, window around selected date) ---
         $trendLabels = [];
         $trendData   = [];
         for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i);
+            $date = $hariIni->copy()->subDays($i);
             $trendLabels[] = $date->translatedFormat('d M');
             $trendData[]   = Transaksi::whereDate('created_at', $date)
                                 ->where('status_pembayaran', 'Sudah Dibayar')
                                 ->sum('total_harga');
         }
 
-        // --- Chart: Distribusi per produk ---
-        $produkList   = Produk::orderBy('nama')->get();
-        $distLabels   = [];
-        $distData     = [];
+        // --- Chart: Distribusi per produk (for selected date or all-time) ---
+        $produkList = Produk::orderBy('nama')->get();
+        $distLabels = [];
+        $distData   = [];
         
         foreach ($produkList as $p) {
             $distLabels[] = $p->nama;
-            $sold = TransaksiItem::whereHas('transaksi', function($q) {
+            $q = TransaksiItem::whereHas('transaksi', function($q) use ($hariIni, $filterDate) {
                 $q->where('status_pembayaran', 'Sudah Dibayar');
-            })->where('produk_id', $p->id)->sum('jumlah');
-            
-            $distData[] = $sold ?: 0;
+                if ($filterDate) $q->whereDate('created_at', $hariIni);
+            })->where('produk_id', $p->id);
+            $distData[] = $q->sum('jumlah') ?: 0;
         }
 
         return view('dashboard', compact(
@@ -63,7 +64,8 @@ class DashboardController extends Controller
             'trendLabels',
             'trendData',
             'distLabels',
-            'distData'
+            'distData',
+            'filterDate'
         ));
     }
 
@@ -97,14 +99,19 @@ class DashboardController extends Controller
     {
         $bulan = $request->input('bulan', '');
         $tahun = $request->input('tahun', date('Y'));
+        $filterDate = $request->input('filter_date', '');
 
         $query = Transaksi::with(['mitra', 'items'])->where('status_pembayaran', 'Sudah Dibayar');
         
-        if (!empty($bulan) && $bulan !== 'all') {
-            $query->whereMonth('created_at', $bulan);
-        }
-        if (!empty($tahun)) {
-            $query->whereYear('created_at', $tahun);
+        if (!empty($filterDate)) {
+            $query->whereDate('created_at', $filterDate);
+        } else {
+            if (!empty($bulan) && $bulan !== 'all') {
+                $query->whereMonth('created_at', $bulan);
+            }
+            if (!empty($tahun)) {
+                $query->whereYear('created_at', $tahun);
+            }
         }
 
         $transaksiRaw = $query->orderBy('created_at', 'desc')->get();

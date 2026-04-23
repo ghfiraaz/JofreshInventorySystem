@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnDelete = e.target.closest('.btn-delete');
         if (btnDelete && document.getElementById('usersTable')?.contains(btnDelete)) {
             const tr = btnDelete.closest('tr');
-            showConfirm('Hapus Pengguna', 'Apakah Anda yakin ingin menghapus data pengguna ini?', () => {
+            showConfirm('Hapus Pengguna', 'Apakah Anda yakin ingin menghapus pengguna ini?', () => {
                 fetch(`/users/${tr.getAttribute('data-id')}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
                 .then(r => { 
                     if (r.ok) {
@@ -210,13 +210,15 @@ document.addEventListener('DOMContentLoaded', () => {
             fRole.value  = tr.querySelector('.row-role').textContent.trim();
             fPass.value  = ''; fPass.required = false;
             pwdHint.textContent = '*Kosongkan jika tidak ingin mengubah password';
-            modalTitle.textContent = 'Edit Kata Sandi Pengguna';
-            modalDesc.textContent  = 'Nama, Email, dan Role tidak dapat diubah di form ini.';
+            modalTitle.textContent = 'Edit Pengguna';
+            modalDesc.textContent  = 'Edit data akun pengguna. Anda dapat mengganti role menjadi Kasir atau Admin.';
             btnSubmit.textContent  = 'Simpan Perubahan';
             
-            fName.disabled = true;
-            fEmail.disabled = true;
-            fRole.disabled = true;
+            fName.disabled = false;
+            fEmail.disabled = false;
+            
+            // Allow changing role, but keep Superadmin/Owner options hidden in dropdown
+            fRole.disabled = false;
             
             modalPengguna.classList.add('active');
         }
@@ -398,18 +400,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const mitraTbody     = document.querySelector('#mitraTable tbody');
 
     function buildMitraRow(m) {
-        const terdaftar = m.created_at ? new Date(m.created_at).toLocaleDateString('id-ID') : new Date().toLocaleDateString('id-ID');
+        const terdaftar = m.created_at ? new Date(m.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'}) : new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'});
         const tr = document.createElement('tr');
         tr.setAttribute('data-id', m.id);
+        tr.className = 'hover:bg-slate-50/60 transition-colors';
         tr.innerHTML = `
-            <td class="fw-bold row-nama-mitra">${m.nama}</td>
-            <td class="row-kontak">${m.kontak || '-'}</td>
-            <td class="row-alamat">${m.alamat || '-'}</td>
-            <td><span class="badge badge-aktif">${m.status || 'Aktif'}</span></td>
-            <td>${terdaftar}</td>
-            <td>
-                <button class="btn-icon btn-edit-mitra" title="Edit">${EDIT_SVG}</button>
-                <button class="btn-icon danger ms-2 btn-delete-mitra" title="Hapus">${DELETE_SVG}</button>
+            <td class="py-3.5 px-5 font-semibold text-slate-800 text-sm row-nama-mitra">${m.nama}</td>
+            <td class="py-3.5 px-5 text-sm text-slate-600 row-kontak">${m.kontak || '-'}</td>
+            <td class="py-3.5 px-5 text-sm text-slate-600 row-alamat">${m.alamat || '-'}</td>
+            <td class="py-3.5 px-5"><span class="px-3 py-1 rounded-full text-xs font-semibold row-status-mitra" style="background:#dbeafe;color:#1d4ed8;">${m.status || 'Aktif'}</span></td>
+            <td class="py-3.5 px-5 text-sm text-slate-500 row-terdaftar">${terdaftar}</td>
+            <td class="py-3.5 px-5">
+                <div class="flex items-center gap-1">
+                    <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-mitra" title="Edit">${EDIT_SVG}</button>
+                    <button class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-delete-mitra" title="Hapus">${DELETE_SVG}</button>
+                </div>
             </td>`;
         return tr;
     }
@@ -458,11 +463,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mitraTbody.addEventListener('click', (e) => {
             if (e.target.closest('.btn-delete-mitra')) {
-                if (confirm('Hapus mitra ini dari database?')) {
-                    const tr = e.target.closest('tr');
+                const tr = e.target.closest('tr');
+                const nama = tr.querySelector('.row-nama-mitra')?.textContent || 'mitra';
+                showConfirm('Hapus Mitra', `Apakah Anda yakin ingin menghapus mitra "${nama}"?`, () => {
                     fetch(`/admin/mitra/${tr.getAttribute('data-id')}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
-                    .then(r => { if (r.ok) tr.remove(); });
-                }
+                    .then(r => {
+                        if (r.ok) {
+                            tr.remove();
+                            showToast('Mitra berhasil dihapus');
+                        }
+                    });
+                });
             }
             if (e.target.closest('.btn-edit-mitra')) {
                 const tr = e.target.closest('tr');

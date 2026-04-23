@@ -64,14 +64,74 @@
     </div>
 </div>
 
+{{-- ===== CUSTOM CALENDAR STYLES ===== --}}
+<style>
+.dash-cal-wrap { position:relative; display:inline-block; }
+#dash-cal-trigger {
+    display:flex; align-items:center; gap:8px;
+    padding:8px 16px; border-radius:12px; cursor:pointer;
+    background:linear-gradient(135deg,#e0e7ff,#f0fdf4);
+    border:1.5px solid #a5b4fc; color:#3730a3;
+    font-weight:600; font-size:0.9rem; transition:all 0.18s;
+    user-select:none; box-shadow:0 2px 8px rgba(99,102,241,.08);
+}
+#dash-cal-trigger:hover { border-color:#6366f1; background:linear-gradient(135deg,#c7d2fe,#dcfce7); }
+#dash-cal-popup {
+    position:absolute; top:calc(100% + 8px); right:0; z-index:200;
+    background:#fff; border-radius:18px; box-shadow:0 12px 40px rgba(99,102,241,.16);
+    border:1.5px solid #e0e7ff; width:308px; overflow:hidden;
+    animation: dashCalSlide 0.18s ease;
+}
+@keyframes dashCalSlide { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
+.dash-cal-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 10px; background:linear-gradient(135deg,#4f46e5,#6366f1); }
+.dash-cal-nav { background:rgba(255,255,255,.18); border:none; border-radius:8px; width:32px; height:32px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; transition:background 0.15s; }
+.dash-cal-nav:hover { background:rgba(255,255,255,.32); }
+.dash-cal-title { background:transparent; border:none; color:#fff; font-weight:700; font-size:1rem; cursor:pointer; padding:4px 10px; border-radius:8px; transition:background 0.15s; }
+.dash-cal-title:hover { background:rgba(255,255,255,.18); }
+.dash-cal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); padding:8px 12px 4px; }
+.dash-cal-weekdays span { text-align:center; font-size:0.72rem; font-weight:700; color:#6366f1; text-transform:uppercase; letter-spacing:.04em; }
+.dash-cal-days { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; padding:4px 12px 12px; }
+.dash-cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:0.85rem; font-weight:500; cursor:pointer; color:#374151; transition:all 0.15s; border:none; background:transparent; }
+.dash-cal-day:hover { background:#e0e7ff; color:#3730a3; }
+.dash-cal-day.today { background:#f0fdf4; color:#16a34a; font-weight:700; border:1.5px solid #86efac; }
+.dash-cal-day.selected { background:linear-gradient(135deg,#4f46e5,#6366f1); color:#fff!important; font-weight:700; box-shadow:0 2px 8px rgba(99,102,241,.3); }
+.dash-cal-day.other-month { color:#d1d5db; }
+.dash-cal-grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:12px 14px 14px; }
+.dash-cal-grid3 button { padding:10px 4px; border:none; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; text-align:center; color:#374151; background:transparent; transition:all 0.15s; }
+.dash-cal-grid3 button:hover { background:#e0e7ff; color:#3730a3; }
+.dash-cal-grid3 button.active { background:linear-gradient(135deg,#4f46e5,#6366f1); color:#fff; box-shadow:0 2px 8px rgba(99,102,241,.3); }
+</style>
+
 <div class="flex justify-between items-center mb-6">
-    <h3 class="font-bold text-xl text-slate-800">Analisis Penjualan</h3>
-    <div class="flex items-center text-[0.95rem]">
-        <label class="text-slate-600 font-medium">Periode:</label>
-        <select class="ml-3 px-4 py-2 border border-blue-200 bg-white rounded-xl outline-none cursor-pointer shadow-sm text-[0.95rem] hover:border-blue-300 transition-colors">
-            <option>1 Minggu</option>
-            <option>1 Bulan</option>
-        </select>
+    <div>
+        <h3 class="font-bold text-xl text-slate-800">Analisis Penjualan</h3>
+        @if($filterDate)
+        <p class="text-sm text-slate-500 mt-0.5">Data untuk: <span class="font-semibold text-indigo-600">{{ \Carbon\Carbon::parse($filterDate)->translatedFormat('d F Y') }}</span> &nbsp;<a href="{{ Request::is('admin/*') ? url('/admin/dashboard') : url('/dashboard') }}" class="text-rose-500 hover:text-rose-700 no-underline text-xs font-bold">× Reset</a></p>
+        @endif
+    </div>
+    <div class="flex items-center gap-3">
+        <form method="GET" action="{{ Request::is('admin/*') ? url('/admin/dashboard') : url('/dashboard') }}" id="dash-filter-form">
+            <input type="hidden" name="filter_date" id="dash-hidden-date" value="{{ $filterDate ?? '' }}">
+        </form>
+        <div class="dash-cal-wrap" id="dash-cal-wrap">
+            <button id="dash-cal-trigger" type="button">
+                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+                <span id="dash-trigger-label">{{ $filterDate ? \Carbon\Carbon::parse($filterDate)->translatedFormat('d M Y') : '7 Hari Terakhir' }}</span>
+                <svg class="w-3.5 h-3.5 opacity-60" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div id="dash-cal-popup" class="hidden">
+                <div class="dash-cal-header">
+                    <button class="dash-cal-nav" id="dash-prev" type="button">
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+                    </button>
+                    <button class="dash-cal-title" id="dash-title-btn" type="button"></button>
+                    <button class="dash-cal-nav" id="dash-next" type="button">
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                    </button>
+                </div>
+                <div id="dash-cal-body"></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -99,4 +159,139 @@
         distData:    @json($distData),
     };
 </script>
+
+<script>
+// Dashboard Calendar (display-only, decorative for now)
+(function() {
+    const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const DAYS_SHORT = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+
+    let viewMode = 'days';
+    const today = new Date();
+    let curYear = today.getFullYear();
+    let curMonth = today.getMonth();
+
+    const trigger = document.getElementById('dash-cal-trigger');
+    const popup   = document.getElementById('dash-cal-popup');
+    const titleBtn = document.getElementById('dash-title-btn');
+    const prevBtn  = document.getElementById('dash-prev');
+    const nextBtn  = document.getElementById('dash-next');
+    const body     = document.getElementById('dash-cal-body');
+    const wrap     = document.getElementById('dash-cal-wrap');
+    const trigLabel = document.getElementById('dash-trigger-label');
+    const hiddenDate = document.getElementById('dash-hidden-date');
+    const filterForm = document.getElementById('dash-filter-form');
+
+    const presetDate = '{{ $filterDate ?? "" }}';
+    let sel = null;
+    if (presetDate) {
+        const p = new Date(presetDate + 'T00:00:00');
+        sel = {y: p.getFullYear(), m: p.getMonth(), d: p.getDate()};
+        curYear = p.getFullYear(); curMonth = p.getMonth();
+    }
+
+    function render() {
+        if (viewMode === 'days') renderDays();
+        else if (viewMode === 'months') renderMonths();
+        else renderYears();
+    }
+
+    function renderDays() {
+        titleBtn.textContent = MONTHS_ID[curMonth] + ' ' + curYear;
+        body.innerHTML = '';
+        const wdRow = document.createElement('div');
+        wdRow.className = 'dash-cal-weekdays';
+        DAYS_SHORT.forEach(d => { const s = document.createElement('span'); s.textContent = d; wdRow.appendChild(s); });
+        body.appendChild(wdRow);
+        const grid = document.createElement('div');
+        grid.className = 'dash-cal-days';
+        const firstDay = new Date(curYear, curMonth, 1).getDay();
+        const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
+        const daysInPrev = new Date(curYear, curMonth, 0).getDate();
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.className = 'dash-cal-day other-month'; btn.textContent = daysInPrev - i;
+            grid.appendChild(btn);
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+            const isToday = d === today.getDate() && curMonth === today.getMonth() && curYear === today.getFullYear();
+            const isSel = sel && sel.y === curYear && sel.m === curMonth && sel.d === d;
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.className = 'dash-cal-day' + (isToday ? ' today' : '') + (isSel ? ' selected' : '');
+            btn.textContent = d;
+            btn.onclick = () => {
+                const dd = String(d).padStart(2,'0');
+                const mm = String(curMonth + 1).padStart(2,'0');
+                hiddenDate.value = `${curYear}-${mm}-${dd}`;
+                trigLabel.textContent = `${dd} ${MONTHS_SHORT[curMonth]} ${curYear}`;
+                popup.classList.add('hidden');
+                filterForm.submit();
+            };
+            grid.appendChild(btn);
+        }
+        const trailing = (firstDay + daysInMonth) % 7 === 0 ? 0 : 7 - ((firstDay + daysInMonth) % 7);
+        for (let i = 1; i <= trailing; i++) {
+            const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'dash-cal-day other-month'; btn.textContent = i; grid.appendChild(btn);
+        }
+        body.appendChild(grid);
+    }
+
+    function renderMonths() {
+        titleBtn.textContent = String(curYear);
+        body.innerHTML = '';
+        const grid = document.createElement('div');
+        grid.className = 'dash-cal-grid3';
+        MONTHS_SHORT.forEach((m, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.textContent = m;
+            btn.onclick = () => { curMonth = idx; viewMode = 'days'; render(); };
+            grid.appendChild(btn);
+        });
+        body.appendChild(grid);
+    }
+
+    function renderYears() {
+        const startYear = Math.floor(curYear / 12) * 12;
+        titleBtn.textContent = `${startYear} – ${startYear + 11}`;
+        body.innerHTML = '';
+        const grid = document.createElement('div');
+        grid.className = 'dash-cal-grid3';
+        for (let y = startYear; y < startYear + 12; y++) {
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.textContent = y;
+            btn.onclick = () => { curYear = y; viewMode = 'months'; render(); };
+            grid.appendChild(btn);
+        }
+        body.appendChild(grid);
+    }
+
+    titleBtn.addEventListener('click', () => {
+        if (viewMode === 'days') viewMode = 'months';
+        else if (viewMode === 'months') viewMode = 'years';
+        render();
+    });
+    prevBtn.addEventListener('click', () => {
+        if (viewMode === 'days') { curMonth--; if (curMonth < 0) { curMonth = 11; curYear--; } }
+        else if (viewMode === 'months') curYear--;
+        else curYear -= 12;
+        render();
+    });
+    nextBtn.addEventListener('click', () => {
+        if (viewMode === 'days') { curMonth++; if (curMonth > 11) { curMonth = 0; curYear++; } }
+        else if (viewMode === 'months') curYear++;
+        else curYear += 12;
+        render();
+    });
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = popup.classList.contains('hidden');
+        popup.classList.toggle('hidden');
+        if (isHidden) { viewMode = 'days'; render(); }
+    });
+    document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) popup.classList.add('hidden'); });
+    render();
+})();
+</script>
+
 @endsection

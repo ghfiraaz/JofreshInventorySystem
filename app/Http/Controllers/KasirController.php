@@ -85,7 +85,7 @@ class KasirController extends Controller
             }
 
             $lastTxn = Transaksi::whereDate('created_at', today())->count();
-            $noTransaksi = 'TXN-' . date('Ymd') . '-' . str_pad($lastTxn + 1, 3, '0', STR_PAD_LEFT);
+            $noTransaksi = 'JFR-' . date('Ymd') . '-' . str_pad($lastTxn + 1, 3, '0', STR_PAD_LEFT);
 
             $transaksi = Transaksi::create([
                 'no_transaksi'       => $noTransaksi,
