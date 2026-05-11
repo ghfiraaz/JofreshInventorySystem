@@ -65,7 +65,8 @@ class DashboardController extends Controller
             'trendData',
             'distLabels',
             'distData',
-            'filterDate'
+            'filterDate',
+            'produkList'
         ));
     }
 

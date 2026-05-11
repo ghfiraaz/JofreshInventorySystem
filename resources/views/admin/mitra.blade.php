@@ -4,9 +4,7 @@
 
 <div class="flex justify-between items-center mb-6">
     <div class="relative w-full max-w-xs">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
         <input type="text" id="search-mitra" placeholder="Cari mitra..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-blue-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all">
     </div>
     <button id="btn-tambah-mitra" class="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-semibold text-sm cursor-pointer border-none transition-all" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">
@@ -20,10 +18,11 @@
         <thead>
             <tr style="background:linear-gradient(135deg,#f8fafc,#f1f5f9);">
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Nama Mitra</th>
+                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Email</th>
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Kontak</th>
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Alamat</th>
+                <th class="py-3.5 px-5 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Jatuh Tempo</th>
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
-                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Terdaftar</th>
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Aksi</th>
             </tr>
         </thead>
@@ -31,12 +30,15 @@
             @forelse($mitra as $m)
             <tr data-id="{{ $m->id }}" class="hover:bg-slate-50/60 transition-colors">
                 <td class="py-3.5 px-5 font-semibold text-slate-800 text-sm row-nama-mitra">{{ $m->nama }}</td>
+                <td class="py-3.5 px-5 text-sm text-slate-600 row-email">{{ $m->email ?? '-' }}</td>
                 <td class="py-3.5 px-5 text-sm text-slate-600 row-kontak">{{ $m->kontak ?? '-' }}</td>
                 <td class="py-3.5 px-5 text-sm text-slate-600 row-alamat">{{ $m->alamat ?? '-' }}</td>
+                <td class="py-3.5 px-5 text-sm text-center row-jatuh-tempo">
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">Tgl {{ $m->tanggal_jatuh_tempo }}</span>
+                </td>
                 <td class="py-3.5 px-5">
                     <span class="px-3 py-1 rounded-full text-xs font-semibold row-status-mitra" style="background:#dbeafe;color:#1d4ed8;">{{ $m->status }}</span>
                 </td>
-                <td class="py-3.5 px-5 text-sm text-slate-500 row-terdaftar">{{ $m->created_at->format('d/m/Y') }}</td>
                 <td class="py-3.5 px-5">
                     <div class="flex items-center gap-1">
                         <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-mitra" title="Edit">
@@ -49,7 +51,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="py-16 text-center text-slate-400 text-sm">Belum ada mitra terdaftar.</td></tr>
+            <tr><td colspan="7" class="py-16 text-center text-slate-400 text-sm">Belum ada mitra terdaftar.</td></tr>
             @endforelse
         </tbody>
     </table>
@@ -73,8 +75,22 @@
                 <input type="text" id="mitra-nama" placeholder="Nama restoran / warung" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all">
             </div>
             <div class="mb-4">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Kontak</label>
-                <input type="text" id="mitra-kontak" placeholder="0812-xxxx-xxxx" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
+                <input type="email" id="mitra-email" placeholder="email@mitra.com" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all">
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Kontak</label>
+                    <input type="text" id="mitra-kontak" placeholder="0812-xxxx-xxxx" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal Jatuh Tempo</label>
+                    <select id="mitra-jatuh-tempo" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all bg-white cursor-pointer">
+                        @for($d = 1; $d <= 31; $d++)
+                            <option value="{{ $d }}">Tanggal {{ $d }}</option>
+                        @endfor
+                    </select>
+                </div>
             </div>
             <div class="mb-6">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Alamat</label>

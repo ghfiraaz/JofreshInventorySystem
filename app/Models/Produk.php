@@ -17,6 +17,11 @@ class Produk extends Model
         'harga',
     ];
 
+    protected $casts = [
+        'stok' => 'integer',
+        'stok_minimal' => 'integer',
+    ];
+
     /**
      * Compute the stock status based on stok vs stok_minimal.
      */

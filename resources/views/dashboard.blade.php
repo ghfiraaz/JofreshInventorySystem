@@ -47,7 +47,7 @@
         <div>
             <span class="{{ $isStokRendah ? 'text-red-500' : 'text-slate-500' }} text-[0.85rem] font-medium tracking-wide">Total Stok</span>
             <div class="flex items-baseline gap-1 mt-1">
-                <h3 class="font-bold text-2xl {{ $isStokRendah ? 'text-red-700' : 'text-slate-800' }}">{{ number_format($totalStok, 0, ',', '.') }}</h3>
+                <h3 class="font-bold text-2xl {{ $isStokRendah ? 'text-red-700' : 'text-slate-800' }}">{{ number_format(intval($totalStok), 0, ',', '.') }}</h3>
                 <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider ml-1">Ekor</span>
             </div>
             @if($isStokRendah)
@@ -147,6 +147,44 @@
         <div class="h-[300px]">
            <canvas id="chartDist"></canvas>
         </div>
+    </div>
+</div>
+
+<div class="mt-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+    <h4 class="font-bold text-[1.15rem] mb-6 text-slate-800">Stok Terkini</h4>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50 border-y border-slate-200">
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Nama Produk</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Kategori</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Harga</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Stok</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($produkList as $p)
+                @php
+                    $isRendah = $p->stok < $p->stok_minimal;
+                    $isHabis = $p->stok <= 0;
+                @endphp
+                <tr class="border-b last:border-0 hover:bg-slate-50 transition-colors">
+                    <td class="py-3 px-4 text-sm font-semibold text-slate-800">{{ $p->nama }}</td>
+                    <td class="py-3 px-4 text-sm text-slate-600">{{ $p->kategori }}</td>
+                    <td class="py-3 px-4 text-sm text-slate-600">{{ $p->harga_format }}</td>
+                    <td class="py-3 px-4 text-sm font-bold text-center {{ $isHabis ? 'text-red-600' : ($isRendah ? 'text-red-500' : 'text-slate-700') }}">
+                        {{ intval($p->stok) }}
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold {{ $p->status === 'Tersedia' ? 'bg-green-100 text-green-700' : ($p->status === 'Stok Rendah' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
+                            {{ $p->status }}
+                        </span>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 </div>
 

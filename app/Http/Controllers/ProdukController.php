@@ -15,10 +15,69 @@ class ProdukController extends Controller
         return view('admin.produk', compact('produk', 'stokRendahCount', 'stokHabisCount'));
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama'         => 'required|string|max:255',
+            'harga'        => 'required|numeric|min:0',
+            'stok_minimal' => 'nullable|integer|min:0',
+        ]);
+
+        $produk = Produk::create([
+            'nama'         => $request->nama,
+            'kategori'     => 'Unggas',
+            'stok'         => 0,
+            'stok_minimal' => $request->stok_minimal ?? 0,
+            'satuan'       => 'Ekor',
+            'harga'        => $request->harga,
+        ]);
+
+        return response()->json([
+            'message' => 'Produk berhasil ditambahkan',
+            'produk'  => array_merge($produk->toArray(), [
+                'status'       => $produk->status,
+                'status_badge' => $produk->status_badge,
+                'harga_format' => $produk->harga_format,
+            ]),
+        ], 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $produk = Produk::findOrFail($id);
+
+        $request->validate([
+            'nama'         => 'required|string|max:255',
+            'harga'        => 'required|numeric|min:0',
+            'stok_minimal' => 'nullable|integer|min:0',
+        ]);
+
+        $produk->update([
+            'nama'         => $request->nama,
+            'stok_minimal' => $request->stok_minimal ?? 0,
+            'harga'        => $request->harga,
+        ]);
+
+        return response()->json([
+            'message' => 'Produk berhasil diperbarui',
+            'produk'  => array_merge($produk->toArray(), [
+                'status'       => $produk->status,
+                'status_badge' => $produk->status_badge,
+                'harga_format' => $produk->harga_format,
+            ]),
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        Produk::findOrFail($id)->delete();
+        return response()->json(['message' => 'Produk berhasil dihapus']);
+    }
+
     public function tambahStok(Request $request, $id)
     {
         $request->validate([
-            'jumlah' => 'required|numeric|min:1',
+            'jumlah' => 'required|integer|min:1',
         ]);
 
         $produk = Produk::findOrFail($id);

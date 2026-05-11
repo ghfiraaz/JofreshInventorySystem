@@ -44,7 +44,7 @@ class AuthController extends Controller
     {
         return match ($role) {
             'Superadmin' => redirect('/dashboard'),
-            'Admin'      => redirect('/admin/produk'),
+            'Admin'      => redirect('/admin/dashboard'),
             'Kasir'      => redirect('/kasir'),
             default      => redirect('/'),
         };

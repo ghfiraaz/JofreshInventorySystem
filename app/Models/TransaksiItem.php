@@ -9,6 +9,10 @@ class TransaksiItem extends Model
     protected $table = 'transaksi_items';
     protected $guarded = [];
 
+    protected $casts = [
+        'jumlah' => 'integer',
+    ];
+
     public function transaksi()
     {
         return $this->belongsTo(Transaksi::class);

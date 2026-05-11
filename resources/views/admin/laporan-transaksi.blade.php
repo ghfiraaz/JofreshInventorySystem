@@ -126,7 +126,7 @@
                         <td class="py-3 px-4 text-sm text-slate-600 text-center">
                             <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-indigo-700 font-bold text-xs" style="background:#e0e7ff;">{{ $data['total_transaksi'] }}</span>
                         </td>
-                        <td class="py-3 px-4 text-sm text-slate-600 text-center">{{ $data['total_item'] }} ekor</td>
+                        <td class="py-3 px-4 text-sm text-slate-600 text-center">{{ intval($data['total_item']) }} ekor</td>
                         <td class="py-3 px-4 text-sm font-bold text-emerald-600 text-right">Rp {{ number_format($data['total_harga'], 0, ',', '.') }}</td>
                         <td class="py-3 px-4 text-center">
                             <div class="flex items-center justify-center gap-2">
@@ -176,7 +176,7 @@
                                                     <div class="w-1.5 h-1.5 rounded-full bg-indigo-300"></div>
                                                     {{ $item->nama_produk }}
                                                 </div>
-                                                <div class="font-semibold text-slate-700 bg-slate-50 px-2 py-0.5 rounded text-xs">{{ $item->jumlah }}x</div>
+                                                <div class="font-semibold text-slate-700 bg-slate-50 px-2 py-0.5 rounded text-xs">{{ intval($item->jumlah) }}x</div>
                                             </div>
                                             @endforeach
                                         </div>

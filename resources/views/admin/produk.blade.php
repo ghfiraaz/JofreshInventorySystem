@@ -23,6 +23,10 @@
         </svg>
         <input type="text" id="search-produk" class="w-full pl-11 pr-4 py-2.5 bg-white border border-blue-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-900 transition-all text-sm" placeholder="Cari produk...">
     </div>
+    <button id="btn-tambah-produk" class="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-semibold text-sm cursor-pointer border-none transition-all" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        Tambah Produk
+    </button>
 </div>
 
 <div class="table-container">
@@ -41,8 +45,8 @@
             @forelse($produk as $p)
             <tr data-id="{{ $p->id }}">
                 <td class="font-bold row-nama">{{ $p->nama }}</td>
-                <td class="row-stok">{{ $p->stok }}</td>
-                <td class="row-minimal">{{ $p->stok_minimal }}</td>
+                <td class="row-stok">{{ intval($p->stok) }}</td>
+                <td class="row-minimal">{{ intval($p->stok_minimal) }}</td>
                 <td class="row-harga">{{ $p->harga_format }}</td>
                 <td><span class="px-3 py-1.5 rounded-full text-xs font-semibold {{ $p->status === 'Tersedia' ? 'bg-green-100 text-green-700' : ($p->status === 'Stok Rendah' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">{{ $p->status }}</span></td>
                 <td>
@@ -86,6 +90,40 @@
             <div class="mt-8 flex justify-end gap-3">
                 <button type="button" class="btn btn-outline" data-close-modal>Batal</button>
                 <button type="submit" class="btn btn-primary" id="btn-submit-stok">Simpan Stok</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Modal Tambah / Edit Produk --}}
+<div class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto modal-overlay" id="modal-produk">
+    <div class="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl relative transform scale-95 transition-transform duration-300 [.active_&]:scale-100">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-900 to-indigo-600"></div>
+        <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer bg-transparent border-none" onclick="document.getElementById('modal-produk').classList.remove('active')">&times;</button>
+        <div class="mb-6">
+            <h3 id="modal-produk-title" class="text-xl font-bold text-slate-800">Tambah Produk</h3>
+            <p id="modal-produk-desc" class="text-sm text-slate-500 mt-1">Tambahkan produk baru ke inventaris.</p>
+        </div>
+        <form id="form-produk">
+            <input type="hidden" id="produk-edit-id" value="">
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nama Produk <span class="text-red-500">*</span></label>
+                    <input type="text" id="produk-nama" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all" placeholder="Contoh: Ayam Broiler" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Harga (per ekor) <span class="text-red-500">*</span></label>
+                    <input type="number" id="produk-harga" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all" placeholder="Contoh: 45000" required min="0">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Stok Minimal</label>
+                    <input type="number" id="produk-minimal" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all" placeholder="Contoh: 50" min="0" value="0">
+                    <small class="text-slate-400 mt-1 block">Sistem akan memberi peringatan jika stok di bawah nilai ini.</small>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('modal-produk').classList.remove('active')" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer border-none">Batal</button>
+                <button type="submit" id="btn-submit-produk" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white border-none cursor-pointer transition-all" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">Simpan Produk</button>
             </div>
         </form>
     </div>

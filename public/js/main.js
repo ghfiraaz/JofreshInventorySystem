@@ -249,8 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tr.setAttribute('data-id', p.id);
         tr.innerHTML = `
             <td class="fw-bold row-nama">${p.nama}</td>
-            <td class="row-stok">${p.stok}</td>
-            <td class="row-minimal">${p.stok_minimal}</td>
+            <td class="row-stok">${parseInt(p.stok)}</td>
+            <td class="row-minimal">${parseInt(p.stok_minimal)}</td>
             <td class="row-harga">${harga}</td>
             <td><span class="badge ${badge}">${status}</span></td>
             <td>
@@ -400,16 +400,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const mitraTbody     = document.querySelector('#mitraTable tbody');
 
     function buildMitraRow(m) {
-        const terdaftar = m.created_at ? new Date(m.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'}) : new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'});
         const tr = document.createElement('tr');
         tr.setAttribute('data-id', m.id);
         tr.className = 'hover:bg-slate-50/60 transition-colors';
         tr.innerHTML = `
             <td class="py-3.5 px-5 font-semibold text-slate-800 text-sm row-nama-mitra">${m.nama}</td>
+            <td class="py-3.5 px-5 text-sm text-slate-600 row-email">${m.email || '-'}</td>
             <td class="py-3.5 px-5 text-sm text-slate-600 row-kontak">${m.kontak || '-'}</td>
             <td class="py-3.5 px-5 text-sm text-slate-600 row-alamat">${m.alamat || '-'}</td>
+            <td class="py-3.5 px-5 text-sm text-center row-jatuh-tempo"><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">Tgl ${m.tanggal_jatuh_tempo || 1}</span></td>
             <td class="py-3.5 px-5"><span class="px-3 py-1 rounded-full text-xs font-semibold row-status-mitra" style="background:#dbeafe;color:#1d4ed8;">${m.status || 'Aktif'}</span></td>
-            <td class="py-3.5 px-5 text-sm text-slate-500 row-terdaftar">${terdaftar}</td>
             <td class="py-3.5 px-5">
                 <div class="flex items-center gap-1">
                     <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-mitra" title="Edit">${EDIT_SVG}</button>
@@ -434,9 +434,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const editId  = document.getElementById('mitra-edit-id').value;
             const payload = {
-                nama:   document.getElementById('mitra-nama').value,
-                kontak: document.getElementById('mitra-kontak').value,
-                alamat: document.getElementById('mitra-alamat').value,
+                nama:                document.getElementById('mitra-nama').value,
+                email:               document.getElementById('mitra-email').value,
+                kontak:              document.getElementById('mitra-kontak').value,
+                alamat:              document.getElementById('mitra-alamat').value,
+                tanggal_jatuh_tempo: document.getElementById('mitra-jatuh-tempo').value,
             };
             const url = editId ? `/admin/mitra/${editId}` : '/admin/mitra';
             const btn = document.getElementById('btn-submit-mitra');
@@ -479,10 +481,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tr = e.target.closest('tr');
                 const kontak = tr.querySelector('.row-kontak').textContent.trim();
                 const alamat = tr.querySelector('.row-alamat').textContent.trim();
+                const email = tr.querySelector('.row-email').textContent.trim();
+                const jatuhTempoEl = tr.querySelector('.row-jatuh-tempo');
+                const jatuhTempoText = jatuhTempoEl ? jatuhTempoEl.textContent.trim() : '';
+                const jatuhTempoMatch = jatuhTempoText.match(/Tgl\s*(\d+)/);
+                const jatuhTempo = jatuhTempoMatch ? jatuhTempoMatch[1] : '1';
                 document.getElementById('mitra-edit-id').value = tr.getAttribute('data-id');
                 document.getElementById('mitra-nama').value    = tr.querySelector('.row-nama-mitra').textContent;
+                document.getElementById('mitra-email').value   = email === '-' ? '' : email;
                 document.getElementById('mitra-kontak').value  = kontak === '-' ? '' : kontak;
                 document.getElementById('mitra-alamat').value  = alamat === '-' ? '' : alamat;
+                document.getElementById('mitra-jatuh-tempo').value = jatuhTempo;
                 document.getElementById('modal-mitra-title').textContent = 'Edit Mitra';
                 document.getElementById('btn-submit-mitra').textContent  = 'Simpan Perubahan';
                 modalMitra.classList.add('active');

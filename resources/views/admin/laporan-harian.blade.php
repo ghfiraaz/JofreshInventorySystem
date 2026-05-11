@@ -55,7 +55,7 @@
         </div>
         <div class="p-5 bg-orange-50 rounded-xl border border-orange-100">
             <div class="text-xs font-bold text-orange-500 uppercase tracking-wider mb-2">Sisa Stok Keseluruhan</div>
-            <div class="font-bold text-orange-700 text-3xl">{{ $stokTersedia->sum('stok') }} <span class="text-base text-orange-600/80 font-medium">ekor</span></div>
+            <div class="font-bold text-orange-700 text-3xl">{{ intval($stokTersedia->sum('stok')) }} <span class="text-base text-orange-600/80 font-medium">ekor</span></div>
         </div>
     </div>
 
@@ -75,10 +75,10 @@
                     <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50">
                         <td class="py-3 px-4 text-sm font-semibold text-gray-800">{{ $produk->nama }}</td>
                         <td class="py-3 px-4 text-sm text-amber-600 font-bold text-center">
-                            {{ $stokKeluar[$produk->nama] ?? 0 }} ekor
+                            {{ intval($stokKeluar[$produk->nama] ?? 0) }} ekor
                         </td>
                         <td class="py-3 px-4 text-sm text-blue-700 font-bold text-center">
-                            {{ $produk->stok }} ekor
+                            {{ intval($produk->stok) }} ekor
                         </td>
                     </tr>
                 @endforeach
@@ -105,7 +105,7 @@
                         <td class="py-3 px-4 text-sm text-gray-600">{{ $tx->created_at->format('H:i') }} WIB</td>
                         <td class="py-3 px-4 text-sm font-semibold text-gray-800">{{ $tx->no_transaksi }}</td>
                         <td class="py-3 px-4 text-sm text-gray-600">{{ $tx->mitra->nama ?? 'N/A' }}</td>
-                        <td class="py-3 px-4 text-sm text-gray-600 text-right">{{ $tx->total_item }}</td>
+                        <td class="py-3 px-4 text-sm text-gray-600 text-right">{{ intval($tx->total_item) }}</td>
                         <td class="py-3 px-4 text-sm font-bold text-gray-800 text-right">Rp {{ number_format($tx->total_harga, 0, ',', '.') }}</td>
                     </tr>
                 @empty

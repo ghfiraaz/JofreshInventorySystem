@@ -15,7 +15,7 @@
                     <select id="kasir-produk" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3E%3Cpath stroke=%27%236b7280%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27m6 8 4 4 4-4%27/%3E%3C/svg%3E'); background-position: right 12px center; background-repeat: no-repeat; background-size: 16px; padding-right: 36px;">
                         <option value="">Pilih produk</option>
                         @foreach($produk as $p)
-                            <option value="{{ $p->id }}" data-nama="{{ $p->nama }}" data-harga="{{ $p->harga }}" data-stok="{{ $p->stok }}">
+                            <option value="{{ $p->id }}" data-nama="{{ $p->nama }}" data-harga="{{ intval($p->harga) }}" data-stok="{{ intval($p->stok) }}">
                                 {{ $p->nama }} — Rp {{ number_format($p->harga, 0, ',', '.') }}
                             </option>
                         @endforeach
