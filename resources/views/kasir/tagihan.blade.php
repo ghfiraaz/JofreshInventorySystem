@@ -137,24 +137,16 @@
                                 </button>
                             @endif
 
-                            {{-- Reminder button - only active at H-3 before due date --}}
+                            {{-- Reminder button - available for all mitra with email --}}
                             @if($mt['mitra']->email)
-                                @php
-                                    $reminderDisabled = $mt['reminderSentToday'] || !$canSendReminder;
-                                    $reminderTitle = $mt['reminderSentToday']
-                                        ? 'Reminder sudah dikirim hari ini'
-                                        : (!$canSendReminder
-                                            ? 'Reminder hanya dapat dikirim 3 hari sebelum jatuh tempo (sisa ' . ($mt['sisaHari'] ?? '?') . ' hari)'
-                                            : 'Kirim reminder via email ke ' . $mt['mitra']->email);
-                                @endphp
                                 <button type="button" class="btn-send-reminder px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none
                                     {{ $reminderDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-amber-100 text-amber-700 hover:bg-amber-600 hover:text-white' }}"
                                     data-mitra="{{ $mt['mitra']->id }}"
                                     data-nama="{{ $mt['mitra']->nama }}"
                                     data-email="{{ $mt['mitra']->email }}"
-                                    {{ $reminderDisabled ? 'disabled' : '' }}
+                                    {{ $mt['reminderSentToday'] ? 'disabled' : '' }}
                                     onclick="event.stopPropagation(); sendReminder(this)"
-                                    title="{{ $reminderTitle }}">
+                                    title="{{ $mt['reminderSentToday'] ? 'Reminder sudah dikirim hari ini' : 'Kirim reminder via email ke ' . $mt['mitra']->email }}">
                                     <span class="flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
                                         {{ $mt['reminderSentToday'] ? 'Terkirim' : ($canSendReminder ? 'Reminder' : 'H-'.($mt['sisaHari'] ?? '?')) }}
@@ -386,20 +378,15 @@ function sendReminder(btn) {
     );
 }
 
-// ========== Validasi Mitra (Terima/Tolak) ==========
+// ========== Validasi Mitra ==========
 function validasiMitra(btn) {
     const mitraId = btn.getAttribute('data-mitra');
-    const action = btn.getAttribute('data-action') || 'terima';
-    const isTerma = action === 'terima';
-    const originalText = btn.textContent.trim();
 
     showConfirmTagihan(
-        isTerma ? 'Terima Pembayaran' : 'Tolak Pembayaran',
-        isTerma
-            ? 'Terima semua bukti pembayaran mitra ini? Status akan berubah menjadi Lunas.'
-            : 'Tolak semua bukti pembayaran mitra ini? Mitra akan dapat mengupload ulang bukti pembayaran.',
+        'Validasi Pembayaran',
+        'Validasi semua bukti pembayaran mitra ini?',
         null,
-        isTerma ? 'Ya, Terima' : 'Ya, Tolak',
+        'Ya, Validasi',
         () => {
             btn.disabled = true;
             btn.textContent = 'Memproses...';
@@ -407,17 +394,16 @@ function validasiMitra(btn) {
             fetch('/kasir/tagihan/validasi-mitra', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-                body: JSON.stringify({ mitra_id: mitraId, action: action })
+                body: JSON.stringify({ mitra_id: mitraId })
             })
             .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
             .then(data => {
-                showToast('success', isTerma ? 'Pembayaran Diterima' : 'Pembayaran Ditolak', data.message);
-                setTimeout(() => window.location.reload(), 1500);
+                window.location.reload();
             })
             .catch(err => {
-                showToast('error', 'Gagal', err.message || 'Terjadi kesalahan');
+                showToast('error', 'Gagal Memvalidasi', err.message || 'Terjadi kesalahan');
                 btn.disabled = false;
-                btn.textContent = originalText;
+                btn.textContent = '✓ Validasi';
             });
         }
     );

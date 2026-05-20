@@ -3,17 +3,18 @@
 namespace App\Mail;
 
 use App\Models\Mitra;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Attachment;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 
-class PaymentReminderMail extends Mailable
+class PaymentReminderMail extends Mailable implements ShouldQueue
 {
-    use SerializesModels;
+    use Queueable, SerializesModels;
 
     public Mitra $mitra;
     public Collection $transaksiList;
@@ -54,8 +55,7 @@ class PaymentReminderMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Rekapitulasi Transaksi ' . $this->mitra->nama . ' - JoFresh',
-            replyTo: [config('mail.from.address')],
+            subject: "Reminder Tagihan Pembayaran - JoFresh ({$this->tanggalTempo})",
         );
     }
 
@@ -66,7 +66,6 @@ class PaymentReminderMail extends Mailable
     {
         return new Content(
             view: 'emails.payment-reminder',
-            text: 'emails.payment-reminder-text',
         );
     }
 
@@ -77,13 +76,19 @@ class PaymentReminderMail extends Mailable
     {
         $attachments = [];
 
-        // Attach PDF invoice only
+        // Attach PDF invoice
         if (file_exists($this->pdfPath)) {
             $attachments[] = Attachment::fromPath($this->pdfPath)
-                ->as('Rekapitulasi_' . str_replace(' ', '_', $this->mitra->nama) . '.pdf')
+                ->as('Invoice_Rekap_JoFresh_' . str_replace(' ', '_', $this->mitra->nama) . '.pdf')
                 ->withMime('application/pdf');
-        } else {
-            Log::warning('Invoice PDF not found for email attachment', ['path' => $this->pdfPath]);
+        }
+
+        // Attach QR Code image
+        $qrPath = public_path('images/qris-jofresh.png');
+        if (file_exists($qrPath)) {
+            $attachments[] = Attachment::fromPath($qrPath)
+                ->as('QRIS_Pembayaran_JoFresh.png')
+                ->withMime('image/png');
         }
 
         return $attachments;

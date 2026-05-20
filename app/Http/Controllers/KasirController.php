@@ -270,21 +270,6 @@ class KasirController extends Controller
         $mitra  = Mitra::findOrFail($request->mitra_id);
         $sender = Auth::user();
 
-        // Backend validation: cek apakah sudah H-3 sebelum jatuh tempo
-        $closestTempo = Transaksi::where('mitra_id', $mitra->id)
-            ->where('status_pembayaran', 'Belum Dibayar')
-            ->whereNotNull('jatuh_tempo')
-            ->min('jatuh_tempo');
-
-        if ($closestTempo) {
-            $sisaHari = (int) now()->startOfDay()->diffInDays($closestTempo, false);
-            if ($sisaHari > 3) {
-                return response()->json([
-                    'message' => 'Reminder hanya dapat dikirim maksimal 3 hari sebelum jatuh tempo. Sisa ' . $sisaHari . ' hari lagi.'
-                ], 422);
-            }
-        }
-
         $result = $reminderService->sendReminder($mitra, $sender);
 
         if (!$result['success']) {

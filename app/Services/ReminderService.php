@@ -31,15 +31,6 @@ class ReminderService
             ];
         }
 
-        // 1b. Validasi format email
-        if (!filter_var($mitra->email, FILTER_VALIDATE_EMAIL)) {
-            return [
-                'success' => false,
-                'message' => 'Format email mitra tidak valid: ' . $mitra->email,
-                'history' => null,
-            ];
-        }
-
         // 2. Validasi max 1 reminder per hari per mitra
         $alreadySentToday = ReminderHistory::where('mitra_id', $mitra->id)
             ->whereDate('tanggal_pengiriman', today())
@@ -88,7 +79,7 @@ class ReminderService
 
         $this->generateInvoicePdf($mitra, $transaksiList, $totalTagihan, $periodeAwal, $periodeAkhir, $pdfPath);
 
-        // 7. Kirim email (synchronous — langsung terkirim, exception langsung tertangkap)
+        // 7. Kirim email
         try {
             Mail::to($mitra->email)->send(new PaymentReminderMail(
                 mitra: $mitra,
@@ -100,12 +91,6 @@ class ReminderService
                 periodeAkhir: $periodeAkhir->translatedFormat('d F Y'),
                 pdfPath: $pdfPath
             ));
-
-            Log::info('Reminder email berhasil dikirim', [
-                'mitra_id' => $mitra->id,
-                'email'    => $mitra->email,
-                'total'    => $totalTagihan,
-            ]);
 
             // 8. Simpan histori - berhasil
             $history = ReminderHistory::create([
@@ -136,7 +121,6 @@ class ReminderService
                 'mitra_id' => $mitra->id,
                 'email'    => $mitra->email,
                 'error'    => $e->getMessage(),
-                'trace'    => $e->getTraceAsString(),
             ]);
 
             // Simpan histori - gagal
@@ -220,7 +204,7 @@ class ReminderService
             'totalTagihan'   => $totalTagihan,
             'periodeAwal'    => $periodeAwal->translatedFormat('d F Y'),
             'periodeAkhir'   => $periodeAkhir->translatedFormat('d F Y'),
-            'qrCodePath'     => public_path('images/qris-jofresh.jpg'),
+            'qrCodePath'     => public_path('images/qris-jofresh.png'),
         ])->setPaper('a4', 'portrait');
 
         $pdf->save($outputPath);
