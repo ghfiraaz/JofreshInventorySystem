@@ -33,6 +33,21 @@
             <p class="text-sm text-green-600">Terima kasih, bukti pembayaran Anda sedang diverifikasi oleh tim kami.</p>
         </div>
     @else
+        {{-- Rejected Payment Notice --}}
+        @if(isset($hasDitolak) && $hasDitolak)
+            <div class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-6">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-white"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-red-800">Bukti Pembayaran Ditolak</h3>
+                        <p class="text-sm text-red-600">Bukti pembayaran sebelumnya tidak valid. Silakan upload ulang bukti pembayaran yang benar.</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Mitra Info --}}
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
             <div class="bg-gradient-to-r from-blue-700 to-indigo-600 p-6 text-white">
@@ -82,7 +97,7 @@
             <div class="text-center p-4 rounded-xl bg-gray-50 border border-gray-200">
                 <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">QRIS Pembayaran</div>
                 <div class="bg-white p-3 rounded-xl inline-block border border-gray-200 shadow-sm">
-                    <img src="{{ asset('images/qris.png') }}" alt="QRIS JoFresh" class="w-48 h-48 object-contain">
+                    <img src="{{ asset('images/qris-jofresh.jpg') }}" alt="QRIS JoFresh" class="w-48 h-48 object-contain">
                 </div>
             </div>
         </div>

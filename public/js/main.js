@@ -254,9 +254,13 @@ document.addEventListener('DOMContentLoaded', () => {
             <td class="row-harga">${harga}</td>
             <td><span class="badge ${badge}">${status}</span></td>
             <td>
-                <button class="bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer border border-blue-200 btn-tambah-stok">
-                    + Tambah Stok
-                </button>
+                <div class="flex items-center gap-1.5">
+                    <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-produk" title="Edit">${EDIT_SVG}</button>
+                    <button class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-delete-produk" title="Hapus">${DELETE_SVG}</button>
+                    <button class="bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer border border-blue-200 btn-tambah-stok">
+                        + Tambah Stok
+                    </button>
+                </div>
             </td>`;
         return tr;
     }
@@ -409,7 +413,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <td class="py-3.5 px-5 text-sm text-slate-600 row-kontak">${m.kontak || '-'}</td>
             <td class="py-3.5 px-5 text-sm text-slate-600 row-alamat">${m.alamat || '-'}</td>
             <td class="py-3.5 px-5 text-sm text-center row-jatuh-tempo"><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">Tgl ${m.tanggal_jatuh_tempo || 1}</span></td>
-            <td class="py-3.5 px-5"><span class="px-3 py-1 rounded-full text-xs font-semibold row-status-mitra" style="background:#dbeafe;color:#1d4ed8;">${m.status || 'Aktif'}</span></td>
             <td class="py-3.5 px-5">
                 <div class="flex items-center gap-1">
                     <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-mitra" title="Edit">${EDIT_SVG}</button>
@@ -530,7 +533,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 scales: { 
                     y: { 
                         beginAtZero: true, 
-                        ticks: { stepSize: 1 } 
+                        ticks: { 
+                            maxTicksLimit: 6,
+                            callback: function(value) {
+                                if (value >= 1000000) return 'Rp ' + (value / 1000000).toLocaleString('id-ID', {maximumFractionDigits: 1}) + ' jt';
+                                if (value >= 1000) return 'Rp ' + (value / 1000).toLocaleString('id-ID', {maximumFractionDigits: 0}) + ' rb';
+                                return 'Rp ' + value.toLocaleString('id-ID');
+                            }
+                        } 
                     } 
                 } 
             }
@@ -558,7 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 responsive: true, 
                 maintainAspectRatio: false, 
                 plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } }, 
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } 
+                scales: { y: { beginAtZero: true, ticks: { maxTicksLimit: 6, precision: 0 } } } 
             }
         });
     }

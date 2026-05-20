@@ -17,13 +17,14 @@ class PaymentController extends Controller
 
         $transaksiUnpaid = Transaksi::with('items')
             ->where('mitra_id', $mitra->id)
-            ->where('status_pembayaran', 'Belum Dibayar')
+            ->whereIn('status_pembayaran', ['Belum Dibayar', 'Ditolak'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $totalTagihan = $transaksiUnpaid->sum('total_harga');
+        $hasDitolak = $transaksiUnpaid->contains('status_pembayaran', 'Ditolak');
 
-        return view('pembayaran-upload', compact('mitra', 'transaksiUnpaid', 'totalTagihan', 'token'));
+        return view('pembayaran-upload', compact('mitra', 'transaksiUnpaid', 'totalTagihan', 'token', 'hasDitolak'));
     }
 
     /**
@@ -37,14 +38,14 @@ class PaymentController extends Controller
             'bukti_pembayaran' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
-        // Store the file
+        // Store the file in the 'public' disk (storage/app/public/bukti-pembayaran/)
         $file = $request->file('bukti_pembayaran');
         $filename = 'bukti_' . $mitra->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('public/bukti-pembayaran', $filename);
+        $path = $file->storeAs('bukti-pembayaran', $filename, 'public');
 
-        // Update all unpaid transactions for this mitra
+        // Update all unpaid/rejected transactions for this mitra
         Transaksi::where('mitra_id', $mitra->id)
-            ->where('status_pembayaran', 'Belum Dibayar')
+            ->whereIn('status_pembayaran', ['Belum Dibayar', 'Ditolak'])
             ->update([
                 'bukti_pembayaran' => 'bukti-pembayaran/' . $filename,
                 'status_pembayaran' => 'Menunggu Validasi',
