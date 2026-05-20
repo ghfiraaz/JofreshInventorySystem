@@ -22,7 +22,6 @@
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Kontak</th>
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Alamat</th>
                 <th class="py-3.5 px-5 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Jatuh Tempo</th>
-                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Aksi</th>
             </tr>
         </thead>
@@ -37,9 +36,6 @@
                     <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">Tgl {{ $m->tanggal_jatuh_tempo }}</span>
                 </td>
                 <td class="py-3.5 px-5">
-                    <span class="px-3 py-1 rounded-full text-xs font-semibold row-status-mitra" style="background:#dbeafe;color:#1d4ed8;">{{ $m->status }}</span>
-                </td>
-                <td class="py-3.5 px-5">
                     <div class="flex items-center gap-1">
                         <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-mitra" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/></svg>
@@ -51,7 +47,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="7" class="py-16 text-center text-slate-400 text-sm">Belum ada mitra terdaftar.</td></tr>
+            <tr><td colspan="6" class="py-16 text-center text-slate-400 text-sm">Belum ada mitra terdaftar.</td></tr>
             @endforelse
         </tbody>
     </table>

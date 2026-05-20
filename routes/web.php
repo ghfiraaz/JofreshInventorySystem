@@ -60,8 +60,8 @@ Route::middleware(['role:Kasir'])->prefix('kasir')->group(function () {
     Route::get('/transaksi/{id}/invoice', [KasirController::class, 'invoice']);
     Route::get('/tagihan', [KasirController::class, 'tagihan']);
     Route::post('/tagihan/bayar', [KasirController::class, 'bayarTagihan']);
-    Route::post('/tagihan/reminder', [KasirController::class, 'recordReminder']);
-    Route::post('/tagihan/reminder-data', [KasirController::class, 'getReminderData']);
+    Route::post('/tagihan/send-reminder', [KasirController::class, 'sendReminder']);
+    Route::get('/reminder-history', [KasirController::class, 'reminderHistory']);
     Route::post('/transaksi/{id}/validasi', [KasirController::class, 'validasiBuktiPembayaran']);
     Route::post('/tagihan/validasi-mitra', [KasirController::class, 'validasiBuktiPerMitra']);
 });

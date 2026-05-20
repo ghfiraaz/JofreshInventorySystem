@@ -125,21 +125,22 @@
                                 </button>
                             @endif
 
-                            {{-- Reminder button --}}
-                            @if($mt['mitra']->email && $mt['sisaHari'] !== null && $mt['sisaHari'] <= 3)
+                            {{-- Reminder button - available for all mitra with email --}}
+                            @if($mt['mitra']->email)
                                 <button type="button" class="btn-send-reminder px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none
                                     {{ $mt['reminderSentToday'] ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-amber-100 text-amber-700 hover:bg-amber-600 hover:text-white' }}"
                                     data-mitra="{{ $mt['mitra']->id }}"
                                     data-nama="{{ $mt['mitra']->nama }}"
+                                    data-email="{{ $mt['mitra']->email }}"
                                     {{ $mt['reminderSentToday'] ? 'disabled' : '' }}
                                     onclick="event.stopPropagation(); sendReminder(this)"
-                                    title="{{ $mt['reminderSentToday'] ? 'Reminder sudah dikirim hari ini' : 'Kirim reminder via email' }}">
+                                    title="{{ $mt['reminderSentToday'] ? 'Reminder sudah dikirim hari ini' : 'Kirim reminder via email ke ' . $mt['mitra']->email }}">
                                     <span class="flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
                                         {{ $mt['reminderSentToday'] ? 'Terkirim' : 'Reminder' }}
                                     </span>
                                 </button>
-                            @elseif(!$mt['mitra']->email)
+                            @else
                                 <span class="text-xs text-gray-400 italic">Email belum diisi</span>
                             @endif
 
@@ -202,79 +203,185 @@
     @endif
 </div>
 
+{{-- ===== TOAST NOTIFICATION (CENTERED) ===== --}}
+<div id="toast-notification" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none" style="display:none;">
+    <div class="rounded-2xl shadow-2xl border overflow-hidden max-w-sm w-full mx-4 pointer-events-auto transform scale-95 opacity-0 transition-all duration-300" id="toast-inner">
+        <div class="px-6 py-5 flex flex-col items-center text-center gap-3">
+            <div id="toast-icon" class="flex-shrink-0"></div>
+            <div>
+                <p id="toast-title" class="font-bold text-base mb-1"></p>
+                <p id="toast-message" class="text-sm opacity-80"></p>
+            </div>
+            <button onclick="hideToast()" class="mt-2 px-6 py-2 rounded-xl font-semibold text-sm cursor-pointer border-none transition-all text-white" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">OK</button>
+        </div>
+    </div>
+</div>
+
+{{-- ===== CONFIRMATION MODAL (CENTERED) ===== --}}
+<div id="modal-confirm-tagihan" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl relative overflow-hidden transform scale-95 transition-transform duration-300 [.active_&]:scale-100">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-900 to-indigo-600"></div>
+        <div class="px-8 pt-8 pb-2 flex justify-between items-start">
+            <div>
+                <h3 id="confirm-tagihan-title" class="text-lg font-bold text-slate-800"></h3>
+            </div>
+            <button type="button" onclick="closeConfirmModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer bg-transparent border-none leading-none mt-1">&times;</button>
+        </div>
+        <div class="px-8 pb-3">
+            <p id="confirm-tagihan-message" class="text-sm text-slate-600 leading-relaxed"></p>
+            <div id="confirm-tagihan-detail" class="mt-3 p-3 bg-slate-50 rounded-xl text-sm text-slate-700 hidden"></div>
+        </div>
+        <div class="px-8 pb-8 pt-4 flex justify-end gap-3">
+            <button type="button" onclick="closeConfirmModal()" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer border-none">Batal</button>
+            <button type="button" id="confirm-tagihan-yes" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white border-none cursor-pointer transition-all" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">Ya, Kirim</button>
+        </div>
+    </div>
+</div>
+
 <script>
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-// Toggle detail
-document.querySelectorAll('.tagihan-mitra-header').forEach(header => {
-    header.addEventListener('click', function() {
-        const detail = this.nextElementSibling;
-        const icon = this.querySelector('.tagihan-expand-icon');
-        if (detail) {
-            detail.classList.toggle('hidden');
-            if (icon) icon.style.transform = detail.classList.contains('hidden') ? '' : 'rotate(180deg)';
-        }
+// ========== Toast (centered) ==========
+function showToast(type, title, message) {
+    const toast = document.getElementById('toast-notification');
+    const inner = document.getElementById('toast-inner');
+    const iconEl = document.getElementById('toast-icon');
+    const titleEl = document.getElementById('toast-title');
+    const msgEl = document.getElementById('toast-message');
+
+    titleEl.textContent = title;
+    msgEl.textContent = message;
+
+    if (type === 'success') {
+        inner.className = 'rounded-2xl shadow-2xl border overflow-hidden max-w-sm w-full mx-4 pointer-events-auto transform transition-all duration-300 bg-white border-emerald-200 text-emerald-800';
+        iconEl.innerHTML = '<div class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center"><svg class="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></div>';
+    } else {
+        inner.className = 'rounded-2xl shadow-2xl border overflow-hidden max-w-sm w-full mx-4 pointer-events-auto transform transition-all duration-300 bg-white border-red-200 text-red-800';
+        iconEl.innerHTML = '<div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center"><svg class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></div>';
+    }
+
+    toast.style.display = 'flex';
+    requestAnimationFrame(() => {
+        inner.classList.remove('scale-95', 'opacity-0');
+        inner.classList.add('scale-100', 'opacity-100');
     });
-});
 
-// Send Reminder via Gmail Compose
-function sendReminder(btn) {
-    const mitraId = btn.getAttribute('data-mitra');
-    btn.disabled = true;
-    btn.querySelector('span').innerHTML = `<svg class="animate-spin w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Loading...`;
-
-    // Get Gmail compose data
-    fetch('/kasir/tagihan/reminder-data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-        body: JSON.stringify({ mitra_id: mitraId })
-    })
-    .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
-    .then(data => {
-        // Open Gmail compose in new tab
-        window.open(data.gmail_url, '_blank');
-
-        // Record that reminder was sent
-        return fetch('/kasir/tagihan/reminder', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-            body: JSON.stringify({ mitra_id: mitraId })
-        });
-    })
-    .then(() => {
-        btn.classList.remove('bg-amber-100', 'text-amber-700', 'hover:bg-amber-600', 'hover:text-white');
-        btn.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed');
-        btn.querySelector('span').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg> Terkirim`;
-    })
-    .catch(err => {
-        alert(err.message || 'Gagal mengirim reminder');
-        btn.disabled = false;
-        btn.querySelector('span').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg> Reminder`;
-    });
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(hideToast, 5000);
 }
 
-// Validasi bukti pembayaran per mitra
+function hideToast() {
+    const toast = document.getElementById('toast-notification');
+    const inner = document.getElementById('toast-inner');
+    inner.classList.add('scale-95', 'opacity-0');
+    inner.classList.remove('scale-100', 'opacity-100');
+    setTimeout(() => { toast.style.display = 'none'; }, 300);
+}
+
+// ========== Confirm Modal ==========
+let _confirmCallback = null;
+
+function showConfirmTagihan(title, message, detail, yesLabel, onYes) {
+    const modal = document.getElementById('modal-confirm-tagihan');
+    document.getElementById('confirm-tagihan-title').textContent = title;
+    document.getElementById('confirm-tagihan-message').textContent = message;
+    const detailEl = document.getElementById('confirm-tagihan-detail');
+    const yesBtn = document.getElementById('confirm-tagihan-yes');
+    yesBtn.textContent = yesLabel || 'Ya, Lanjutkan';
+    if (detail) {
+        detailEl.innerHTML = detail;
+        detailEl.classList.remove('hidden');
+    } else {
+        detailEl.classList.add('hidden');
+    }
+    _confirmCallback = onYes;
+    modal.classList.add('active');
+}
+
+function closeConfirmModal() {
+    document.getElementById('modal-confirm-tagihan').classList.remove('active');
+    _confirmCallback = null;
+}
+
+document.getElementById('confirm-tagihan-yes')?.addEventListener('click', () => {
+    if (_confirmCallback) _confirmCallback();
+    closeConfirmModal();
+});
+
+document.getElementById('modal-confirm-tagihan')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeConfirmModal();
+});
+
+// ========== Send Reminder ==========
+function sendReminder(btn) {
+    const mitraId = btn.getAttribute('data-mitra');
+    const mitraName = btn.getAttribute('data-nama');
+    const mitraEmail = btn.getAttribute('data-email');
+
+    showConfirmTagihan(
+        'Kirim Reminder Pembayaran',
+        `Kirim email reminder pembayaran ke ${mitraName} (${mitraEmail})?`,
+        '<div style="line-height:1.8;">Email akan berisi:<br>• Rekapitulasi tagihan 1 bulan<br>• PDF Invoice sebagai lampiran<br>• QR Code pembayaran</div>',
+        'Ya, Kirim Email',
+        () => {
+            btn.disabled = true;
+            const originalContent = btn.querySelector('span').innerHTML;
+            btn.querySelector('span').innerHTML = `<svg class="animate-spin w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Mengirim...`;
+
+            fetch('/kasir/tagihan/send-reminder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                body: JSON.stringify({ mitra_id: mitraId })
+            })
+            .then(r => r.json().then(data => ({ ok: r.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok) {
+                    btn.classList.remove('bg-amber-100', 'text-amber-700', 'hover:bg-amber-600', 'hover:text-white');
+                    btn.classList.add('bg-emerald-100', 'text-emerald-700', 'cursor-not-allowed');
+                    btn.querySelector('span').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg> Terkirim`;
+                    showToast('success', 'Reminder Terkirim!', data.message);
+                } else {
+                    throw data;
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.querySelector('span').innerHTML = originalContent;
+                showToast('error', 'Gagal Mengirim', err.message || 'Terjadi kesalahan saat mengirim reminder');
+            });
+        }
+    );
+}
+
+// ========== Validasi Mitra ==========
 function validasiMitra(btn) {
     const mitraId = btn.getAttribute('data-mitra');
-    if (!confirm('Validasi semua bukti pembayaran mitra ini?')) return;
-    
-    btn.disabled = true;
-    btn.textContent = 'Memproses...';
 
-    fetch('/kasir/tagihan/validasi-mitra', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-        body: JSON.stringify({ mitra_id: mitraId })
-    })
-    .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
-    .then(data => {
-        window.location.reload();
-    })
-    .catch(err => {
-        alert(err.message || 'Gagal memvalidasi');
-        btn.disabled = false;
-        btn.textContent = '✓ Validasi';
-    });
+    showConfirmTagihan(
+        'Validasi Pembayaran',
+        'Validasi semua bukti pembayaran mitra ini?',
+        null,
+        'Ya, Validasi',
+        () => {
+            btn.disabled = true;
+            btn.textContent = 'Memproses...';
+
+            fetch('/kasir/tagihan/validasi-mitra', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                body: JSON.stringify({ mitra_id: mitraId })
+            })
+            .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
+            .then(data => {
+                window.location.reload();
+            })
+            .catch(err => {
+                showToast('error', 'Gagal Memvalidasi', err.message || 'Terjadi kesalahan');
+                btn.disabled = false;
+                btn.textContent = '✓ Validasi';
+            });
+        }
+    );
 }
 </script>
 

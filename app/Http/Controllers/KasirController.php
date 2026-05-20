@@ -6,6 +6,8 @@ use App\Models\Produk;
 use App\Models\Mitra;
 use App\Models\Transaksi;
 use App\Models\TransaksiItem;
+use App\Models\ReminderHistory;
+use App\Services\ReminderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -219,10 +221,11 @@ class KasirController extends Controller
                 $isLewatTempo = $sisaHari < 0;
             }
 
-            // Check if reminder was sent today for any transaction of this mitra
-            $reminderSentToday = $txns->contains(function ($tx) {
-                return $tx->last_reminder_sent_at && $tx->last_reminder_sent_at->isToday();
-            });
+            // Check if reminder was sent today from reminder_histories
+            $reminderSentToday = ReminderHistory::where('mitra_id', $mitra->id)
+                ->whereDate('tanggal_pengiriman', today())
+                ->where('status', 'berhasil')
+                ->exists();
 
             $mitraTagihan[] = [
                 'mitra'              => $mitra,
@@ -255,32 +258,59 @@ class KasirController extends Controller
     }
 
     /**
-     * Record that reminder was sent (called after kasir opens Gmail compose)
+     * Kirim reminder pembayaran via email otomatis
      */
-    public function recordReminder(Request $request)
+    public function sendReminder(Request $request, ReminderService $reminderService)
     {
         $request->validate([
             'mitra_id' => 'required|exists:mitra,id',
         ]);
 
-        // Check if reminder already sent today
-        $alreadySent = Transaksi::where('user_id', Auth::id())
-            ->where('mitra_id', $request->mitra_id)
-            ->where('status_pembayaran', 'Belum Dibayar')
-            ->whereDate('last_reminder_sent_at', today())
-            ->exists();
+        $mitra  = Mitra::findOrFail($request->mitra_id);
+        $sender = Auth::user();
 
-        if ($alreadySent) {
-            return response()->json(['message' => 'Reminder sudah dikirim hari ini.'], 422);
+        $result = $reminderService->sendReminder($mitra, $sender);
+
+        if (!$result['success']) {
+            return response()->json(['message' => $result['message']], 422);
         }
 
-        // Mark reminder as sent for all unpaid transactions of this mitra
-        Transaksi::where('user_id', Auth::id())
-            ->where('mitra_id', $request->mitra_id)
-            ->where('status_pembayaran', 'Belum Dibayar')
-            ->update(['last_reminder_sent_at' => now()]);
+        return response()->json([
+            'message' => $result['message'],
+            'history' => $result['history'],
+        ]);
+    }
 
-        return response()->json(['message' => 'Reminder berhasil dicatat.']);
+    /**
+     * Halaman histori pengiriman reminder dengan filter periode tanggal
+     */
+    public function reminderHistory(Request $request)
+    {
+        $dari   = $request->get('dari', now()->startOfMonth()->format('Y-m-d'));
+        $sampai = $request->get('sampai', now()->format('Y-m-d'));
+        $status = $request->get('status', '');
+
+        $query = ReminderHistory::with('mitra')
+            ->where('user_id', Auth::id())
+            ->whereBetween('tanggal_pengiriman', [
+                Carbon::parse($dari)->startOfDay(),
+                Carbon::parse($sampai)->endOfDay(),
+            ])
+            ->orderBy('tanggal_pengiriman', 'desc');
+
+        if ($status !== '') {
+            $query->where('status', $status);
+        }
+
+        $histories = $query->get();
+
+        $totalReminder = $histories->count();
+        $totalBerhasil = $histories->where('status', 'berhasil')->count();
+        $totalGagal    = $histories->where('status', 'gagal')->count();
+
+        return view('kasir.reminder-history', compact(
+            'histories', 'totalReminder', 'totalBerhasil', 'totalGagal'
+        ));
     }
 
     /**
@@ -357,91 +387,5 @@ class KasirController extends Controller
     {
         $transaksi = Transaksi::with(['mitra', 'items'])->where('user_id', Auth::id())->findOrFail($id);
         return view('kasir.invoice', compact('transaksi'));
-    }
-
-    /**
-     * Get Gmail compose URL data for reminder email
-     */
-    public function getReminderData(Request $request)
-    {
-        $request->validate([
-            'mitra_id' => 'required|exists:mitra,id',
-        ]);
-
-        $mitra = Mitra::findOrFail($request->mitra_id);
-        
-        if (!$mitra->email) {
-            return response()->json(['message' => 'Email mitra belum diisi. Silakan update data mitra terlebih dahulu.'], 422);
-        }
-
-        $transaksiUnpaid = Transaksi::with('items')
-            ->where('user_id', Auth::id())
-            ->where('mitra_id', $mitra->id)
-            ->where('status_pembayaran', 'Belum Dibayar')
-            ->get();
-
-        if ($transaksiUnpaid->isEmpty()) {
-            return response()->json(['message' => 'Tidak ada tagihan yang belum dibayar.'], 422);
-        }
-
-        $totalTagihan = $transaksiUnpaid->sum('total_harga');
-        $closestTempo = $transaksiUnpaid->whereNotNull('jatuh_tempo')->pluck('jatuh_tempo')->sort()->first();
-        
-        $sisaHari = null;
-        if ($closestTempo) {
-            $sisaHari = (int) now()->startOfDay()->diffInDays($closestTempo, false);
-        }
-
-        // Build tempo text
-        $tempoText = 'segera';
-        if ($sisaHari !== null) {
-            if ($sisaHari <= 0) $tempoText = 'hari ini';
-            elseif ($sisaHari === 1) $tempoText = 'besok';
-            elseif ($sisaHari === 2) $tempoText = 'dalam 2 hari';
-            elseif ($sisaHari === 3) $tempoText = 'dalam 3 hari';
-            else $tempoText = "dalam {$sisaHari} hari";
-        }
-
-        $tanggalTempo = $closestTempo ? Carbon::parse($closestTempo)->translatedFormat('d F Y') : '-';
-
-        // Build payment link
-        $paymentLink = url('/pembayaran/' . $mitra->payment_token);
-
-        // Build invoice list
-        $invoiceList = '';
-        foreach ($transaksiUnpaid as $tx) {
-            $invoiceList .= '  - ' . $tx->no_transaksi . ' (Rp ' . number_format($tx->total_harga, 0, ',', '.') . ")\n";
-        }
-
-        // Build email body
-        $subject = "Reminder Tagihan Pembayaran - JoFresh ({$tanggalTempo})";
-        
-        $body = "Yth. Bapak/Ibu {$mitra->nama},\n\n";
-        $body .= "Semoga Bapak/Ibu dalam keadaan baik.\n\n";
-        $body .= "Melalui email ini kami ingin mengingatkan bahwa tagihan berikut akan jatuh tempo {$tempoText}:\n\n";
-        $body .= "Tanggal Jatuh Tempo: {$tanggalTempo}\n";
-        $body .= "Total Tagihan: Rp " . number_format($totalTagihan, 0, ',', '.') . "\n\n";
-        $body .= "Sebagai informasi, kami turut melampirkan:\n\n";
-        $body .= "* Daftar invoice:\n{$invoiceList}\n";
-        $body .= "* Link Download PDF Detail Transaksi: " . url('/pembayaran/' . $mitra->payment_token . '/pdf') . "\n";
-        $body .= "* Informasi nomor rekening pembayaran\n";
-        $body .= "* QRIS pembayaran\n\n";
-        $body .= "Untuk melakukan konfirmasi pembayaran dan mengunggah bukti transfer, silakan klik link berikut:\n";
-        $body .= "{$paymentLink}\n\n";
-        $body .= "Kami mohon kesediaannya untuk segera melakukan pembayaran sesuai jadwal yang telah disepakati.\n\n";
-        $body .= "Apabila pembayaran sudah dilakukan, mohon abaikan pesan ini. Terima kasih atas perhatian dan kerja sama yang baik.\n\n";
-        $body .= "Hormat kami,\nJoFresh.";
-
-        // Build Gmail compose URL
-        $gmailUrl = 'https://mail.google.com/mail/?view=cm'
-            . '&to=' . urlencode($mitra->email)
-            . '&su=' . urlencode($subject)
-            . '&body=' . urlencode($body);
-
-        return response()->json([
-            'gmail_url' => $gmailUrl,
-            'mitra_nama' => $mitra->nama,
-            'mitra_email' => $mitra->email,
-        ]);
     }
 }

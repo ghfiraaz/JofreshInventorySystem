@@ -13,45 +13,106 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        // --- Determine filter period ---
+        $filterMode  = $request->input('filter_mode', ''); // 'month' or 'range'
+        $filterMonth = $request->input('filter_month', '');
+        $filterYear  = $request->input('filter_year', '');
+        $filterStart = $request->input('filter_start', '');
+        $filterEnd   = $request->input('filter_end', '');
+
+        // Legacy support for old filter_date param
         $filterDate = $request->input('filter_date', null);
-        $hariIni    = $filterDate ? Carbon::parse($filterDate) : today();
+
+        // Calculate date range for charts & summary
+        $rangeStart = null;
+        $rangeEnd   = null;
+        $periodLabel = '';
+
+        if ($filterMode === 'month' && $filterMonth && $filterYear) {
+            $rangeStart = Carbon::createFromDate($filterYear, $filterMonth, 1)->startOfMonth();
+            $rangeEnd   = $rangeStart->copy()->endOfMonth();
+            $periodLabel = $rangeStart->translatedFormat('F Y');
+        } elseif ($filterMode === 'range' && $filterStart && $filterEnd) {
+            $rangeStart = Carbon::parse($filterStart)->startOfDay();
+            $rangeEnd   = Carbon::parse($filterEnd)->endOfDay();
+            $periodLabel = $rangeStart->format('d/m/Y') . ' — ' . $rangeEnd->format('d/m/Y');
+        } elseif ($filterDate) {
+            // Legacy single-date support
+            $rangeStart = Carbon::parse($filterDate)->startOfDay();
+            $rangeEnd   = Carbon::parse($filterDate)->endOfDay();
+            $periodLabel = $rangeStart->translatedFormat('d F Y');
+        }
+
+        $hasFilter = $rangeStart && $rangeEnd;
 
         // --- Summary cards ---
-        $transaksiHariIni = Transaksi::whereDate('created_at', $hariIni)
-            ->where('status_pembayaran', 'Sudah Dibayar')
-            ->get();
-            
-        $penjualanHariIni = $transaksiHariIni->sum('total_harga');
-        $totalTransaksi   = $transaksiHariIni->count();
+        $summaryQuery = Transaksi::where('status_pembayaran', 'Sudah Dibayar');
+        if ($hasFilter) {
+            $summaryQuery->whereBetween('created_at', [$rangeStart, $rangeEnd]);
+        } else {
+            $summaryQuery->whereDate('created_at', today());
+        }
+        $transaksiFiltered = $summaryQuery->get();
+
+        $penjualanHariIni = $transaksiFiltered->sum('total_harga');
+        $totalTransaksi   = $transaksiFiltered->count();
         
         $totalMitra        = Mitra::count();
         $totalStok         = Produk::sum('stok');
         $stokRendahCount   = Produk::whereColumn('stok', '<', 'stok_minimal')->count();
         $isStokRendah      = $stokRendahCount > 0;
 
-        // --- Chart: Tren Penjualan (7 hari, window around selected date) ---
+        // --- Chart: Tren Penjualan ---
         $trendLabels = [];
         $trendData   = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = $hariIni->copy()->subDays($i);
-            $trendLabels[] = $date->translatedFormat('d M');
-            $trendData[]   = Transaksi::whereDate('created_at', $date)
-                                ->where('status_pembayaran', 'Sudah Dibayar')
-                                ->sum('total_harga');
+
+        if ($hasFilter) {
+            $daysDiff = $rangeStart->diffInDays($rangeEnd);
+
+            if ($daysDiff <= 31) {
+                // Daily granularity
+                for ($d = $rangeStart->copy(); $d->lte($rangeEnd); $d->addDay()) {
+                    $trendLabels[] = $d->translatedFormat('d M');
+                    $trendData[]   = (int) Transaksi::whereDate('created_at', $d->toDateString())
+                                        ->where('status_pembayaran', 'Sudah Dibayar')
+                                        ->sum('total_harga');
+                }
+            } else {
+                // Monthly granularity for large ranges
+                $cursor = $rangeStart->copy()->startOfMonth();
+                while ($cursor->lte($rangeEnd)) {
+                    $monthEnd = $cursor->copy()->endOfMonth();
+                    $trendLabels[] = $cursor->translatedFormat('M Y');
+                    $trendData[]   = (int) Transaksi::whereBetween('created_at', [$cursor, $monthEnd])
+                                        ->where('status_pembayaran', 'Sudah Dibayar')
+                                        ->sum('total_harga');
+                    $cursor->addMonth();
+                }
+            }
+        } else {
+            // Default: 7 hari terakhir
+            $hariIni = today();
+            for ($i = 6; $i >= 0; $i--) {
+                $date = $hariIni->copy()->subDays($i);
+                $trendLabels[] = $date->translatedFormat('d M');
+                $trendData[]   = (int) Transaksi::whereDate('created_at', $date)
+                                    ->where('status_pembayaran', 'Sudah Dibayar')
+                                    ->sum('total_harga');
+            }
         }
 
-        // --- Chart: Distribusi per produk (for selected date or all-time) ---
+        // --- Chart: Distribusi per produk ---
         $produkList = Produk::orderBy('nama')->get();
         $distLabels = [];
         $distData   = [];
         
         foreach ($produkList as $p) {
             $distLabels[] = $p->nama;
-            $q = TransaksiItem::whereHas('transaksi', function($q) use ($hariIni, $filterDate) {
+            $q = TransaksiItem::whereHas('transaksi', function($q) use ($hasFilter, $rangeStart, $rangeEnd) {
                 $q->where('status_pembayaran', 'Sudah Dibayar');
-                if ($filterDate) $q->whereDate('created_at', $hariIni);
+                if ($hasFilter) $q->whereBetween('created_at', [$rangeStart, $rangeEnd]);
             })->where('produk_id', $p->id);
-            $distData[] = $q->sum('jumlah') ?: 0;
+            $distData[] = (int) ($q->sum('jumlah') ?: 0);
         }
 
         return view('dashboard', compact(
@@ -65,7 +126,14 @@ class DashboardController extends Controller
             'trendData',
             'distLabels',
             'distData',
+            'filterMode',
+            'filterMonth',
+            'filterYear',
+            'filterStart',
+            'filterEnd',
             'filterDate',
+            'periodLabel',
+            'hasFilter',
             'produkList'
         ));
     }

@@ -42,18 +42,18 @@
             </a>
             
             <div class="mt-2">
-                <button type="button" onclick="document.getElementById('transaksi-submenu').classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('rotate-180')" class="flex items-center justify-between w-full px-5 py-3.5 rounded-xl font-medium transition-all duration-200 text-base border-none outline-none cursor-pointer {{ Request::is('kasir/transaksi') || Request::is('kasir/tagihan') || Request::is('kasir/riwayat') ? 'bg-slate-100 text-slate-900 font-bold' : 'bg-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800' }}">
+                <button type="button" onclick="document.getElementById('transaksi-submenu').classList.toggle('hidden'); this.querySelector('.chevron').classList.toggle('rotate-180')" class="flex items-center justify-between w-full px-5 py-3.5 rounded-xl font-medium transition-all duration-200 text-base border-none outline-none cursor-pointer {{ Request::is('kasir/transaksi') || Request::is('kasir/tagihan') || Request::is('kasir/riwayat') || Request::is('kasir/reminder-history') ? 'bg-slate-100 text-slate-900 font-bold' : 'bg-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800' }}">
                     <div class="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[22px] h-[22px] mr-3.5 transition-transform duration-400">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
                         </svg>
                         Transaksi
                     </div>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 chevron transition-transform duration-200 {{ Request::is('kasir/transaksi') || Request::is('kasir/tagihan') || Request::is('kasir/riwayat') ? 'rotate-180' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 chevron transition-transform duration-200 {{ Request::is('kasir/transaksi') || Request::is('kasir/tagihan') || Request::is('kasir/riwayat') || Request::is('kasir/reminder-history') ? 'rotate-180' : '' }}">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                     </svg>
                 </button>
-                <div id="transaksi-submenu" class="ml-9 mt-1 flex flex-col gap-1 {{ Request::is('kasir/transaksi') || Request::is('kasir/tagihan') || Request::is('kasir/riwayat') ? '' : 'hidden' }}">
+                <div id="transaksi-submenu" class="ml-9 mt-1 flex flex-col gap-1 {{ Request::is('kasir/transaksi') || Request::is('kasir/tagihan') || Request::is('kasir/riwayat') || Request::is('kasir/reminder-history') ? '' : 'hidden' }}">
                     <a href="{{ url('/kasir/transaksi') }}" class="block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('kasir/transaksi') ? 'bg-slate-200/50 text-slate-900' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50' }}">
                         Input Transaksi
                     </a>
@@ -62,6 +62,12 @@
                     </a>
                     <a href="{{ url('/kasir/riwayat') }}" class="block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('kasir/riwayat') ? 'bg-slate-200/50 text-slate-900' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50' }}">
                         Riwayat Transaksi
+                    </a>
+                    <a href="{{ url('/kasir/reminder-history') }}" class="block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors {{ Request::is('kasir/reminder-history') ? 'bg-slate-200/50 text-slate-900' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50' }}">
+                        <span class="flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+                            Histori Reminder
+                        </span>
                     </a>
                 </div>
             </div>
