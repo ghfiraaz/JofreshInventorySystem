@@ -79,20 +79,9 @@ class ReminderService
 
         $this->generateInvoicePdf($mitra, $transaksiList, $totalTagihan, $periodeAwal, $periodeAkhir, $pdfPath);
 
-        // 7. Kirim email
+        // 7. Simpan histori awal (default 'berhasil', akan di-update ke 'gagal' di Mailable jika queue gagal)
+        $history = null;
         try {
-            Mail::to($mitra->email)->send(new PaymentReminderMail(
-                mitra: $mitra,
-                transaksiList: $transaksiList,
-                totalTagihan: $totalTagihan,
-                paymentLink: $paymentLink,
-                tanggalTempo: $tanggalTempo,
-                periodeAwal: $periodeAwal->translatedFormat('d F Y'),
-                periodeAkhir: $periodeAkhir->translatedFormat('d F Y'),
-                pdfPath: $pdfPath
-            ));
-
-            // 8. Simpan histori - berhasil
             $history = ReminderHistory::create([
                 'mitra_id'           => $mitra->id,
                 'user_id'            => $sender->id,
@@ -105,6 +94,19 @@ class ReminderService
                 'total_tagihan'      => $totalTagihan,
             ]);
 
+            // 8. Kirim email (antrean asinkronus otomatis)
+            Mail::to($mitra->email)->send(new PaymentReminderMail(
+                $mitra,
+                $transaksiList,
+                $totalTagihan,
+                $paymentLink,
+                $tanggalTempo,
+                $periodeAwal->translatedFormat('d F Y'),
+                $periodeAkhir->translatedFormat('d F Y'),
+                $pdfPath,
+                $history
+            ));
+
             // 9. Update last_reminder_sent_at di transaksi
             Transaksi::where('mitra_id', $mitra->id)
                 ->where('status_pembayaran', 'Belum Dibayar')
@@ -115,27 +117,32 @@ class ReminderService
                 'message' => 'Reminder berhasil dikirim ke ' . $mitra->email,
                 'history' => $history,
             ];
-
         } catch (\Exception $e) {
-            Log::error('Gagal mengirim reminder email', [
+            Log::error('Gagal mengirim/memasukkan antrean email', [
                 'mitra_id' => $mitra->id,
                 'email'    => $mitra->email,
                 'error'    => $e->getMessage(),
             ]);
 
-            // Simpan histori - gagal
-            $history = ReminderHistory::create([
-                'mitra_id'           => $mitra->id,
-                'user_id'            => $sender->id,
-                'email_penerima'     => $mitra->email,
-                'tanggal_pengiriman' => now(),
-                'status'             => 'gagal',
-                'error_message'      => $e->getMessage(),
-                'invoice_filename'   => $pdfFilename,
-                'periode_awal'       => $periodeAwal->toDateString(),
-                'periode_akhir'      => $periodeAkhir->toDateString(),
-                'total_tagihan'      => $totalTagihan,
-            ]);
+            if ($history) {
+                $history->update([
+                    'status' => 'gagal',
+                    'error_message' => $e->getMessage(),
+                ]);
+            } else {
+                $history = ReminderHistory::create([
+                    'mitra_id'           => $mitra->id,
+                    'user_id'            => $sender->id,
+                    'email_penerima'     => $mitra->email,
+                    'tanggal_pengiriman' => now(),
+                    'status'             => 'gagal',
+                    'error_message'      => $e->getMessage(),
+                    'invoice_filename'   => $pdfFilename,
+                    'periode_awal'       => $periodeAwal->toDateString(),
+                    'periode_akhir'      => $periodeAkhir->toDateString(),
+                    'total_tagihan'      => $totalTagihan,
+                ]);
+            }
 
             return [
                 'success' => false,

@@ -89,6 +89,7 @@
 
                     // H-3 logic: reminder hanya boleh dikirim jika sisa hari <= 3 (termasuk lewat tempo)
                     $canSendReminder = $mt['sisaHari'] !== null && $mt['sisaHari'] <= 3;
+                    $reminderDisabled = !$canSendReminder || $mt['reminderSentToday'];
                 @endphp
 
                 <div class="border {{ $borderColor }} {{ $bgColor }} rounded-lg overflow-hidden">
@@ -144,7 +145,7 @@
                                     data-mitra="{{ $mt['mitra']->id }}"
                                     data-nama="{{ $mt['mitra']->nama }}"
                                     data-email="{{ $mt['mitra']->email }}"
-                                    {{ $mt['reminderSentToday'] ? 'disabled' : '' }}
+                                    {{ $reminderDisabled ? 'disabled' : '' }}
                                     onclick="event.stopPropagation(); sendReminder(this)"
                                     title="{{ $mt['reminderSentToday'] ? 'Reminder sudah dikirim hari ini' : 'Kirim reminder via email ke ' . $mt['mitra']->email }}">
                                     <span class="flex items-center gap-1">

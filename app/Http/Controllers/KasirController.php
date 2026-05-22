@@ -48,9 +48,42 @@ class KasirController extends Controller
             ->where('status_pembayaran', 'Menunggu Validasi')
             ->count();
 
+        // Query produk terlaris berdasarkan total kuantitas terjual
+        $produkTerlaris = DB::table('transaksi_items')
+            ->join('transaksi', 'transaksi.id', '=', 'transaksi_items.transaksi_id')
+            ->where('transaksi.status_pembayaran', 'Sudah Dibayar')
+            ->where('transaksi.user_id', Auth::id())
+            ->select('transaksi_items.nama_produk', DB::raw('SUM(transaksi_items.jumlah) as total_terjual'))
+            ->groupBy('transaksi_items.nama_produk')
+            ->orderByDesc('total_terjual')
+            ->limit(5)
+            ->get();
+
+        $chartLabels = $produkTerlaris->pluck('nama_produk')->toArray();
+        $chartData = $produkTerlaris->pluck('total_terjual')->map(function($val) {
+            return (int) $val;
+        })->toArray();
+
+        // Fallback ke data global jika data spesifik kasir ini masih kosong
+        if (empty($chartLabels)) {
+            $produkTerlarisGlobal = DB::table('transaksi_items')
+                ->join('transaksi', 'transaksi.id', '=', 'transaksi_items.transaksi_id')
+                ->where('transaksi.status_pembayaran', 'Sudah Dibayar')
+                ->select('transaksi_items.nama_produk', DB::raw('SUM(transaksi_items.jumlah) as total_terjual'))
+                ->groupBy('transaksi_items.nama_produk')
+                ->orderByDesc('total_terjual')
+                ->limit(5)
+                ->get();
+            $chartLabels = $produkTerlarisGlobal->pluck('nama_produk')->toArray();
+            $chartData = $produkTerlarisGlobal->pluck('total_terjual')->map(function($val) {
+                return (int) $val;
+            })->toArray();
+        }
+
         return view('kasir.dashboard', compact(
             'totalPenjualan', 'totalTransaksi', 'produkTersedia',
-            'belumBayar', 'tagihanMendesak', 'menungguValidasi'
+            'belumBayar', 'tagihanMendesak', 'menungguValidasi',
+            'chartLabels', 'chartData'
         ));
     }
 
