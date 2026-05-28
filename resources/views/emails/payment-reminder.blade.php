@@ -127,8 +127,13 @@
                             <p style="margin: 0 0 4px 0; color: #1e3a5f; font-size: 14px; font-weight: 700;">Hormat kami,</p>
                             <p style="margin: 0 0 16px 0; color: #64748b; font-size: 13px;">Tim JoFresh Inventory</p>
                             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 0 0 12px 0;">
-                            <p style="margin: 0; color: #94a3b8; font-size: 11px; text-align: center;">
-                                Email ini dikirim secara otomatis oleh JoFresh Inventory System.<br>
+                            <p style="margin: 0 0 12px 0; color: #94a3b8; font-size: 11px; text-align: center; line-height: 1.6;">
+                                Email ini dikirim secara otomatis oleh JoFresh Inventory System kepada mitra terdaftar.<br>
+                                Anda menerima email ini karena ada tagihan aktif. Untuk berhenti menerima email penagihan ini, silakan hubungi administrator kami.<br>
+                                <a href="{{ $paymentLink }}" style="color: #2d5a8e; text-decoration: underline;">Berhenti Berlangganan (Unsubscribe)</a>
+                            </p>
+                            <p style="margin: 0; color: #94a3b8; font-size: 11px; text-align: center; line-height: 1.6;">
+                                <strong>JoFresh</strong> - Jl. Elang Mutiara, Periuk Jaya, Kota Tangerang, Banten 15131<br>
                                 &copy; {{ date('Y') }} JoFresh. Semua Hak Cipta Dilindungi.
                             </p>
                         </td>
