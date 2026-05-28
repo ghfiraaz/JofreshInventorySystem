@@ -139,6 +139,9 @@
 
                             {{-- Reminder button - available for all mitra with email --}}
                             @if($mt['mitra']->email)
+                            @php
+                                $reminderDisabled = $mt['reminderSentToday'] ?? false;
+                            @endphp
                                 <button type="button" class="btn-send-reminder px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none
                                     {{ $reminderDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-amber-100 text-amber-700 hover:bg-amber-600 hover:text-white' }}"
                                     data-mitra="{{ $mt['mitra']->id }}"
