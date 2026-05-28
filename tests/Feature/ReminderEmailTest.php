@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Mail\PaymentReminderMail;
 use App\Models\Mitra;
-use App\Models\ReminderHistory;
 use App\Models\Transaksi;
 use App\Models\User;
 use App\Services\ReminderService;
@@ -23,7 +22,7 @@ class ReminderEmailTest extends TestCase
         config(['mail.mailers.smtp.local_domain' => 'jofresh.com']);
     }
 
-    public function test_send_reminder_successfully_dispatches_email_and_logs_history(): void
+    public function test_send_reminder_successfully_dispatches_email(): void
     {
         Mail::fake();
 
@@ -49,7 +48,7 @@ class ReminderEmailTest extends TestCase
             'total_harga' => 500000,
             'total_item' => 5,
             'total_berat' => 10,
-            'created_at' => now(), // Masuk ke range
+            'created_at' => now(),
         ]);
 
         // 4. Run ReminderService
@@ -58,13 +57,6 @@ class ReminderEmailTest extends TestCase
 
         // 5. Assertions
         $this->assertTrue($result['success']);
-        $this->assertDatabaseHas('reminder_histories', [
-            'mitra_id' => $mitra->id,
-            'user_id' => $user->id,
-            'email_penerima' => 'budi@example.com',
-            'status' => 'berhasil',
-            'total_tagihan' => 500000,
-        ]);
 
         $this->assertDatabaseHas('transaksi', [
             'id' => $transaksi->id,
@@ -80,9 +72,8 @@ class ReminderEmailTest extends TestCase
         });
     }
 
-    public function test_payment_reminder_mail_headers_and_views(): void
+    public function test_payment_reminder_mail_envelope_and_content(): void
     {
-        $user = User::factory()->create();
         $mitra = Mitra::create([
             'nama' => 'Budi Santoso',
             'kontak' => '08123456789',
@@ -90,18 +81,6 @@ class ReminderEmailTest extends TestCase
             'alamat' => 'Jl. Mawar No. 123',
             'tanggal_jatuh_tempo' => 15,
             'status' => 'Aktif',
-        ]);
-        
-        $history = ReminderHistory::create([
-            'mitra_id' => $mitra->id,
-            'user_id' => $user->id,
-            'email_penerima' => $mitra->email,
-            'tanggal_pengiriman' => now(),
-            'status' => 'berhasil',
-            'invoice_filename' => 'invoice.pdf',
-            'periode_awal' => now()->startOfMonth()->toDateString(),
-            'periode_akhir' => now()->endOfMonth()->toDateString(),
-            'total_tagihan' => 100000,
         ]);
 
         $transaksiList = collect([]);
@@ -115,8 +94,7 @@ class ReminderEmailTest extends TestCase
             '15 June 2026',
             '01 June 2026',
             '15 June 2026',
-            '/path/to/nonexistent/file.pdf',
-            $history
+            '/path/to/nonexistent/file.pdf'
         );
 
         // Check envelope subject
@@ -127,62 +105,25 @@ class ReminderEmailTest extends TestCase
         $content = $mail->content();
         $this->assertEquals('emails.payment-reminder', $content->view);
         $this->assertEquals('emails.payment-reminder-text', $content->text);
-
-        // Check custom anti-spam headers
-        $headers = $mail->headers();
-        $this->assertStringContainsString('reminder.', $headers->messageId);
-        $this->assertStringContainsString('@jofresh.com', $headers->messageId);
-
-        $customHeaders = $headers->text;
-        $this->assertEquals('OOF, AutoReply', $customHeaders['X-Auto-Response-Suppress']);
-        $this->assertEquals('bulk', $customHeaders['Precedence']);
-        $this->assertEquals('<http://localhost/pembayaran/' . $mitra->payment_token . '>', $customHeaders['List-Unsubscribe']);
     }
 
-    public function test_mailable_failed_handler_updates_database_to_gagal(): void
+    public function test_send_reminder_fails_without_email(): void
     {
         $user = User::factory()->create();
+
         $mitra = Mitra::create([
-            'nama' => 'Budi Santoso',
+            'nama' => 'Tanpa Email',
             'kontak' => '08123456789',
-            'email' => 'budi@example.com',
+            'email' => null,
             'alamat' => 'Jl. Mawar No. 123',
             'tanggal_jatuh_tempo' => 15,
             'status' => 'Aktif',
         ]);
-        
-        $history = ReminderHistory::create([
-            'mitra_id' => $mitra->id,
-            'user_id' => $user->id,
-            'email_penerima' => $mitra->email,
-            'tanggal_pengiriman' => now(),
-            'status' => 'berhasil',
-            'invoice_filename' => 'invoice.pdf',
-            'periode_awal' => now()->startOfMonth()->toDateString(),
-            'periode_akhir' => now()->endOfMonth()->toDateString(),
-            'total_tagihan' => 100000,
-        ]);
 
-        $mail = new PaymentReminderMail(
-            $mitra,
-            collect([]),
-            100000,
-            'http://localhost/pembayaran/' . $mitra->payment_token,
-            '15 June 2026',
-            '01 June 2026',
-            '15 June 2026',
-            '/path/to/nonexistent/file.pdf',
-            $history
-        );
+        $service = new ReminderService();
+        $result = $service->sendReminder($mitra, $user);
 
-        // Simulate queue failure
-        $mail->failed(new \Exception('SMTP Connection Timeout'));
-
-        // Check if database updated
-        $this->assertDatabaseHas('reminder_histories', [
-            'id' => $history->id,
-            'status' => 'gagal',
-            'error_message' => 'SMTP Connection Timeout',
-        ]);
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('Email mitra belum diisi', $result['message']);
     }
 }

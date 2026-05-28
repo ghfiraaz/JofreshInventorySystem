@@ -61,8 +61,8 @@ Route::middleware(['role:Kasir'])->prefix('kasir')->group(function () {
     Route::get('/tagihan', [KasirController::class, 'tagihan']);
     Route::post('/tagihan/bayar', [KasirController::class, 'bayarTagihan']);
     Route::post('/tagihan/send-reminder', [KasirController::class, 'sendReminder']);
-    Route::get('/reminder-history', [KasirController::class, 'reminderHistory']);
     Route::post('/transaksi/{id}/validasi', [KasirController::class, 'validasiBuktiPembayaran']);
+    Route::get('/transaksi/{id}/invoice-pdf', [KasirController::class, 'downloadInvoicePdf']);
     Route::post('/tagihan/validasi-mitra', [KasirController::class, 'validasiBuktiPerMitra']);
     Route::get('/bukti-pembayaran/{filename}', [KasirController::class, 'showBuktiPembayaran'])
         ->where('filename', '.*')

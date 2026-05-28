@@ -87,9 +87,8 @@
                     // Check if any transaction has "Menunggu Validasi" status
                     $hasWaitingValidation = $mt['transaksi']->contains('status_pembayaran', 'Menunggu Validasi');
 
-                    // H-3 logic: reminder hanya boleh dikirim jika sisa hari <= 3 (termasuk lewat tempo)
-                    $canSendReminder = $mt['sisaHari'] !== null && $mt['sisaHari'] <= 3;
-                    $reminderDisabled = !$canSendReminder || $mt['reminderSentToday'];
+                    // Reminder disabled jika tidak dalam zona H-3
+                    $reminderDisabled = !$mt['canSendReminder'];
                 @endphp
 
                 <div class="border {{ $borderColor }} {{ $bgColor }} rounded-lg overflow-hidden">
@@ -138,7 +137,7 @@
                                 </button>
                             @endif
 
-                            {{-- Reminder button - available for all mitra with email --}}
+                            {{-- Reminder button --}}
                             @if($mt['mitra']->email)
                             @php
                                 $reminderDisabled = $mt['reminderSentToday'] ?? false;
@@ -150,10 +149,10 @@
                                     data-email="{{ $mt['mitra']->email }}"
                                     {{ $reminderDisabled ? 'disabled' : '' }}
                                     onclick="event.stopPropagation(); sendReminder(this)"
-                                    title="{{ $mt['reminderSentToday'] ? 'Reminder sudah dikirim hari ini' : 'Kirim reminder via email ke ' . $mt['mitra']->email }}">
+                                    title="{{ $reminderDisabled ? 'Reminder hanya bisa dikirim H-3 sebelum jatuh tempo' : 'Kirim reminder via email ke ' . $mt['mitra']->email }}">
                                     <span class="flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
-                                        {{ $mt['reminderSentToday'] ? 'Terkirim' : ($canSendReminder ? 'Reminder' : 'H-'.($mt['sisaHari'] ?? '?')) }}
+                                        {{ $mt['canSendReminder'] ? 'Reminder' : 'H-'.($mt['sisaHari'] ?? '?') }}
                                     </span>
                                 </button>
                             @else
@@ -186,6 +185,8 @@
                                         <td class="py-1.5 text-center">
                                             @if($tx->status_pembayaran === 'Menunggu Validasi')
                                                 <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">Menunggu Validasi</span>
+                                            @elseif($tx->status_pembayaran === 'Ditolak')
+                                                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">Ditolak</span>
                                             @else
                                                 <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700">Belum Dibayar</span>
                                             @endif
@@ -385,32 +386,35 @@ function sendReminder(btn) {
 // ========== Validasi Mitra ==========
 function validasiMitra(btn) {
     const mitraId = btn.getAttribute('data-mitra');
+    const action = btn.getAttribute('data-action');
+    const isTerima = action === 'terima';
 
-    showConfirmTagihan(
-        'Validasi Pembayaran',
-        'Validasi semua bukti pembayaran mitra ini?',
-        null,
-        'Ya, Validasi',
-        () => {
-            btn.disabled = true;
-            btn.textContent = 'Memproses...';
+    const title = isTerima ? 'Terima Pembayaran' : 'Tolak Pembayaran';
+    const message = isTerima
+        ? 'Terima semua bukti pembayaran mitra ini? Email konfirmasi akan dikirim otomatis.'
+        : 'Tolak semua bukti pembayaran mitra ini? Email notifikasi akan dikirim agar mitra upload ulang.';
+    const yesLabel = isTerima ? 'Ya, Terima' : 'Ya, Tolak';
 
-            fetch('/kasir/tagihan/validasi-mitra', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-                body: JSON.stringify({ mitra_id: mitraId })
-            })
-            .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
-            .then(data => {
-                window.location.reload();
-            })
-            .catch(err => {
-                showToast('error', 'Gagal Memvalidasi', err.message || 'Terjadi kesalahan');
-                btn.disabled = false;
-                btn.textContent = '✓ Validasi';
-            });
-        }
-    );
+    showConfirmTagihan(title, message, null, yesLabel, () => {
+        btn.disabled = true;
+        btn.textContent = 'Memproses...';
+
+        fetch('/kasir/tagihan/validasi-mitra', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+            body: JSON.stringify({ mitra_id: mitraId, action: action })
+        })
+        .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
+        .then(data => {
+            showToast('success', isTerima ? 'Pembayaran Diterima' : 'Pembayaran Ditolak', data.message);
+            setTimeout(() => window.location.reload(), 2000);
+        })
+        .catch(err => {
+            showToast('error', 'Gagal Memvalidasi', err.message || 'Terjadi kesalahan');
+            btn.disabled = false;
+            btn.textContent = isTerima ? '✓ Terima' : '✗ Tolak';
+        });
+    });
 }
 </script>
 

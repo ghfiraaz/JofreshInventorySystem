@@ -58,13 +58,4 @@ class Transaksi extends Model
         $sisa = $this->sisaHariTempo();
         return $sisa !== null && $sisa < 0;
     }
-
-    /**
-     * Apakah reminder sudah dikirim hari ini
-     */
-    public function isReminderSentToday(): bool
-    {
-        if (!$this->last_reminder_sent_at) return false;
-        return $this->last_reminder_sent_at->isToday();
-    }
 }

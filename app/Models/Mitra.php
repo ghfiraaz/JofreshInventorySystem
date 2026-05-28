@@ -32,9 +32,4 @@ class Mitra extends Model
     {
         return $this->hasMany(\App\Models\Transaksi::class);
     }
-
-    public function reminderHistories()
-    {
-        return $this->hasMany(\App\Models\ReminderHistory::class);
-    }
 }

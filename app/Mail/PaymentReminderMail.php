@@ -3,13 +3,11 @@
 namespace App\Mail;
 
 use App\Models\Mitra;
-use App\Models\ReminderHistory;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Attachment;
-use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 
@@ -24,7 +22,6 @@ class PaymentReminderMail extends Mailable
     public string $tanggalTempo;
     public string $periodeAwal;
     public string $periodeAkhir;
-    public ReminderHistory $history;
 
     protected string $pdfPath;
 
@@ -39,8 +36,7 @@ class PaymentReminderMail extends Mailable
         string $tanggalTempo,
         string $periodeAwal,
         string $periodeAkhir,
-        string $pdfPath,
-        ReminderHistory $history
+        string $pdfPath
     ) {
         $this->mitra          = $mitra;
         $this->transaksiList  = $transaksiList;
@@ -50,7 +46,6 @@ class PaymentReminderMail extends Mailable
         $this->periodeAwal    = $periodeAwal;
         $this->periodeAkhir   = $periodeAkhir;
         $this->pdfPath        = $pdfPath;
-        $this->history        = $history;
     }
 
     /**
@@ -71,28 +66,6 @@ class PaymentReminderMail extends Mailable
         return new Content(
             view: 'emails.payment-reminder',
             text: 'emails.payment-reminder-text',
-        );
-    }
-
-    /**
-     * Get the message headers.
-     */
-    public function headers(): Headers
-    {
-        $domain = parse_url(config('app.url'), PHP_URL_HOST) ?: 'jofresh.com';
-        if ($domain === 'localhost') {
-            $domain = 'jofresh.com';
-        }
-        $messageId = 'reminder.' . sha1($this->history->id . '_' . time()) . '@' . $domain;
-
-        return new Headers(
-            messageId: $messageId,
-            references: [],
-            text: [
-                'X-Auto-Response-Suppress' => 'OOF, AutoReply',
-                'Precedence' => 'bulk',
-                'List-Unsubscribe' => '<' . $this->paymentLink . '>',
-            ],
         );
     }
 
@@ -120,18 +93,4 @@ class PaymentReminderMail extends Mailable
 
         return $attachments;
     }
-
-    /**
-     * Handle job failure.
-     */
-    public function failed(\Throwable $exception): void
-    {
-        if ($this->history) {
-            $this->history->update([
-                'status' => 'gagal',
-                'error_message' => $exception->getMessage(),
-            ]);
-        }
-    }
 }
-

@@ -4,21 +4,19 @@ namespace App\Services;
 
 use App\Mail\PaymentReminderMail;
 use App\Models\Mitra;
-use App\Models\ReminderHistory;
 use App\Models\Transaksi;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 
 class ReminderService
 {
     /**
      * Kirim reminder pembayaran ke mitra.
      *
-     * @return array{success: bool, message: string, history: ?ReminderHistory}
+     * @return array{success: bool, message: string}
      */
     public function sendReminder(Mitra $mitra, User $sender): array
     {
@@ -27,28 +25,13 @@ class ReminderService
             return [
                 'success' => false,
                 'message' => 'Email mitra belum diisi. Silakan update data mitra terlebih dahulu.',
-                'history' => null,
             ];
         }
 
-        // 2. Validasi max 1 reminder per hari per mitra
-        $alreadySentToday = ReminderHistory::where('mitra_id', $mitra->id)
-            ->whereDate('tanggal_pengiriman', today())
-            ->where('status', 'berhasil')
-            ->exists();
-
-        if ($alreadySentToday) {
-            return [
-                'success' => false,
-                'message' => 'Reminder sudah dikirim hari ini ke mitra ini. Maksimal 1 kali per hari.',
-                'history' => null,
-            ];
-        }
-
-        // 3. Hitung periode berdasarkan tanggal_jatuh_tempo mitra
+        // 2. Hitung periode berdasarkan tanggal_jatuh_tempo mitra
         [$periodeAwal, $periodeAkhir] = $this->hitungPeriode($mitra->tanggal_jatuh_tempo);
 
-        // 4. Ambil transaksi dalam periode (belum dibayar)
+        // 3. Ambil transaksi dalam periode (belum dibayar)
         $transaksiList = Transaksi::with('items')
             ->where('mitra_id', $mitra->id)
             ->where('status_pembayaran', 'Belum Dibayar')
@@ -63,38 +46,23 @@ class ReminderService
             return [
                 'success' => false,
                 'message' => 'Tidak ada tagihan yang belum dibayar pada periode ini.',
-                'history' => null,
             ];
         }
 
         $totalTagihan = $transaksiList->sum('total_harga');
 
-        // 5. Build data
+        // 4. Build data
         $paymentLink  = url('/pembayaran/' . $mitra->payment_token);
         $tanggalTempo = $periodeAkhir->translatedFormat('d F Y');
 
-        // 6. Generate PDF invoice rekapitulasi
+        // 5. Generate PDF invoice rekapitulasi
         $pdfFilename = 'Invoice_Rekap_' . str_replace(' ', '_', $mitra->nama) . '_' . $periodeAwal->format('Ymd') . '_' . $periodeAkhir->format('Ymd') . '.pdf';
         $pdfPath     = storage_path('app/invoices/' . $pdfFilename);
 
         $this->generateInvoicePdf($mitra, $transaksiList, $totalTagihan, $periodeAwal, $periodeAkhir, $pdfPath);
 
-        // 7. Simpan histori awal (default 'berhasil', akan di-update ke 'gagal' di Mailable jika queue gagal)
-        $history = null;
+        // 6. Kirim email
         try {
-            $history = ReminderHistory::create([
-                'mitra_id'           => $mitra->id,
-                'user_id'            => $sender->id,
-                'email_penerima'     => $mitra->email,
-                'tanggal_pengiriman' => now(),
-                'status'             => 'berhasil',
-                'invoice_filename'   => $pdfFilename,
-                'periode_awal'       => $periodeAwal->toDateString(),
-                'periode_akhir'      => $periodeAkhir->toDateString(),
-                'total_tagihan'      => $totalTagihan,
-            ]);
-
-            // 8. Kirim email (antrean asinkronus otomatis)
             Mail::to($mitra->email)->send(new PaymentReminderMail(
                 $mitra,
                 $transaksiList,
@@ -103,11 +71,10 @@ class ReminderService
                 $tanggalTempo,
                 $periodeAwal->translatedFormat('d F Y'),
                 $periodeAkhir->translatedFormat('d F Y'),
-                $pdfPath,
-                $history
+                $pdfPath
             ));
 
-            // 9. Update last_reminder_sent_at di transaksi
+            // 7. Update last_reminder_sent_at di transaksi
             Transaksi::where('mitra_id', $mitra->id)
                 ->where('status_pembayaran', 'Belum Dibayar')
                 ->update(['last_reminder_sent_at' => now()]);
@@ -115,39 +82,17 @@ class ReminderService
             return [
                 'success' => true,
                 'message' => 'Reminder berhasil dikirim ke ' . $mitra->email,
-                'history' => $history,
             ];
         } catch (\Exception $e) {
-            Log::error('Gagal mengirim/memasukkan antrean email', [
+            Log::error('Gagal mengirim email reminder', [
                 'mitra_id' => $mitra->id,
                 'email'    => $mitra->email,
                 'error'    => $e->getMessage(),
             ]);
 
-            if ($history) {
-                $history->update([
-                    'status' => 'gagal',
-                    'error_message' => $e->getMessage(),
-                ]);
-            } else {
-                $history = ReminderHistory::create([
-                    'mitra_id'           => $mitra->id,
-                    'user_id'            => $sender->id,
-                    'email_penerima'     => $mitra->email,
-                    'tanggal_pengiriman' => now(),
-                    'status'             => 'gagal',
-                    'error_message'      => $e->getMessage(),
-                    'invoice_filename'   => $pdfFilename,
-                    'periode_awal'       => $periodeAwal->toDateString(),
-                    'periode_akhir'      => $periodeAkhir->toDateString(),
-                    'total_tagihan'      => $totalTagihan,
-                ]);
-            }
-
             return [
                 'success' => false,
                 'message' => 'Gagal mengirim email: ' . $e->getMessage(),
-                'history' => $history,
             ];
         }
     }

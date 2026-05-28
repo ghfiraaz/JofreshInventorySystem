@@ -6,13 +6,17 @@ use App\Models\Produk;
 use App\Models\Mitra;
 use App\Models\Transaksi;
 use App\Models\TransaksiItem;
-use App\Models\ReminderHistory;
 use App\Services\ReminderService;
+use App\Mail\PaymentRejectedMail;
+use App\Mail\PaymentAcceptedMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KasirController extends Controller
 {
@@ -255,11 +259,8 @@ class KasirController extends Controller
                 $isLewatTempo = $sisaHari < 0;
             }
 
-            // Check if reminder was sent today from reminder_histories
-            $reminderSentToday = ReminderHistory::where('mitra_id', $mitra->id)
-                ->whereDate('tanggal_pengiriman', today())
-                ->where('status', 'berhasil')
-                ->exists();
+            // H-3 logic: reminder hanya boleh dikirim jika sisa hari <= 3 (termasuk lewat tempo)
+            $canSendReminder = $sisaHari !== null && $sisaHari <= 3;
 
             $mitraTagihan[] = [
                 'mitra'              => $mitra,
@@ -270,7 +271,7 @@ class KasirController extends Controller
                 'sisaHari'           => $sisaHari,
                 'isTempoMerah'       => $isTempoMerah,
                 'isLewatTempo'       => $isLewatTempo,
-                'reminderSentToday'  => $reminderSentToday,
+                'canSendReminder'    => $canSendReminder,
             ];
         }
 
@@ -311,40 +312,7 @@ class KasirController extends Controller
 
         return response()->json([
             'message' => $result['message'],
-            'history' => $result['history'],
         ]);
-    }
-
-    /**
-     * Halaman histori pengiriman reminder dengan filter periode tanggal
-     */
-    public function reminderHistory(Request $request)
-    {
-        $dari   = $request->get('dari', now()->startOfMonth()->format('Y-m-d'));
-        $sampai = $request->get('sampai', now()->format('Y-m-d'));
-        $status = $request->get('status', '');
-
-        $query = ReminderHistory::with('mitra')
-            ->where('user_id', Auth::id())
-            ->whereBetween('tanggal_pengiriman', [
-                Carbon::parse($dari)->startOfDay(),
-                Carbon::parse($sampai)->endOfDay(),
-            ])
-            ->orderBy('tanggal_pengiriman', 'desc');
-
-        if ($status !== '') {
-            $query->where('status', $status);
-        }
-
-        $histories = $query->get();
-
-        $totalReminder = $histories->count();
-        $totalBerhasil = $histories->where('status', 'berhasil')->count();
-        $totalGagal    = $histories->where('status', 'gagal')->count();
-
-        return view('kasir.reminder-history', compact(
-            'histories', 'totalReminder', 'totalBerhasil', 'totalGagal'
-        ));
     }
 
     /**
@@ -356,25 +324,34 @@ class KasirController extends Controller
             'action' => 'required|in:terima,tolak',
         ]);
 
-        $transaksi = Transaksi::where('user_id', Auth::id())->findOrFail($id);
+        $transaksi = Transaksi::with(['mitra', 'items'])->where('user_id', Auth::id())->findOrFail($id);
 
         if ($transaksi->status_pembayaran !== 'Menunggu Validasi') {
             return response()->json(['message' => 'Transaksi tidak dalam status menunggu validasi.'], 422);
         }
+
+        $mitra = $transaksi->mitra;
 
         if ($request->action === 'terima') {
             $transaksi->update([
                 'status_pembayaran' => 'Sudah Dibayar',
                 'updated_at' => now(),
             ]);
-            return response()->json(['message' => 'Pembayaran berhasil diterima.', 'status' => 'Sudah Dibayar']);
+
+            // Generate PDF invoice LUNAS dan kirim email
+            $this->sendPaymentAcceptedEmail($transaksi, $mitra);
+
+            return response()->json(['message' => 'Pembayaran berhasil diterima. Email konfirmasi telah dikirim.', 'status' => 'Sudah Dibayar']);
         } else {
             $transaksi->update([
                 'status_pembayaran' => 'Ditolak',
-                'bukti_pembayaran' => null,
                 'updated_at' => now(),
             ]);
-            return response()->json(['message' => 'Pembayaran berhasil ditolak. Mitra dapat upload ulang bukti pembayaran.', 'status' => 'Ditolak']);
+
+            // Kirim email notifikasi penolakan
+            $this->sendPaymentRejectedEmail($transaksi, $mitra);
+
+            return response()->json(['message' => 'Pembayaran berhasil ditolak. Email notifikasi telah dikirim ke mitra.', 'status' => 'Ditolak']);
         }
     }
 
@@ -388,23 +365,43 @@ class KasirController extends Controller
             'action'   => 'required|in:terima,tolak',
         ]);
 
-        $query = Transaksi::where('user_id', Auth::id())
+        $mitra = Mitra::findOrFail($request->mitra_id);
+
+        $transaksiList = Transaksi::with('items')
+            ->where('user_id', Auth::id())
             ->where('mitra_id', $request->mitra_id)
-            ->where('status_pembayaran', 'Menunggu Validasi');
+            ->where('status_pembayaran', 'Menunggu Validasi')
+            ->get();
+
+        if ($transaksiList->isEmpty()) {
+            return response()->json(['message' => 'Tidak ada transaksi yang menunggu validasi.'], 422);
+        }
 
         if ($request->action === 'terima') {
-            $updated = $query->update([
-                'status_pembayaran' => 'Sudah Dibayar',
-                'updated_at' => now(),
-            ]);
-            return response()->json(['message' => "Berhasil menerima {$updated} transaksi."]);
+            foreach ($transaksiList as $transaksi) {
+                $transaksi->update([
+                    'status_pembayaran' => 'Sudah Dibayar',
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Kirim 1 email konfirmasi untuk semua transaksi yang diterima
+            $this->sendPaymentAcceptedEmailBulk($transaksiList, $mitra);
+
+            return response()->json(['message' => "Berhasil menerima {$transaksiList->count()} transaksi. Email konfirmasi telah dikirim."]);
         } else {
-            $updated = $query->update([
-                'status_pembayaran' => 'Ditolak',
-                'bukti_pembayaran' => null,
-                'updated_at' => now(),
-            ]);
-            return response()->json(['message' => "Berhasil menolak {$updated} transaksi. Mitra dapat upload ulang."]);
+            foreach ($transaksiList as $transaksi) {
+                $transaksi->update([
+                    'status_pembayaran' => 'Ditolak',
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Kirim 1 email notifikasi penolakan
+            $noInvoices = $transaksiList->pluck('no_transaksi')->join(', ');
+            $this->sendPaymentRejectedEmail($transaksiList->first(), $mitra);
+
+            return response()->json(['message' => "Berhasil menolak {$transaksiList->count()} transaksi. Email notifikasi telah dikirim ke mitra."]);
         }
     }
 
@@ -446,6 +443,28 @@ class KasirController extends Controller
     }
 
     /**
+     * Download PDF invoice (dengan watermark LUNAS jika sudah dibayar)
+     */
+    public function downloadInvoicePdf($id)
+    {
+        $transaksi = Transaksi::with(['mitra', 'items'])->where('user_id', Auth::id())->findOrFail($id);
+        $mitra = $transaksi->mitra;
+
+        $isLunas = $transaksi->status_pembayaran === 'Sudah Dibayar';
+
+        $pdf = Pdf::loadView('pdf.invoice-lunas', [
+            'transaksi'  => $transaksi,
+            'mitra'      => $mitra,
+            'isLunas'    => $isLunas,
+        ])->setPaper('a4', 'portrait');
+
+        $prefix = $isLunas ? 'Invoice-LUNAS-' : 'Invoice-';
+        $filename = $prefix . $transaksi->no_transaksi . '.pdf';
+
+        return $pdf->stream($filename);
+    }
+
+    /**
      * Serve bukti pembayaran file (bypasses PHP built-in server junction issues)
      */
     public function showBuktiPembayaran($filename)
@@ -459,5 +478,119 @@ class KasirController extends Controller
         return response()->file(
             Storage::disk('public')->path($path)
         );
+    }
+
+    // ========================
+    // Private Helper Methods
+    // ========================
+
+    /**
+     * Kirim email pembayaran diterima (single transaksi)
+     */
+    private function sendPaymentAcceptedEmail(Transaksi $transaksi, Mitra $mitra): void
+    {
+        if (empty($mitra->email)) return;
+
+        try {
+            // Generate PDF invoice LUNAS
+            $pdfPath = $this->generateInvoiceLunasPdf($transaksi, $mitra);
+
+            Mail::to($mitra->email)->send(new PaymentAcceptedMail(
+                $mitra,
+                $transaksi->no_transaksi,
+                $pdfPath
+            ));
+
+            Log::info('Email pembayaran diterima terkirim', [
+                'mitra' => $mitra->nama,
+                'invoice' => $transaksi->no_transaksi,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim email pembayaran diterima', [
+                'mitra_id' => $mitra->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Kirim email pembayaran diterima (bulk/semua transaksi mitra)
+     */
+    private function sendPaymentAcceptedEmailBulk($transaksiList, Mitra $mitra): void
+    {
+        if (empty($mitra->email)) return;
+
+        try {
+            // Generate PDF untuk transaksi pertama sebagai representasi
+            $firstTransaksi = $transaksiList->first();
+            $pdfPath = $this->generateInvoiceLunasPdf($firstTransaksi, $mitra);
+
+            $noInvoices = $transaksiList->pluck('no_transaksi')->join(', ');
+
+            Mail::to($mitra->email)->send(new PaymentAcceptedMail(
+                $mitra,
+                $noInvoices,
+                $pdfPath
+            ));
+
+            Log::info('Email bulk pembayaran diterima terkirim', [
+                'mitra' => $mitra->nama,
+                'jumlah' => $transaksiList->count(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim email bulk pembayaran diterima', [
+                'mitra_id' => $mitra->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Kirim email pembayaran ditolak
+     */
+    private function sendPaymentRejectedEmail(Transaksi $transaksi, Mitra $mitra): void
+    {
+        if (empty($mitra->email)) return;
+
+        try {
+            Mail::to($mitra->email)->send(new PaymentRejectedMail(
+                $mitra,
+                $transaksi->no_transaksi
+            ));
+
+            Log::info('Email pembayaran ditolak terkirim', [
+                'mitra' => $mitra->nama,
+                'invoice' => $transaksi->no_transaksi,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim email pembayaran ditolak', [
+                'mitra_id' => $mitra->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Generate PDF invoice LUNAS untuk satu transaksi
+     */
+    private function generateInvoiceLunasPdf(Transaksi $transaksi, Mitra $mitra): string
+    {
+        $dir = storage_path('app/invoices');
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $filename = 'Invoice-LUNAS-' . $transaksi->no_transaksi . '.pdf';
+        $pdfPath = $dir . '/' . $filename;
+
+        $pdf = Pdf::loadView('pdf.invoice-lunas', [
+            'transaksi'  => $transaksi,
+            'mitra'      => $mitra,
+            'isLunas'    => true,
+        ])->setPaper('a4', 'portrait');
+
+        $pdf->save($pdfPath);
+
+        return $pdfPath;
     }
 }
