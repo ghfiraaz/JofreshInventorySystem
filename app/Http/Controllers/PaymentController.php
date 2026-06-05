@@ -17,11 +17,11 @@ class PaymentController extends Controller
 
         $transaksiUnpaid = Transaksi::with('items')
             ->where('mitra_id', $mitra->id)
-            ->whereIn('status_pembayaran', ['Belum Dibayar', 'Ditolak'])
+            ->whereIn('status_pembayaran', ['Belum Dibayar', 'Ditolak', 'Menunggu Validasi'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $totalTagihan = $transaksiUnpaid->sum('total_harga');
+        $totalTagihan = $transaksiUnpaid->whereIn('status_pembayaran', ['Belum Dibayar', 'Ditolak'])->sum('total_harga');
         $hasDitolak = $transaksiUnpaid->contains('status_pembayaran', 'Ditolak');
 
         return view('pembayaran-upload', compact('mitra', 'transaksiUnpaid', 'totalTagihan', 'token', 'hasDitolak'));
@@ -50,6 +50,12 @@ class PaymentController extends Controller
                 'bukti_pembayaran' => 'bukti-pembayaran/' . $filename,
                 'status_pembayaran' => 'Menunggu Validasi',
             ]);
+
+        // Lock payment upload for the Mitra
+        $mitra->update(['payment_upload_locked' => true]);
+
+        // Trigger Mitra Mengunggah Bukti Pembayaran notification for Kasir
+        \App\Models\Notification::triggerBuktiPembayaran($mitra);
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['message' => 'Bukti pembayaran berhasil diupload. Terima kasih!']);

@@ -75,6 +75,12 @@
                 </svg>
                 Riwayat Transaksi
             </a>
+            <a href="{{ url('/log-stok') }}" class="flex items-center px-5 py-3.5 rounded-xl font-medium transition-all duration-200 text-base {{ Request::is('log-stok') ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 hover:translate-x-1' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[22px] h-[22px] mr-3.5 transition-transform duration-400">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
+                </svg>
+                Log Stok
+            </a>
         </ul>
 
         {{-- Logout --}}
@@ -109,6 +115,26 @@
                     <span id="hd-date" class="text-sm font-bold text-slate-700"></span>
                     <span class="w-px h-4 bg-blue-200"></span>
                     <span id="hd-time" class="text-sm font-bold text-blue-600 tabular-nums" style="font-variant-numeric:tabular-nums;"></span>
+                </div>
+
+                <div class="relative notif-bell-container">
+                    <button type="button" id="btn-notif-bell" class="relative p-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer outline-none shadow-sm focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                        </svg>
+                        <!-- Badge Unread Counter -->
+                        <span id="notif-badge" class="absolute top-0 right-0 -mt-1 -mr-1 h-4.5 w-4.5 bg-red-500 text-[10px] font-bold text-white rounded-full flex items-center justify-center border border-white hidden">0</span>
+                    </button>
+
+                    <div id="notif-dropdown" class="hidden absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden">
+                        <div class="px-4 py-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <h3 class="text-sm font-bold text-slate-800">Notifikasi</h3>
+                            <button type="button" id="btn-notif-read-all" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer border-none bg-transparent focus:outline-none">Tandai Semua Dibaca</button>
+                        </div>
+                        <div id="notif-list-container" class="max-h-[300px] overflow-y-auto divide-y divide-gray-100">
+                            <div class="p-4 text-center text-slate-400 text-xs">Memuat notifikasi...</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>

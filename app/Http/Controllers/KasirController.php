@@ -6,6 +6,7 @@ use App\Models\Produk;
 use App\Models\Mitra;
 use App\Models\Transaksi;
 use App\Models\TransaksiItem;
+use App\Models\LogStok;
 use App\Services\ReminderService;
 use App\Mail\PaymentRejectedMail;
 use App\Mail\PaymentAcceptedMail;
@@ -142,7 +143,24 @@ class KasirController extends Controller
                     'subtotal'     => $subtotal,
                 ];
 
+                // Catat stok sebelum decrement untuk log
+                $stokSebelumKasir = $produk->stok;
                 $produk->decrement('stok', $item['jumlah']);
+                $produk->refresh();
+
+                // Catat log stok keluar otomatis
+                LogStok::create([
+                    'produk_id'    => $produk->id,
+                    'user_id'      => Auth::id(),
+                    'tipe'         => 'Keluar',
+                    'jumlah'       => $item['jumlah'],
+                    'stok_sebelum' => $stokSebelumKasir,
+                    'stok_sesudah' => $produk->stok,
+                    'keterangan'   => 'Penjualan kasir',
+                ]);
+
+                // Trigger low stock alert for Admin
+                \App\Models\Notification::triggerLowStockAlert($produk);
             }
 
             // Calculate jatuh tempo based on mitra's tanggal_jatuh_tempo
@@ -338,6 +356,9 @@ class KasirController extends Controller
                 'updated_at' => now(),
             ]);
 
+            // Trigger Laporan Penjualan Hari Ini notification for Owner
+            \App\Models\Notification::triggerLaporanPenjualan();
+
             // Generate PDF invoice LUNAS dan kirim email
             $this->sendPaymentAcceptedEmail($transaksi, $mitra);
 
@@ -347,6 +368,9 @@ class KasirController extends Controller
                 'status_pembayaran' => 'Ditolak',
                 'updated_at' => now(),
             ]);
+
+            // Unlock payment upload for the Mitra
+            $mitra->update(['payment_upload_locked' => false]);
 
             // Kirim email notifikasi penolakan
             $this->sendPaymentRejectedEmail($transaksi, $mitra);
@@ -385,6 +409,9 @@ class KasirController extends Controller
                 ]);
             }
 
+            // Trigger Laporan Penjualan Hari Ini notification for Owner
+            \App\Models\Notification::triggerLaporanPenjualan();
+
             // Kirim 1 email konfirmasi untuk semua transaksi yang diterima
             $this->sendPaymentAcceptedEmailBulk($transaksiList, $mitra);
 
@@ -396,6 +423,9 @@ class KasirController extends Controller
                     'updated_at' => now(),
                 ]);
             }
+
+            // Unlock payment upload for the Mitra
+            $mitra->update(['payment_upload_locked' => false]);
 
             // Kirim 1 email notifikasi penolakan
             $noInvoices = $transaksiList->pluck('no_transaksi')->join(', ');
@@ -425,6 +455,9 @@ class KasirController extends Controller
                 'status_pembayaran' => 'Sudah Dibayar',
                 'updated_at'        => now()
             ]);
+
+        // Trigger Laporan Penjualan Hari Ini notification for Owner
+        \App\Models\Notification::triggerLaporanPenjualan();
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['message' => 'Pembayaran berhasil dikonfirmasi.']);

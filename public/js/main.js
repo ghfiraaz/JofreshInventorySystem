@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <td class="row-harga">${harga}</td>
             <td><span class="badge ${badge}">${status}</span></td>
             <td>
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center justify-center gap-1.5">
                     <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-produk" title="Edit">${EDIT_SVG}</button>
                     <button class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-delete-produk" title="Hapus">${DELETE_SVG}</button>
                     <button class="bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer border border-blue-200 btn-tambah-stok">
@@ -394,6 +394,118 @@ document.addEventListener('DOMContentLoaded', () => {
             modalTambahStok.classList.add('active');
         }
     });
+
+    // -------------------------------------------------------
+    // Admin: Penyesuaian Stok Modal
+    // -------------------------------------------------------
+    const btnBukaPenyesuaian = document.getElementById('btn-buka-penyesuaian');
+    const modalPenyesuaian   = document.getElementById('modal-penyesuaian-stok');
+    const formAdjustment     = document.getElementById('form-adjustment');
+    const adjProduk          = document.getElementById('adj-produk');
+    const adjTypeMasuk       = document.getElementById('adj-type-masuk');
+    const adjTypeKeluar      = document.getElementById('adj-type-keluar');
+    const adjTipeHidden      = document.getElementById('adj-tipe');
+    const btnSubmitAdj       = document.getElementById('btn-submit-adj');
+    const adjBtnText         = document.getElementById('adj-btn-text');
+
+    if (btnBukaPenyesuaian && modalPenyesuaian) {
+        btnBukaPenyesuaian.addEventListener('click', () => {
+            if (formAdjustment) formAdjustment.reset();
+            if (adjTipeHidden) adjTipeHidden.value = '';
+            const info = document.getElementById('adj-stok-info');
+            if (info) info.classList.add('hidden');
+            if (adjTypeMasuk) adjTypeMasuk.className = 'adj-type-btn btn-tambah flex-1 py-3 px-4 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-500 font-bold text-sm cursor-pointer transition-all hover:bg-green-50 hover:border-green-300 hover:text-green-600 flex items-center justify-center gap-2';
+            if (adjTypeKeluar) adjTypeKeluar.className = 'adj-type-btn btn-kurang flex-1 py-3 px-4 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-500 font-bold text-sm cursor-pointer transition-all hover:bg-red-50 hover:border-red-300 hover:text-red-600 flex items-center justify-center gap-2';
+            modalPenyesuaian.classList.add('active');
+        });
+    }
+
+    if (adjProduk) {
+        adjProduk.addEventListener('change', function() {
+            const opt = this.options[this.selectedIndex];
+            const info = document.getElementById('adj-stok-info');
+            const val = document.getElementById('adj-stok-value');
+            if (this.value && opt) {
+                if (info) info.classList.remove('hidden');
+                if (val) val.textContent = parseInt(opt.dataset.stok);
+            } else {
+                if (info) info.classList.add('hidden');
+            }
+        });
+    }
+
+    function setAdjType(type) {
+        if (!adjTipeHidden) return;
+        adjTipeHidden.value = type;
+        if (adjTypeMasuk) {
+            adjTypeMasuk.className = 'adj-type-btn btn-tambah flex-1 py-3 px-4 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-500 font-bold text-sm cursor-pointer transition-all hover:bg-green-50 hover:border-green-300 hover:text-green-600 flex items-center justify-center gap-2' + (type === 'Adjustment Masuk' ? ' active-masuk' : '');
+        }
+        if (adjTypeKeluar) {
+            adjTypeKeluar.className = 'adj-type-btn btn-kurang flex-1 py-3 px-4 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-500 font-bold text-sm cursor-pointer transition-all hover:bg-red-50 hover:border-red-300 hover:text-red-600 flex items-center justify-center gap-2' + (type === 'Adjustment Keluar' ? ' active-keluar' : '');
+        }
+    }
+
+    if (adjTypeMasuk) {
+        adjTypeMasuk.addEventListener('click', () => setAdjType('Adjustment Masuk'));
+    }
+    if (adjTypeKeluar) {
+        adjTypeKeluar.addEventListener('click', () => setAdjType('Adjustment Keluar'));
+    }
+
+    if (formAdjustment) {
+        formAdjustment.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const produkId = adjProduk.value;
+            const tipe = adjTipeHidden.value;
+            const jumlah = document.getElementById('adj-jumlah').value;
+            const keterangan = document.getElementById('adj-keterangan').value;
+
+            if (!produkId || !tipe || !jumlah || !keterangan) {
+                showToast('Semua field wajib diisi, termasuk tipe penyesuaian.', 'error');
+                return;
+            }
+
+            if (btnSubmitAdj) btnSubmitAdj.disabled = true;
+            if (adjBtnText) adjBtnText.textContent = 'Menyimpan...';
+
+            try {
+                const res = await fetch('/admin/penyesuaian-stok', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        produk_id: produkId,
+                        tipe_adjustment: tipe,
+                        jumlah: parseInt(jumlah),
+                        keterangan: keterangan,
+                    }),
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(data.message || 'Penyesuaian stok berhasil disimpan');
+                    modalPenyesuaian.classList.remove('active');
+                    formAdjustment.reset();
+                    if (adjTipeHidden) adjTipeHidden.value = '';
+                    const info = document.getElementById('adj-stok-info');
+                    if (info) info.classList.add('hidden');
+                    
+                    // Reload to update table + stock values
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    showToast(data.message || 'Gagal menyimpan penyesuaian.', 'error');
+                }
+            } catch (err) {
+                showToast('Terjadi kesalahan jaringan.', 'error');
+            } finally {
+                if (btnSubmitAdj) btnSubmitAdj.disabled = false;
+                if (adjBtnText) adjBtnText.textContent = 'Simpan Penyesuaian';
+            }
+        });
+    }
+
 
     // -------------------------------------------------------
     // Admin: Mitra Page (DB-backed via Fetch API)
@@ -888,5 +1000,141 @@ document.addEventListener('DOMContentLoaded', () => {
                 gsap.to(item, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.3)' });
             });
         });
+    }
+
+    // -------------------------------------------------------
+    // Role-Based Notification System
+    // -------------------------------------------------------
+    const btnNotifBell       = document.getElementById('btn-notif-bell');
+    const notifDropdown      = document.getElementById('notif-dropdown');
+    const notifBadge         = document.getElementById('notif-badge');
+    const notifListContainer = document.getElementById('notif-list-container');
+    const btnNotifReadAll    = document.getElementById('btn-notif-read-all');
+
+    async function loadNotifications() {
+        if (!notifListContainer) return;
+        try {
+            const res = await fetch('/notifications');
+            if (!res.ok) return;
+            const data = await res.json();
+            
+            // Render count badge
+            updateNotifBadge(data.unread_count);
+
+            // Render list
+            if (data.notifications.length === 0) {
+                notifListContainer.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">Tidak ada notifikasi.</div>';
+                return;
+            }
+
+            notifListContainer.innerHTML = '';
+            data.notifications.forEach(notif => {
+                const item = document.createElement('div');
+                item.className = `p-4 flex gap-3 cursor-pointer hover:bg-slate-50 transition-colors ${notif.is_read ? 'bg-white' : 'bg-blue-50/30'}`;
+                item.setAttribute('data-id', notif.id);
+                item.innerHTML = `
+                    <div class="flex-grow">
+                        <h4 class="text-xs font-bold ${notif.is_read ? 'text-slate-600' : 'text-slate-800'}">${notif.title}</h4>
+                        <p class="text-[11px] ${notif.is_read ? 'text-slate-400' : 'text-slate-600'} mt-1 leading-relaxed">${notif.message}</p>
+                        <span class="text-[9px] text-slate-400 mt-2 block">${notif.time_ago}</span>
+                    </div>
+                    <div class="flex items-center justify-center flex-shrink-0 w-3">
+                        ${notif.is_read ? '' : '<span class="w-2.5 h-2.5 rounded-full bg-blue-600 notif-dot"></span>'}
+                    </div>
+                `;
+
+                // Mark as read on click and navigate
+                item.addEventListener('click', async () => {
+                    if (!notif.is_read) {
+                        try {
+                            const readRes = await fetch(`/notifications/${notif.id}/read`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': csrfToken,
+                                    'Accept': 'application/json'
+                                }
+                            });
+                            if (readRes.ok) {
+                                const readData = await readRes.json();
+                                notif.is_read = true;
+                                item.className = 'p-4 flex gap-3 cursor-pointer hover:bg-slate-50 transition-colors bg-white';
+                                item.querySelector('h4').className = 'text-xs font-bold text-slate-600';
+                                item.querySelector('p').className = 'text-[11px] text-slate-400 mt-1 leading-relaxed';
+                                const dot = item.querySelector('.notif-dot');
+                                if (dot) dot.remove();
+                                updateNotifBadge(readData.unread_count);
+                            }
+                        } catch (e) {
+                            console.error('Error marking notification as read', e);
+                        }
+                    }
+
+                    // Route user based on notification type
+                    if (notif.type === 'jatuh_tempo') {
+                        window.location.href = '/kasir/tagihan';
+                    } else if (notif.type === 'bukti_pembayaran') {
+                        window.location.href = '/kasir/riwayat';
+                    }
+                });
+
+                notifListContainer.appendChild(item);
+            });
+        } catch (err) {
+            console.error('Failed to load notifications', err);
+        }
+    }
+
+    function updateNotifBadge(count) {
+        if (!notifBadge) return;
+        if (count > 0) {
+            notifBadge.textContent = count;
+            notifBadge.classList.remove('hidden');
+        } else {
+            notifBadge.classList.add('hidden');
+        }
+    }
+
+    if (btnNotifBell && notifDropdown) {
+        btnNotifBell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notifDropdown.classList.toggle('hidden');
+            if (!notifDropdown.classList.contains('hidden')) {
+                loadNotifications();
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.notif-bell-container')) {
+                notifDropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    if (btnNotifReadAll) {
+        btnNotifReadAll.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            try {
+                const res = await fetch('/notifications/read-all', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+                if (res.ok) {
+                    updateNotifBadge(0);
+                    showToast('Semua notifikasi ditandai dibaca');
+                    loadNotifications(); // Reload list
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    }
+
+    // Load initial unread count on page load
+    if (notifBadge) {
+        loadNotifications();
     }
 });

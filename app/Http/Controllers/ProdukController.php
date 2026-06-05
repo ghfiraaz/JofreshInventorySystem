@@ -94,3 +94,4 @@ class ProdukController extends Controller
         ]);
     }
 }
+

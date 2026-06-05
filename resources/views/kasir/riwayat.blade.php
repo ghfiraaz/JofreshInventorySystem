@@ -209,6 +209,26 @@
     </div>
 </div>
 
+{{-- ===== CONFIRMATION MODAL (CENTERED) ===== --}}
+<div id="modal-confirm-riwayat" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto">
+    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl relative overflow-hidden transform scale-95 transition-transform duration-300 [.active_&]:scale-100">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-900 to-indigo-600"></div>
+        <div class="px-8 pt-8 pb-2 flex justify-between items-start">
+            <div>
+                <h3 id="confirm-riwayat-title" class="text-lg font-bold text-slate-800"></h3>
+            </div>
+            <button type="button" onclick="closeConfirmRiwayatModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer bg-transparent border-none leading-none mt-1">&times;</button>
+        </div>
+        <div class="px-8 pb-3">
+            <p id="confirm-riwayat-message" class="text-sm text-slate-600 leading-relaxed"></p>
+        </div>
+        <div class="px-8 pb-8 pt-4 flex justify-end gap-3">
+            <button type="button" id="confirm-riwayat-no" onclick="closeConfirmRiwayatModal()" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer border-none">Tidak</button>
+            <button type="button" id="confirm-riwayat-yes" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white border-none cursor-pointer transition-all" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">Ya</button>
+        </div>
+    </div>
+</div>
+
 <script>
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
@@ -261,37 +281,70 @@ document.querySelectorAll('.riwayat-row').forEach(row => {
     });
 });
 
+// ========== Confirm Modal Riwayat ==========
+let _confirmRiwayatCallback = null;
+
+function showConfirmRiwayat(title, message, yesLabel, onYes, noLabel = 'Tidak') {
+    const modal = document.getElementById('modal-confirm-riwayat');
+    document.getElementById('confirm-riwayat-title').textContent = title;
+    document.getElementById('confirm-riwayat-message').textContent = message;
+    const yesBtn = document.getElementById('confirm-riwayat-yes');
+    const noBtn = document.getElementById('confirm-riwayat-no');
+    
+    yesBtn.textContent = yesLabel || 'Ya';
+    if (noBtn) {
+        noBtn.textContent = noLabel;
+    }
+    _confirmRiwayatCallback = onYes;
+    modal.classList.add('active');
+}
+
+function closeConfirmRiwayatModal() {
+    document.getElementById('modal-confirm-riwayat').classList.remove('active');
+    _confirmRiwayatCallback = null;
+}
+
+document.getElementById('confirm-riwayat-yes')?.addEventListener('click', () => {
+    if (_confirmRiwayatCallback) _confirmRiwayatCallback();
+    closeConfirmRiwayatModal();
+});
+
+document.getElementById('modal-confirm-riwayat')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeConfirmRiwayatModal();
+});
+
 // Validasi individual (Terima/Tolak)
 document.querySelectorAll('.btn-validasi').forEach(btn => {
     btn.addEventListener('click', function() {
         const id = this.dataset.id;
         const action = this.dataset.action;
         const isTerima = action === 'terima';
+        const title = isTerima ? 'Terima Pembayaran' : 'Tolak Pembayaran';
         const confirmMsg = isTerima
-            ? 'Terima pembayaran transaksi ini?'
-            : 'Tolak pembayaran transaksi ini? Mitra dapat upload ulang.';
+            ? 'Apakah anda yakin ingin validasi bukti pembayaran ini?'
+            : 'Apakah anda yakin ingin menolak bukti pembayaran ini?';
 
-        if (!confirm(confirmMsg)) return;
+        showConfirmRiwayat(title, confirmMsg, 'Ya', () => {
+            this.disabled = true;
+            const originalText = this.textContent;
+            this.textContent = '...';
 
-        this.disabled = true;
-        const originalText = this.textContent;
-        this.textContent = '...';
-
-        fetch(`/kasir/transaksi/${id}/validasi`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-            body: JSON.stringify({ action: action }),
-        })
-        .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
-        .then(data => {
-            showRiwayatToast('success', isTerima ? 'Pembayaran Diterima' : 'Pembayaran Ditolak', data.message);
-            setTimeout(() => window.location.reload(), 1500);
-        })
-        .catch(err => {
-            showRiwayatToast('error', 'Gagal', err.message || 'Terjadi kesalahan');
-            this.disabled = false;
-            this.textContent = originalText;
-        });
+            fetch(`/kasir/transaksi/${id}/validasi`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                body: JSON.stringify({ action: action }),
+            })
+            .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
+            .then(data => {
+                showRiwayatToast('success', isTerima ? 'Pembayaran Diterima' : 'Pembayaran Ditolak', data.message);
+                setTimeout(() => window.location.reload(), 1500);
+            })
+            .catch(err => {
+                showRiwayatToast('error', 'Gagal', err.message || 'Terjadi kesalahan');
+                this.disabled = false;
+                this.textContent = originalText;
+            });
+        }, 'Tidak');
     });
 });
 </script>

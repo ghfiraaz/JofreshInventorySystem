@@ -17,6 +17,7 @@ class Mitra extends Model
         'tanggal_jatuh_tempo',
         'status',
         'payment_token',
+        'payment_upload_locked',
     ];
 
     protected static function booted()

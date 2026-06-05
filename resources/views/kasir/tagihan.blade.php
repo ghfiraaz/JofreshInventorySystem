@@ -262,7 +262,7 @@
             <div id="confirm-tagihan-detail" class="mt-3 p-3 bg-slate-50 rounded-xl text-sm text-slate-700 hidden"></div>
         </div>
         <div class="px-8 pb-8 pt-4 flex justify-end gap-3">
-            <button type="button" onclick="closeConfirmModal()" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer border-none">Batal</button>
+            <button type="button" id="confirm-tagihan-no" onclick="closeConfirmModal()" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer border-none">Batal</button>
             <button type="button" id="confirm-tagihan-yes" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white border-none cursor-pointer transition-all" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">Ya, Kirim</button>
         </div>
     </div>
@@ -311,13 +311,17 @@ function hideToast() {
 // ========== Confirm Modal ==========
 let _confirmCallback = null;
 
-function showConfirmTagihan(title, message, detail, yesLabel, onYes) {
+function showConfirmTagihan(title, message, detail, yesLabel, onYes, noLabel = 'Batal') {
     const modal = document.getElementById('modal-confirm-tagihan');
     document.getElementById('confirm-tagihan-title').textContent = title;
     document.getElementById('confirm-tagihan-message').textContent = message;
     const detailEl = document.getElementById('confirm-tagihan-detail');
     const yesBtn = document.getElementById('confirm-tagihan-yes');
+    const noBtn = document.getElementById('confirm-tagihan-no');
     yesBtn.textContent = yesLabel || 'Ya, Lanjutkan';
+    if (noBtn) {
+        noBtn.textContent = noLabel;
+    }
     if (detail) {
         detailEl.innerHTML = detail;
         detailEl.classList.remove('hidden');
@@ -391,9 +395,10 @@ function validasiMitra(btn) {
 
     const title = isTerima ? 'Terima Pembayaran' : 'Tolak Pembayaran';
     const message = isTerima
-        ? 'Terima semua bukti pembayaran mitra ini? Email konfirmasi akan dikirim otomatis.'
-        : 'Tolak semua bukti pembayaran mitra ini? Email notifikasi akan dikirim agar mitra upload ulang.';
-    const yesLabel = isTerima ? 'Ya, Terima' : 'Ya, Tolak';
+        ? 'Apakah anda yakin ingin validasi bukti pembayaran ini?'
+        : 'Apakah anda yakin ingin menolak bukti pembayaran ini?';
+    const yesLabel = 'Ya';
+    const noLabel = 'Tidak';
 
     showConfirmTagihan(title, message, null, yesLabel, () => {
         btn.disabled = true;
@@ -414,7 +419,7 @@ function validasiMitra(btn) {
             btn.disabled = false;
             btn.textContent = isTerima ? '✓ Terima' : '✗ Tolak';
         });
-    });
+    }, noLabel);
 }
 </script>
 

@@ -79,6 +79,9 @@ class ReminderService
                 ->where('status_pembayaran', 'Belum Dibayar')
                 ->update(['last_reminder_sent_at' => now()]);
 
+            // Unlock payment upload for the Mitra
+            $mitra->update(['payment_upload_locked' => false]);
+
             return [
                 'success' => true,
                 'message' => 'Reminder berhasil dikirim ke ' . $mitra->email,

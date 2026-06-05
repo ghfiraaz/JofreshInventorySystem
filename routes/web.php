@@ -9,6 +9,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\LogStokController;
+use App\Http\Controllers\NotificationController;
 
 // Auth routes (guest only)
 Route::middleware('guest')->group(function () {
@@ -22,6 +24,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/pembayaran/{token}', [PaymentController::class, 'showUploadForm'])->name('pembayaran.upload');
 Route::post('/pembayaran/{token}', [PaymentController::class, 'uploadBuktiBayar'])->name('pembayaran.store');
 Route::get('/pembayaran/{token}/pdf', [PaymentController::class, 'downloadTagihanPdf'])->name('pembayaran.pdf');
+
+// Log Stok — semua role bisa lihat (view-only)
+Route::middleware(['role:Admin,Kasir,Superadmin'])->group(function () {
+    Route::get('/log-stok', [LogStokController::class, 'index'])->name('log-stok.index');
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+});
 
 // Superadmin routes
 Route::middleware(['role:Superadmin'])->group(function () {
@@ -43,6 +53,7 @@ Route::middleware(['role:Admin'])->prefix('admin')->group(function () {
     Route::put('/produk/{id}', [ProdukController::class, 'update']);
     Route::delete('/produk/{id}', [ProdukController::class, 'destroy']);
     Route::post('/produk/{id}/stok', [ProdukController::class, 'tambahStok']);
+    Route::post('/penyesuaian-stok', [LogStokController::class, 'storeAdjustment'])->name('admin.penyesuaian-stok.store');
     Route::get('/mitra', [MitraController::class, 'index']);
     Route::post('/mitra', [MitraController::class, 'store']);
     Route::put('/mitra/{id}', [MitraController::class, 'update']);
