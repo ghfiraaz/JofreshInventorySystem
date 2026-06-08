@@ -9,9 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css'])
     <style>
-        body { background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #f5f3ff 100%); min-height: 100vh; font-family: 'Inter', sans-serif; }
-        .upload-zone { border: 2px dashed #c7d2fe; border-radius: 16px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: #f8faff; }
-        .upload-zone:hover, .upload-zone.dragover { border-color: #6366f1; background: #eef2ff; }
+        body { background: linear-gradient(135deg, #FAF8F5 0%, #F5F0EB 50%, #FFF8F0 100%); min-height: 100vh; font-family: 'Inter', sans-serif; }
+        .upload-zone { border: 2px dashed #E0C4A8; border-radius: 16px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: #FAF8F5; }
+        .upload-zone:hover, .upload-zone.dragover { border-color: #7B3911; background: #FAF5EF; }
         .upload-zone.has-file { border-color: #22c55e; background: #f0fdf4; }
     </style>
 </head>
@@ -20,8 +20,10 @@
 
     {{-- Header --}}
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-extrabold tracking-[4px] text-blue-900 mb-2">J I S</h1>
-        <p class="text-sm text-gray-500">JoFresh Inventory System</p>
+        <div class="flex justify-center mb-3">
+            <img src="{{ asset('images/logo-jofresh.png') }}" alt="JoFresh Logo" class="h-16 w-auto object-contain">
+        </div>
+        <p class="text-sm text-gray-500 font-medium">JoFresh Inventory System</p>
     </div>
 
     @if(session('success'))
@@ -60,9 +62,9 @@
         @else
             {{-- Mitra Info --}}
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-                <div class="bg-gradient-to-r from-blue-700 to-indigo-600 p-6 text-white">
+                <div class="bg-gradient-to-r from-[#7B3911] to-[#A1511E] p-6 text-white">
                     <h2 class="text-xl font-bold mb-1">Tagihan Pembayaran</h2>
-                    <p class="text-blue-100 text-sm">{{ $mitra->nama }}</p>
+                    <p class="text-white/80 text-sm">{{ $mitra->nama }}</p>
                 </div>
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
@@ -81,7 +83,7 @@
                     @foreach($transaksiUnpaid as $tx)
                     <div class="flex justify-between items-center p-3 rounded-lg bg-gray-50 border border-gray-100">
                         <div>
-                            <div class="text-sm font-bold text-indigo-700">{{ $tx->no_transaksi }}</div>
+                            <div class="text-sm font-bold text-[#7B3911]">{{ $tx->no_transaksi }}</div>
                             <div class="text-xs text-gray-400">{{ $tx->created_at->format('d/m/Y') }} • {{ $tx->total_item }} item</div>
                             @if($tx->status_pembayaran === 'Menunggu Validasi')
                                 <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700">Menunggu Validasi</span>
@@ -103,8 +105,8 @@
                 <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Informasi Pembayaran</h3>
                 
                 {{-- Bank Info --}}
-                <div class="p-4 rounded-xl bg-blue-50 border border-blue-100 mb-4">
-                    <div class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">Transfer Bank</div>
+                <div class="p-4 rounded-xl bg-[#FAF5EF] border border-[#E0D5CA] mb-4">
+                    <div class="text-xs font-bold text-[#8B4513] uppercase tracking-wider mb-2">Transfer Bank</div>
                     <div class="text-sm text-gray-700 mb-1">Bank: <span class="font-bold">BCA</span></div>
                     <div class="text-sm text-gray-700 mb-1">No. Rekening: <span class="font-bold">7380582030</span></div>
                     <div class="text-sm text-gray-700">Atas Nama: <span class="font-bold">JoFresh</span></div>
@@ -141,7 +143,7 @@
                         <div class="upload-zone mb-4" id="upload-zone" onclick="document.getElementById('file-input').click()">
                             <input type="file" name="bukti_pembayaran" id="file-input" accept=".jpg,.jpeg,.png,.pdf" class="hidden" required>
                             <div id="upload-placeholder">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-indigo-300 mx-auto mb-3"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-[#E0C4A8] mx-auto mb-3"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg>
                                 <p class="text-sm font-semibold text-gray-600 mb-1">Klik atau drag file ke sini</p>
                                 <p class="text-xs text-gray-400">Format: JPG, PNG, PDF (maks. 5MB)</p>
                             </div>
@@ -156,7 +158,7 @@
                             <p class="text-sm text-red-500 mb-4">{{ $errors->first('bukti_pembayaran') }}</p>
                         @endif
 
-                        <button type="submit" id="btn-submit" disabled class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 cursor-pointer border-none disabled:opacity-40 disabled:cursor-not-allowed">
+                        <button type="submit" id="btn-submit" disabled class="w-full py-3.5 bg-[#7B3911] hover:bg-[#5A270B] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#7B3911]/20 flex items-center justify-center gap-2 cursor-pointer border-none disabled:opacity-40 disabled:cursor-not-allowed">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
                             <span>Kirim Bukti Pembayaran</span>
                         </button>

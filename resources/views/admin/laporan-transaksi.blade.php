@@ -9,40 +9,40 @@
 #lp-cal-trigger {
     display:flex; align-items:center; gap:8px;
     padding:8px 16px; border-radius:12px; cursor:pointer;
-    background:linear-gradient(135deg,#e0e7ff,#f0fdf4);
-    border:1.5px solid #a5b4fc; color:#3730a3;
+    background:linear-gradient(135deg,#FAF5EF,#FFF8F0);
+    border:1.5px solid #E0C4A8; color:#7B3911;
     font-weight:600; font-size:0.93rem; transition:all 0.18s;
-    user-select:none; box-shadow:0 2px 8px rgba(99,102,241,.08);
+    user-select:none; box-shadow:0 2px 8px rgba(123,57,17,.08);
 }
-#lp-cal-trigger:hover { border-color:#6366f1; background:linear-gradient(135deg,#c7d2fe,#dcfce7); }
+#lp-cal-trigger:hover { border-color:#C8702A; background:linear-gradient(135deg,#F0E0D0,#FFF8F0); }
 #lp-cal-popup {
     position:absolute; top:calc(100% + 8px); right:0; z-index:200;
-    background:#fff; border-radius:18px; box-shadow:0 12px 40px rgba(99,102,241,.16);
-    border:1.5px solid #e0e7ff; width:308px; overflow:hidden;
+    background:#fff; border-radius:18px; box-shadow:0 12px 40px rgba(107,52,16,.16);
+    border:1.5px solid #E0D5CA; width:308px; overflow:hidden;
     animation: lp-calSlide 0.18s ease;
 }
 @keyframes lp-calSlide { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
 .lp-cal-header {
     display:flex; align-items:center; justify-content:space-between;
     padding:14px 16px 10px;
-    background:linear-gradient(135deg,#4f46e5,#6366f1);
+    background:linear-gradient(135deg,#7B3911,#A1511E);
 }
 .lp-cal-nav { background:rgba(255,255,255,.18); border:none; border-radius:8px; width:32px; height:32px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; transition:background 0.15s; }
 .lp-cal-nav:hover { background:rgba(255,255,255,.32); }
 .lp-cal-title { background:transparent; border:none; color:#fff; font-weight:700; font-size:1rem; cursor:pointer; padding:4px 10px; border-radius:8px; transition:background 0.15s; }
 .lp-cal-title:hover { background:rgba(255,255,255,.18); }
 .lp-cal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); padding:8px 12px 4px; }
-.lp-cal-weekdays span { text-align:center; font-size:0.72rem; font-weight:700; color:#6366f1; text-transform:uppercase; letter-spacing:.04em; }
+.lp-cal-weekdays span { text-align:center; font-size:0.72rem; font-weight:700; color:#C8702A; text-transform:uppercase; letter-spacing:.04em; }
 .lp-cal-days { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; padding:4px 12px 12px; }
 .lp-cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:0.85rem; font-weight:500; cursor:pointer; color:#374151; transition:all 0.15s; border:none; background:transparent; }
-.lp-cal-day:hover { background:#e0e7ff; color:#3730a3; }
+.lp-cal-day:hover { background:#FAF5EF; color:#7B3911; }
 .lp-cal-day.today { background:#f0fdf4; color:#16a34a; font-weight:700; border:1.5px solid #86efac; }
-.lp-cal-day.selected { background:linear-gradient(135deg,#4f46e5,#6366f1); color:#fff !important; font-weight:700; box-shadow:0 2px 8px rgba(99,102,241,.3); }
+.lp-cal-day.selected { background:linear-gradient(135deg,#7B3911,#A1511E); color:#fff !important; font-weight:700; box-shadow:0 2px 8px rgba(123,57,17,.3); }
 .lp-cal-day.other-month { color:#d1d5db; }
 .lp-cal-grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:12px 14px 14px; }
 .lp-cal-grid3 button { padding:10px 4px; border:none; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; text-align:center; color:#374151; background:transparent; transition:all 0.15s; }
-.lp-cal-grid3 button:hover { background:#e0e7ff; color:#3730a3; }
-.lp-cal-grid3 button.active { background:linear-gradient(135deg,#4f46e5,#6366f1); color:#fff; box-shadow:0 2px 8px rgba(99,102,241,.3); }
+.lp-cal-grid3 button:hover { background:#FAF5EF; color:#7B3911; }
+.lp-cal-grid3 button.active { background:linear-gradient(135deg,#7B3911,#A1511E); color:#fff; box-shadow:0 2px 8px rgba(123,57,17,.3); }
 </style>
 
 <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-[0_2px_10px_rgba(0,0,0,0.02)] mb-8">
@@ -124,7 +124,7 @@
                     <tr class="border-b last:border-0 hover:brightness-95 transition-all" style="background:{{ $pc['bg'] }}; border-color:{{ $pc['border'] }};">
                         <td class="py-3 px-4 text-sm font-semibold text-slate-800">{{ $data['date']->translatedFormat('d F Y') }}</td>
                         <td class="py-3 px-4 text-sm text-slate-600 text-center">
-                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-indigo-700 font-bold text-xs" style="background:#e0e7ff;">{{ $data['total_transaksi'] }}</span>
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-xs" style="background:#FAF5EF; color:#7B3911;">{{ $data['total_transaksi'] }}</span>
                         </td>
                         <td class="py-3 px-4 text-sm text-slate-600 text-center">{{ intval($data['total_item']) }} ekor</td>
                         <td class="py-3 px-4 text-sm font-bold text-emerald-600 text-right">Rp {{ number_format($data['total_harga'], 0, ',', '.') }}</td>
@@ -136,7 +136,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                                     </svg>
                                 </button>
-                                <a href="{{ url('/owner/laporan-harian?date='.$dateKey) }}" target="_blank" class="px-3 py-1.5 bg-indigo-50 border border-indigo-100 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 text-indigo-700 text-xs font-semibold rounded flex items-center gap-1 cursor-pointer transition-colors no-underline">
+                                <a href="{{ url('/owner/laporan-harian?date='.$dateKey) }}" target="_blank" class="px-3 py-1.5 border text-xs font-semibold rounded flex items-center gap-1 cursor-pointer transition-colors no-underline" style="background:#FAF5EF; border-color:#E0C4A8; color:#7B3911;" onmouseover="this.style.background='#7B3911';this.style.color='#fff';this.style.borderColor='#7B3911';" onmouseout="this.style.background='#FAF5EF';this.style.color='#7B3911';this.style.borderColor='#E0C4A8';">
                                     Cetak PDF
                                 </a>
                             </div>
@@ -173,7 +173,7 @@
                                             @foreach($tx->items as $item)
                                             <div class="flex justify-between items-center text-sm">
                                                 <div class="flex items-center gap-2 text-slate-600">
-                                                    <div class="w-1.5 h-1.5 rounded-full bg-indigo-300"></div>
+                                                    <div class="w-1.5 h-1.5 rounded-full" style="background:#C8956A;"></div>
                                                     {{ $item->nama_produk }}
                                                 </div>
                                                 <div class="font-semibold text-slate-700 bg-slate-50 px-2 py-0.5 rounded text-xs">{{ intval($item->jumlah) }}x</div>
@@ -189,9 +189,9 @@
                 @endforeach
             </tbody>
             <tfoot>
-                <tr class="bg-blue-50/30 border-t-2 border-blue-100">
+                <tr style="background:#FAF5EF; border-top:2px solid #E0C4A8;">
                     <td colspan="3" class="py-4 px-4 text-sm font-bold text-slate-700 text-right uppercase tracking-wider">Total Pendapatan Terfilter</td>
-                    <td class="py-4 px-4 text-lg font-black text-blue-700 text-right">Rp {{ number_format($grandTotal, 0, ',', '.') }}</td>
+                    <td class="py-4 px-4 text-lg font-black text-right" style="color:#7B3911;">Rp {{ number_format($grandTotal, 0, ',', '.') }}</td>
                     <td></td>
                 </tr>
             </tfoot>
@@ -199,8 +199,8 @@
     </div>
     @else
     <div class="text-center py-16 px-4">
-        <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-blue-400">
+        <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style="background:#FAF5EF;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10" style="color:#C8702A;">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
             </svg>
         </div>

@@ -4,39 +4,35 @@
 
 <style>
 .trx-cal-wrap{position:relative;display:inline-block;}
-.trx-cal-trigger{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#e0e7ff,#f0fdf4);border:1.5px solid #a5b4fc;color:#3730a3;font-weight:600;font-size:.93rem;transition:all .18s;user-select:none;box-shadow:0 2px 8px rgba(99,102,241,.08);}
-.trx-cal-trigger:hover{border-color:#6366f1;background:linear-gradient(135deg,#c7d2fe,#dcfce7);}
-.trx-cal-popup{position:absolute;top:calc(100% + 8px);right:0;z-index:200;background:#fff;border-radius:18px;box-shadow:0 12px 40px rgba(99,102,241,.16);border:1.5px solid #e0e7ff;width:308px;overflow:hidden;animation:tCalSlide .18s ease;}
+.trx-cal-trigger{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#FAF5EF,#FFF8F0);border:1.5px solid #E0C4A8;color:#7B3911;font-weight:600;font-size:.93rem;transition:all .18s;user-select:none;box-shadow:0 2px 8px rgba(123,57,17,.08);}
+.trx-cal-trigger:hover{border-color:#C8702A;background:linear-gradient(135deg,#F0E0D0,#FFF8F0);}
+.trx-cal-popup{position:absolute;top:calc(100% + 8px);right:0;z-index:200;background:#fff;border-radius:18px;box-shadow:0 12px 40px rgba(123,57,17,.16);border:1.5px solid #E0D5CA;width:308px;overflow:hidden;animation:tCalSlide .18s ease;}
 @keyframes tCalSlide{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
-.trx-cal-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;background:linear-gradient(135deg,#4f46e5,#6366f1);}
+.trx-cal-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;background:linear-gradient(135deg,#7B3911,#A1511E);}
 .trx-cal-nav{background:rgba(255,255,255,.18);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:background .15s;}
 .trx-cal-nav:hover{background:rgba(255,255,255,.32);}
 .trx-cal-title{background:transparent;border:none;color:#fff;font-weight:700;font-size:1rem;cursor:pointer;padding:4px 10px;border-radius:8px;transition:background .15s;}
 .trx-cal-title:hover{background:rgba(255,255,255,.18);}
 .trx-cal-wdays{display:grid;grid-template-columns:repeat(7,1fr);padding:8px 12px 4px;}
-.trx-cal-wdays span{text-align:center;font-size:.72rem;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.04em;}
+.trx-cal-wdays span{text-align:center;font-size:.72rem;font-weight:700;color:#C8702A;text-transform:uppercase;letter-spacing:.04em;}
 .trx-cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:4px 12px 12px;}
 .trx-cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:.85rem;font-weight:500;cursor:pointer;color:#374151;transition:all .15s;border:none;background:transparent;}
-.trx-cal-day:hover{background:#e0e7ff;color:#3730a3;}
+.trx-cal-day:hover{background:#FAF5EF;color:#7B3911;}
 .trx-cal-day.today{background:#f0fdf4;color:#16a34a;font-weight:700;border:1.5px solid #86efac;}
-.trx-cal-day.selected{background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff!important;font-weight:700;box-shadow:0 2px 8px rgba(99,102,241,.3);}
+.trx-cal-day.selected{background:linear-gradient(135deg,#7B3911,#A1511E);color:#fff!important;font-weight:700;box-shadow:0 2px 8px rgba(123,57,17,.3);}
 .trx-cal-day.other-month{color:#d1d5db;}
 .trx-cal-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px 14px 14px;}
 .trx-cal-grid3 button{padding:10px 4px;border:none;border-radius:10px;font-size:.82rem;font-weight:600;cursor:pointer;color:#374151;background:transparent;transition:all .15s;}
-.trx-cal-grid3 button:hover{background:#e0e7ff;color:#3730a3;}
-.trx-cal-grid3 button.active{background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;box-shadow:0 2px 8px rgba(99,102,241,.3);}
-#trx-detail-modal{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.trx-cal-grid3 button:hover{background:#FAF5EF;color:#7B3911;}
+.trx-cal-grid3 button.active{background:linear-gradient(135deg,#7B3911,#A1511E);color:#fff;box-shadow:0 2px 8px rgba(123,57,17,.3);}
+#trx-detail-modal{position:fixed;inset:0;background:rgba(61,31,10,.4);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
 #trx-detail-modal.active{opacity:1;pointer-events:auto;}
 #trx-detail-box{background:#fff;border-radius:20px;width:100%;max-width:520px;margin:16px;box-shadow:0 24px 60px rgba(0,0,0,.18);overflow:hidden;transform:scale(.96);transition:transform .2s;}
 #trx-detail-modal.active #trx-detail-box{transform:scale(1);}
 </style>
 
 {{-- Top Bar --}}
-<div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-    <div class="relative w-full max-w-xs">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-        <input type="text" id="trx-search" placeholder="Cari no. transaksi / kasir..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-blue-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all">
-    </div>
+<div class="flex flex-wrap justify-end items-center gap-4 mb-6">
     <div class="flex items-center gap-3">
         @php $trxUrl = Auth::user()->role === 'Admin' ? url('/admin/transactions') : url('/transactions'); @endphp
         <form method="GET" action="{{ $trxUrl }}" id="trx-filter-form">
@@ -68,21 +64,21 @@
 </div>
 
 {{-- Table --}}
-<div class="rounded-2xl overflow-hidden border border-indigo-100 shadow-sm">
+<div class="table-container">
     <table class="w-full" id="trx-table">
         <thead>
-            <tr style="background:linear-gradient(135deg,#eef2ff,#f0fdf4);">
-                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-indigo-500">Tanggal</th>
-                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-indigo-500">No. Transaksi</th>
-                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-indigo-500">Mitra</th>
-                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-indigo-500">Item</th>
-                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-indigo-500">Status</th>
-                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-indigo-500">Total</th>
-                <th class="py-3.5 px-5 text-center text-xs font-bold uppercase tracking-wider text-indigo-500">Aksi</th>
+            <tr>
+                <th>Tanggal</th>
+                <th>No. Transaksi</th>
+                <th>Mitra</th>
+                <th>Item</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-slate-100">
-            @php $rowColors=['bg-white','bg-blue-50/40','bg-purple-50/40','bg-green-50/30','bg-amber-50/30']; $ri=0; @endphp
+            @php $rowColors=['bg-white','bg-[#FAF5EF]/20','bg-[#FFF8F0]/20','bg-green-50/20','bg-amber-50/20']; $ri=0; @endphp
             @forelse($transactions as $trx)
             @php
                 $rowBg=$rowColors[$ri%count($rowColors)]; $ri++;
@@ -90,7 +86,7 @@
                     return ['nama'=>$i->nama_produk,'qty'=>$i->jumlah,'harga'=>$i->harga_satuan,'subtotal'=>$i->subtotal];
                 })->values());
             @endphp
-            <tr class="trx-row {{ $rowBg }} hover:bg-indigo-50/60 transition-colors"
+            <tr class="trx-row {{ $rowBg }} hover:bg-[#FAF5EF]/50 transition-colors"
                 data-search="{{ strtolower($trx->no_transaksi.' '.($trx->user->name??'').' '.($trx->mitra->nama??'')) }}"
                 data-no="{{ $trx->no_transaksi }}"
                 data-tanggal="{{ $trx->created_at->format('d/m/Y H:i') }}"
@@ -102,9 +98,9 @@
                 data-total="Rp {{ number_format($trx->total_harga,0,',','.') }}"
                 data-items='{{ $itemsJson }}'>
                 <td class="py-3.5 px-5 text-sm text-slate-600 whitespace-nowrap">{{ $trx->created_at->format('d/m/Y H:i') }}</td>
-                <td class="py-3.5 px-5"><span class="font-bold text-indigo-700 text-sm">{{ $trx->no_transaksi }}</span></td>
+                <td class="py-3.5 px-5"><span class="font-bold text-[#7B3911] text-sm">{{ $trx->no_transaksi }}</span></td>
                 <td class="py-3.5 px-5 text-sm text-slate-600">{{ $trx->mitra->nama ?? '-' }}</td>
-                <td class="py-3.5 px-5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#e0e7ff;color:#4338ca;">{{ $trx->total_item }} item</span></td>
+                <td class="py-3.5 px-5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#FAF5EF;color:#7B3911;">{{ $trx->total_item }} item</span></td>
                 <td class="py-3.5 px-5">
                     @if($trx->status_pembayaran === 'Sudah Dibayar')
                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#dcfce7;color:#15803d;">Lunas</span>
@@ -114,7 +110,7 @@
                 </td>
                 <td class="py-3.5 px-5 text-sm font-bold" style="color:#15803d;">Rp {{ number_format($trx->total_harga,0,',','.') }}</td>
                 <td class="py-3.5 px-5 text-center">
-                    <button onclick="showTrxDetail(this.closest('tr'))" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="Detail Transaksi">
+                    <button onclick="showTrxDetail(this.closest('tr'))" class="p-2 text-slate-400 hover:text-[#7B3911] hover:bg-[#FAF5EF] rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="Detail Transaksi">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px]"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
                     </button>
                 </td>
@@ -134,10 +130,6 @@
 </div>
 
 <script>
-document.getElementById('trx-search').addEventListener('input',function(){
-    const q=this.value.toLowerCase();
-    document.querySelectorAll('.trx-row').forEach(r=>{r.style.display=r.dataset.search.includes(q)?'':'none';});
-});
 document.getElementById('trx-detail-modal').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('active'); });
 
 function showTrxDetail(row){
@@ -151,11 +143,11 @@ function showTrxDetail(row){
     let itemsHtml=items.map(i=>`<tr><td class="py-2 text-sm text-slate-700">${i.nama}</td><td class="py-2 text-sm text-slate-600 text-center">${i.qty}</td><td class="py-2 text-sm text-slate-600 text-right">Rp ${fmt(i.harga)}</td><td class="py-2 text-sm font-semibold text-right" style="color:#15803d;">Rp ${fmt(i.subtotal)}</td></tr>`).join('');
 
     document.getElementById('trx-detail-content').innerHTML=`
-        <div style="background:linear-gradient(135deg,#4f46e5,#6366f1);" class="px-6 py-5 flex justify-between items-start">
+        <div style="background:linear-gradient(135deg,#7B3911,#A1511E);" class="px-6 py-5 flex justify-between items-start">
             <div>
-                <div class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Detail Transaksi</div>
+                <div class="text-white/70 text-xs font-bold uppercase tracking-wider mb-1">Detail Transaksi</div>
                 <div class="text-white font-black text-lg">${no}</div>
-                <div class="text-indigo-200 text-xs mt-1">${tgl}</div>
+                <div class="text-white/70 text-xs mt-1">${tgl}</div>
             </div>
             <button onclick="document.getElementById('trx-detail-modal').classList.remove('active')" class="text-white/70 hover:text-white text-2xl font-bold bg-transparent border-none cursor-pointer leading-none">&times;</button>
         </div>
@@ -175,9 +167,9 @@ function showTrxDetail(row){
                     </table>
                 </div>
             </div>
-            <div class="flex justify-between items-center bg-indigo-50 rounded-xl px-5 py-4 border border-indigo-100">
+            <div class="flex justify-between items-center bg-[#FAF5EF] rounded-xl px-5 py-4 border border-[#E0C4A8]">
                 <span class="font-bold text-slate-700">Total</span>
-                <span class="font-black text-xl" style="color:#4f46e5;">${total}</span>
+                <span class="font-black text-xl" style="color:#7B3911;">${total}</span>
             </div>
             <div class="mt-4 flex justify-end">
                 <button onclick="document.getElementById('trx-detail-modal').classList.remove('active')" class="px-6 py-2.5 rounded-xl font-semibold text-slate-500 bg-slate-100 hover:bg-slate-200 text-sm border-none cursor-pointer transition-all">Tutup</button>

@@ -2,12 +2,8 @@
 @section('title', 'Mitra')
 @section('content')
 
-<div class="flex justify-between items-center mb-6">
-    <div class="relative w-full max-w-xs">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-        <input type="text" id="search-mitra" placeholder="Cari mitra..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-blue-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all">
-    </div>
-    <button id="btn-tambah-mitra" class="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-semibold text-sm cursor-pointer border-none transition-all" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">
+<div class="flex justify-end items-center mb-6">
+    <button id="btn-tambah-mitra" class="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-semibold text-sm cursor-pointer border-none transition-all" style="background:#7B3911;" onmouseover="this.style.background='#5A270B'" onmouseout="this.style.background='#7B3911'">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
         Tambah Mitra
     </button>
@@ -33,11 +29,11 @@
                 <td class="py-3.5 px-5 text-sm text-slate-600 row-kontak">{{ $m->kontak ?? '-' }}</td>
                 <td class="py-3.5 px-5 text-sm text-slate-600 row-alamat">{{ $m->alamat ?? '-' }}</td>
                 <td class="py-3.5 px-5 text-sm text-center row-jatuh-tempo">
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">Tgl {{ $m->tanggal_jatuh_tempo }}</span>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[#FAF0E6] text-[#7B3911]">Tgl {{ $m->tanggal_jatuh_tempo }}</span>
                 </td>
                 <td class="py-3.5 px-5">
                     <div class="flex items-center gap-1">
-                        <button class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-mitra" title="Edit">
+                        <button class="p-2 text-slate-400 hover:text-[#7B3911] hover:bg-[#FAF5EF] rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-mitra" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/></svg>
                         </button>
                         <button class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-delete-mitra" title="Hapus">
@@ -56,7 +52,7 @@
 {{-- Modal --}}
 <div class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 modal-overlay [&.active]:opacity-100 [&.active]:pointer-events-auto" id="modal-mitra">
     <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl relative overflow-hidden transform scale-95 transition-transform duration-300 [.active_&]:scale-100">
-        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-900 to-indigo-600"></div>
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#7B3911] to-[#A1511E]"></div>
         <div class="px-8 pt-8 pb-2 flex justify-between items-start">
             <div>
                 <h3 id="modal-mitra-title" class="text-xl font-bold text-slate-800">Tambah Mitra</h3>
@@ -66,49 +62,41 @@
         </div>
         <form id="form-mitra" class="px-8 pb-8 pt-4">
             <input type="hidden" id="mitra-edit-id" value="">
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nama Mitra <span class="text-red-500">*</span></label>
-                <input type="text" id="mitra-nama" placeholder="Nama restoran / warung" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all">
+            <div class="form-group">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nama Mitra *</label>
+                <input type="text" id="mitra-nama" placeholder="Nama restoran / warung" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
             </div>
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
-                <input type="email" id="mitra-email" placeholder="email@mitra.com" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all">
+            <div class="form-group">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email Mitra</label>
+                <input type="email" id="mitra-email" placeholder="email@mitra.com" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
             </div>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Kontak</label>
-                    <input type="text" id="mitra-kontak" placeholder="0812-xxxx-xxxx" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all">
+            <div class="flex gap-4">
+                <div class="form-group flex-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Kontak / HP</label>
+                    <input type="text" id="mitra-kontak" placeholder="0812-xxxx-xxxx" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal Jatuh Tempo</label>
-                    <select id="mitra-jatuh-tempo" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all bg-white cursor-pointer">
-                        @for($d = 1; $d <= 31; $d++)
-                            <option value="{{ $d }}">Tanggal {{ $d }}</option>
+                <div class="form-group flex-1">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal Jatuh Tempo *</label>
+                    <select id="mitra-jatuh-tempo" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all bg-white cursor-pointer">
+                        @for($i=1; $i<=31; $i++)
+                            <option value="{{ $i }}">Tgl {{ $i }}</option>
                         @endfor
                     </select>
                 </div>
             </div>
-            <div class="mb-6">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Alamat</label>
-                <input type="text" id="mitra-alamat" placeholder="Jl. ..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all">
+            <div class="form-group">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Alamat Lengkap</label>
+                <input type="text" id="mitra-alamat" placeholder="Jl. ..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
             </div>
-            <div class="flex justify-end gap-3">
+            <div class="mt-8 flex justify-end gap-3">
                 <button type="button" onclick="document.getElementById('modal-mitra').classList.remove('active')" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer border-none">Batal</button>
-                <button type="submit" id="btn-submit-mitra" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white border-none cursor-pointer transition-all" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">Simpan Mitra</button>
+                <button type="submit" id="btn-submit-mitra" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white border-none cursor-pointer transition-all" style="background:#7B3911;" onmouseover="this.style.background='#5A270B'" onmouseout="this.style.background='#7B3911'">Simpan Mitra</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-// Search
-document.getElementById('search-mitra').addEventListener('input', function() {
-    const q = this.value.toLowerCase();
-    document.querySelectorAll('#mitraTable tbody tr[data-id]').forEach(r => {
-        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-});
-
 // Backdrop close
 document.getElementById('modal-mitra').addEventListener('click', function(e) {
     if (e.target === this) this.classList.remove('active');

@@ -62,43 +62,31 @@ class DashboardController extends Controller
         $stokRendahCount   = Produk::whereColumn('stok', '<', 'stok_minimal')->count();
         $isStokRendah      = $stokRendahCount > 0;
 
-        // --- Chart: Tren Penjualan ---
+        // --- Chart: Tren Penjualan Bulanan (12 bulan terakhir) ---
         $trendLabels = [];
         $trendData   = [];
 
-        if ($hasFilter) {
-            $daysDiff = $rangeStart->diffInDays($rangeEnd);
+        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
-            if ($daysDiff <= 31) {
-                // Daily granularity
-                for ($d = $rangeStart->copy(); $d->lte($rangeEnd); $d->addDay()) {
-                    $trendLabels[] = $d->translatedFormat('d M');
-                    $trendData[]   = (int) Transaksi::whereDate('created_at', $d->toDateString())
-                                        ->where('status_pembayaran', 'Sudah Dibayar')
-                                        ->sum('total_harga');
-                }
-            } else {
-                // Monthly granularity for large ranges
-                $cursor = $rangeStart->copy()->startOfMonth();
-                while ($cursor->lte($rangeEnd)) {
-                    $monthEnd = $cursor->copy()->endOfMonth();
-                    $trendLabels[] = $cursor->translatedFormat('M Y');
-                    $trendData[]   = (int) Transaksi::whereBetween('created_at', [$cursor, $monthEnd])
-                                        ->where('status_pembayaran', 'Sudah Dibayar')
-                                        ->sum('total_harga');
-                    $cursor->addMonth();
-                }
-            }
-        } else {
-            // Default: 7 hari terakhir
-            $hariIni = today();
-            for ($i = 6; $i >= 0; $i--) {
-                $date = $hariIni->copy()->subDays($i);
-                $trendLabels[] = $date->translatedFormat('d M');
-                $trendData[]   = (int) Transaksi::whereDate('created_at', $date)
-                                    ->where('status_pembayaran', 'Sudah Dibayar')
-                                    ->sum('total_harga');
-            }
+        // Selalu tampilkan 12 bulan terakhir (tidak terpengaruh filter periode)
+        $startOf12Months = Carbon::now()->startOfMonth()->subMonths(11);
+
+        // Ambil semua transaksi berhasil 12 bulan terakhir, group by bulan
+        $monthlyData = Transaksi::where('status_pembayaran', 'Sudah Dibayar')
+            ->where('created_at', '>=', $startOf12Months)
+            ->selectRaw('YEAR(created_at) as tahun, MONTH(created_at) as bulan, SUM(total_harga) as total')
+            ->groupBy('tahun', 'bulan')
+            ->orderBy('tahun')
+            ->orderBy('bulan')
+            ->get()
+            ->keyBy(fn($row) => $row->tahun . '-' . str_pad($row->bulan, 2, '0', STR_PAD_LEFT));
+
+        // Isi 12 bulan berurutan, jika tidak ada transaksi → 0
+        for ($i = 11; $i >= 0; $i--) {
+            $month = Carbon::now()->startOfMonth()->subMonths($i);
+            $key   = $month->format('Y-m');
+            $trendLabels[] = $monthNames[(int)$month->format('n') - 1] . ' ' . $month->format('Y');
+            $trendData[]   = isset($monthlyData[$key]) ? (int) $monthlyData[$key]->total : 0;
         }
 
         // --- Chart: Distribusi per produk ---

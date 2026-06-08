@@ -23,7 +23,7 @@
             <span class="text-slate-500 text-[0.85rem] font-medium tracking-wide">Total Transaksi</span>
             <h3 class="font-bold text-2xl mt-1 text-slate-800">{{ $totalTransaksi }}</h3>
         </div>
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 group-hover:scale-110 transition-transform duration-300">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#FAF5EF] text-[#7B3911] group-hover:scale-110 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
             </svg>
@@ -34,7 +34,7 @@
             <span class="text-slate-500 text-[0.85rem] font-medium tracking-wide">Total Mitra</span>
             <h3 class="font-bold text-2xl mt-1 text-slate-800">{{ $totalMitra }}</h3>
         </div>
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-600 group-hover:scale-110 transition-transform duration-300">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-[#FFF8F0] text-[#D2691E] group-hover:scale-110 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
             </svg>
@@ -70,53 +70,53 @@
 .period-trigger {
     display:flex; align-items:center; gap:8px;
     padding:8px 16px; border-radius:12px; cursor:pointer;
-    background:linear-gradient(135deg,#e0e7ff,#f0fdf4);
-    border:1.5px solid #a5b4fc; color:#3730a3;
+    background:linear-gradient(135deg,#FAF5EF,#FFF8F0);
+    border:1.5px solid #E0C4A8; color:#7B3911;
     font-weight:600; font-size:0.9rem; transition:all 0.18s;
-    user-select:none; box-shadow:0 2px 8px rgba(99,102,241,.08);
+    user-select:none; box-shadow:0 2px 8px rgba(123,57,17,.08);
 }
-.period-trigger:hover { border-color:#6366f1; background:linear-gradient(135deg,#c7d2fe,#dcfce7); }
+.period-trigger:hover { border-color:#C8702A; background:linear-gradient(135deg,#F0E0D0,#FFF8F0); }
 .period-popup {
     position:absolute; top:calc(100% + 8px); right:0; z-index:200;
-    background:#fff; border-radius:18px; box-shadow:0 12px 40px rgba(99,102,241,.16);
-    border:1.5px solid #e0e7ff; width:360px; overflow:hidden;
+    background:#fff; border-radius:18px; box-shadow:0 12px 40px rgba(107,52,16,.16);
+    border:1.5px solid #E0D5CA; width:360px; overflow:hidden;
     animation: periodSlide 0.18s ease;
 }
 @keyframes periodSlide { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
-.period-tabs { display:flex; border-bottom:1px solid #e0e7ff; }
+.period-tabs { display:flex; border-bottom:1px solid #E0D5CA; }
 .period-tab {
     flex:1; padding:12px; text-align:center; font-size:0.82rem; font-weight:700;
     text-transform:uppercase; letter-spacing:0.05em; cursor:pointer;
     color:#94a3b8; background:transparent; border:none; transition:all 0.15s;
 }
-.period-tab:hover { color:#6366f1; background:#f8fafc; }
-.period-tab.active { color:#4f46e5; border-bottom:2.5px solid #4f46e5; background:#eef2ff; }
+.period-tab:hover { color:#C8702A; background:#FAF5EF; }
+.period-tab.active { color:#7B3911; border-bottom:2.5px solid #7B3911; background:#FAF5EF; }
 .period-section { padding:16px; }
 .period-select {
     width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid #e2e8f0;
     font-size:0.88rem; font-weight:500; color:#334155; background:#fff;
     cursor:pointer; transition:border-color 0.15s; appearance:auto;
 }
-.period-select:focus { outline:none; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,.1); }
+.period-select:focus { outline:none; border-color:#7B3911; box-shadow:0 0 0 3px rgba(123,57,17,.1); }
 .period-input {
     width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid #e2e8f0;
     font-size:0.88rem; font-weight:500; color:#334155; background:#fff; transition:border-color 0.15s;
 }
-.period-input:focus { outline:none; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,.1); }
+.period-input:focus { outline:none; border-color:#7B3911; box-shadow:0 0 0 3px rgba(123,57,17,.1); }
 .period-apply {
     width:100%; padding:10px; border-radius:10px; border:none; cursor:pointer;
     font-size:0.88rem; font-weight:700; color:#fff; letter-spacing:0.03em;
-    background:linear-gradient(135deg,#4f46e5,#6366f1); transition:all 0.15s;
-    box-shadow:0 2px 8px rgba(99,102,241,.25);
+    background:linear-gradient(135deg,#7B3911,#A1511E); transition:all 0.15s;
+    box-shadow:0 2px 8px rgba(123,57,17,.25);
 }
-.period-apply:hover { background:linear-gradient(135deg,#4338ca,#4f46e5); transform:translateY(-1px); box-shadow:0 4px 12px rgba(99,102,241,.35); }
+.period-apply:hover { background:linear-gradient(135deg,#5A270B,#7B3911); transform:translateY(-1px); box-shadow:0 4px 12px rgba(123,57,17,.35); }
 </style>
 
 <div class="flex justify-between items-center mb-6">
     <div>
         <h3 class="font-bold text-xl text-slate-800">Analisis Penjualan</h3>
         @if($hasFilter)
-        <p class="text-sm text-slate-500 mt-0.5">Periode: <span class="font-semibold text-indigo-600">{{ $periodLabel }}</span> &nbsp;<a href="{{ Request::is('admin/*') ? url('/admin/dashboard') : url('/dashboard') }}" class="text-rose-500 hover:text-rose-700 no-underline text-xs font-bold">× Reset</a></p>
+        <p class="text-sm text-slate-500 mt-0.5">Periode: <span class="font-semibold text-[#7B3911]">{{ $periodLabel }}</span> &nbsp;<a href="{{ Request::is('admin/*') ? url('/admin/dashboard') : url('/dashboard') }}" class="text-rose-500 hover:text-rose-700 no-underline text-xs font-bold">× Reset</a></p>
         @endif
     </div>
     <div class="flex items-center gap-3">
@@ -189,8 +189,9 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-7">
     <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-        <h4 class="font-bold text-[1.15rem] mb-6 text-slate-800">Tren Penjualan</h4>
-        <div class="h-[300px]">
+        <h4 class="font-bold text-[1.15rem] text-slate-800">Tren Penjualan Bulanan</h4>
+        <p class="text-xs text-slate-400 mt-1 mb-5">Menampilkan perkembangan total penjualan setiap bulan untuk memantau performa bisnis dari waktu ke waktu.</p>
+        <div class="h-[280px]">
            <canvas id="chartTrend"></canvas>
         </div>
     </div>

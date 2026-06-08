@@ -16,6 +16,10 @@ class PaymentAcceptedMail extends Mailable
 
     public Mitra $mitra;
     public string $kodeInvoice;
+    public $transaksiList;
+    public $totalTagihan;
+    public $periodeAwal;
+    public $periodeAkhir;
     protected string $pdfPath;
 
     public function __construct(Mitra $mitra, string $kodeInvoice, string $pdfPath)
@@ -23,6 +27,20 @@ class PaymentAcceptedMail extends Mailable
         $this->mitra = $mitra;
         $this->kodeInvoice = $kodeInvoice;
         $this->pdfPath = $pdfPath;
+
+        $invoiceCodes = array_map('trim', explode(',', $kodeInvoice));
+        $this->transaksiList = \App\Models\Transaksi::whereIn('no_transaksi', $invoiceCodes)->get();
+        $this->totalTagihan = $this->transaksiList->sum('total_harga');
+
+        if ($this->transaksiList->isNotEmpty()) {
+            $minDate = $this->transaksiList->min('created_at');
+            $maxDate = $this->transaksiList->max('created_at');
+            $this->periodeAwal = \Illuminate\Support\Carbon::parse($minDate)->translatedFormat('d M Y');
+            $this->periodeAkhir = \Illuminate\Support\Carbon::parse($maxDate)->translatedFormat('d M Y');
+        } else {
+            $this->periodeAwal = '-';
+            $this->periodeAkhir = '-';
+        }
     }
 
     public function envelope(): Envelope

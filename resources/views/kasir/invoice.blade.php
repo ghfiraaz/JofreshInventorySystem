@@ -33,17 +33,24 @@
     {{-- Actions --}}
     <div class="flex justify-end gap-3 mb-8 no-print">
         <a href="{{ url('/kasir/riwayat') }}" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors no-underline">Kembali</a>
-        <button onclick="window.print()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors flex items-center gap-2 cursor-pointer border-none">
+        <button onclick="window.print()" class="px-4 py-2 bg-brand-700 text-white rounded-lg text-sm font-bold hover:bg-brand-800 transition-colors flex items-center gap-2 cursor-pointer border-none">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.724.092m6.524-4.31a5.25 5.25 0 0 0-5.25 5.25m5.25-5.25a5.25 5.25 0 0 1 5.25 5.25m-5.25-5.25v5.25m0-5.25a5.25 5.25 0 0 1 5.25 5.25m0 0v1.5m0-1.5c0 1.16-.311 2.247-.852 3.146M21 12c0 5.04-4.048 9.146-9.146 9.146m9.146-9.146a9.146 9.146 0 0 0-9.146-9.146M3 12c0-5.04 4.048-9.146 9.146-9.146m-9.146 9.146c0 1.16.311 2.247.852 3.146M3 12v1.5m0-1.5a5.25 5.25 0 0 0 5.25 5.25m0 0v1.5m0-1.5c.24.03.48.062.724.092" /></svg>
             Cetak / Download PDF
         </button>
     </div>
 
     {{-- Header --}}
-    <div class="flex justify-between items-start mb-8">
-        <div>
-            <h1 class="text-3xl font-extrabold tracking-[4px] text-blue-900 mb-2">J I S</h1>
-            <p class="text-sm text-gray-500">JoFresh Inventory System<br>Jl. Bintaro Raya</p>
+    <div class="flex justify-between items-start mb-8 border-b border-gray-200 pb-6">
+        <div class="flex items-center gap-4">
+            <img src="{{ asset('images/logo-jofresh.png') }}" alt="JoFresh Logo" style="height: 14mm; width: auto; display: block;" class="object-contain">
+            <div>
+                <h1 class="text-3xl font-black tracking-wide text-brand-700 leading-none mb-1">JoFresh</h1>
+                <p class="text-xs text-gray-400 italic mb-1">Elevating Freshness Every Day</p>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Kawasan Pergudangan Bintaro, Blok B No. 4, Tangerang Selatan<br>
+                    Email: info@jofresh.id | Telp: (021) 745-8889
+                </p>
+            </div>
         </div>
         <div class="text-right">
             <h2 class="text-2xl font-black text-gray-800 uppercase tracking-widest mb-2">INVOICE</h2>
@@ -106,7 +113,7 @@
             </div>
             <div class="flex justify-between py-4">
                 <span class="text-base font-bold text-gray-800">Grand Total</span>
-                <span class="text-2xl font-black text-blue-600">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
+                <span class="text-2xl font-black text-brand-700">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
             </div>
         </div>
     </div>

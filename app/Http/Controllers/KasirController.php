@@ -53,42 +53,85 @@ class KasirController extends Controller
             ->where('status_pembayaran', 'Menunggu Validasi')
             ->count();
 
-        // Query produk terlaris berdasarkan total kuantitas terjual
+        // Data tambahan untuk menyamakan tampilan dengan Owner
+        $totalMitra    = Mitra::count();
+        $totalStok     = Produk::sum('stok');
+        $stokRendahCount = Produk::whereColumn('stok', '<', 'stok_minimal')->count();
+        $isStokRendah  = $stokRendahCount > 0;
+
+        // Produk list untuk tabel stok
+        $produkList = Produk::orderBy('nama')->get()->map(function ($p) {
+            $isRendah = $p->stok < $p->stok_minimal;
+            $isHabis  = $p->stok <= 0;
+            $p->harga_format = 'Rp ' . number_format($p->harga, 0, ',', '.');
+            $p->status = $isHabis ? 'Stok Habis' : ($isRendah ? 'Stok Rendah' : 'Tersedia');
+            return $p;
+        });
+
+        // --- Chart: Tren Penjualan Bulanan (12 bulan terakhir) ---
+        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $startOf12Months = Carbon::now()->startOfMonth()->subMonths(11);
+
+        $monthlyDataRaw = Transaksi::where('status_pembayaran', 'Sudah Dibayar')
+            ->where('created_at', '>=', $startOf12Months)
+            ->selectRaw('YEAR(created_at) as tahun, MONTH(created_at) as bulan, SUM(total_harga) as total')
+            ->groupBy('tahun', 'bulan')
+            ->orderBy('tahun')
+            ->orderBy('bulan')
+            ->get()
+            ->keyBy(fn($row) => $row->tahun . '-' . str_pad($row->bulan, 2, '0', STR_PAD_LEFT));
+
+        $trendLabels = [];
+        $trendData   = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $month = Carbon::now()->startOfMonth()->subMonths($i);
+            $key   = $month->format('Y-m');
+            $trendLabels[] = $monthNames[(int)$month->format('n') - 1] . ' ' . $month->format('Y');
+            $trendData[]   = isset($monthlyDataRaw[$key]) ? (int) $monthlyDataRaw[$key]->total : 0;
+        }
+
+        // --- Chart: Produk Terlaris (Bar Chart) ---
         $produkTerlaris = DB::table('transaksi_items')
             ->join('transaksi', 'transaksi.id', '=', 'transaksi_items.transaksi_id')
             ->where('transaksi.status_pembayaran', 'Sudah Dibayar')
-            ->where('transaksi.user_id', Auth::id())
             ->select('transaksi_items.nama_produk', DB::raw('SUM(transaksi_items.jumlah) as total_terjual'))
             ->groupBy('transaksi_items.nama_produk')
             ->orderByDesc('total_terjual')
-            ->limit(5)
+            ->limit(6)
             ->get();
 
-        $chartLabels = $produkTerlaris->pluck('nama_produk')->toArray();
-        $chartData = $produkTerlaris->pluck('total_terjual')->map(function($val) {
-            return (int) $val;
-        })->toArray();
+        $distLabels = $produkTerlaris->pluck('nama_produk')->toArray();
+        $distData   = $produkTerlaris->pluck('total_terjual')->map(fn($v) => (int) $v)->toArray();
 
-        // Fallback ke data global jika data spesifik kasir ini masih kosong
-        if (empty($chartLabels)) {
-            $produkTerlarisGlobal = DB::table('transaksi_items')
-                ->join('transaksi', 'transaksi.id', '=', 'transaksi_items.transaksi_id')
-                ->where('transaksi.status_pembayaran', 'Sudah Dibayar')
-                ->select('transaksi_items.nama_produk', DB::raw('SUM(transaksi_items.jumlah) as total_terjual'))
-                ->groupBy('transaksi_items.nama_produk')
-                ->orderByDesc('total_terjual')
-                ->limit(5)
-                ->get();
-            $chartLabels = $produkTerlarisGlobal->pluck('nama_produk')->toArray();
-            $chartData = $produkTerlarisGlobal->pluck('total_terjual')->map(function($val) {
-                return (int) $val;
-            })->toArray();
+        // Legacy chart data for quick actions (bar chart produk terlaris by kasir)
+        $chartLabels = $distLabels;
+        $chartData   = $distData;
+
+        // Fallback jika kosong
+        if (empty($distLabels)) {
+            $chartLabels = [];
+            $chartData   = [];
         }
+
+        // Period filter variables (untuk konsistensi view)
+        $hasFilter   = false;
+        $periodLabel = '';
+        $filterMode  = '';
+        $filterMonth = '';
+        $filterYear  = '';
+        $filterStart = '';
+        $filterEnd   = '';
 
         return view('kasir.dashboard', compact(
             'totalPenjualan', 'totalTransaksi', 'produkTersedia',
             'belumBayar', 'tagihanMendesak', 'menungguValidasi',
-            'chartLabels', 'chartData'
+            'totalMitra', 'totalStok', 'isStokRendah', 'stokRendahCount',
+            'produkList',
+            'trendLabels', 'trendData',
+            'distLabels', 'distData',
+            'chartLabels', 'chartData',
+            'hasFilter', 'periodLabel',
+            'filterMode', 'filterMonth', 'filterYear', 'filterStart', 'filterEnd'
         ));
     }
 
@@ -293,12 +336,19 @@ class KasirController extends Controller
             ];
         }
 
-        // Sort by closest jatuh tempo (nearest first, null last)
+        // Sort by closest jatuh tempo to realtime (absolute distance, nearest first, null last)
         usort($mitraTagihan, function ($a, $b) {
             if ($a['sisaHari'] === null && $b['sisaHari'] === null) return 0;
             if ($a['sisaHari'] === null) return 1;
             if ($b['sisaHari'] === null) return -1;
-            return $a['sisaHari'] <=> $b['sisaHari'];
+            
+            $diffA = abs($a['sisaHari']);
+            $diffB = abs($b['sisaHari']);
+            
+            if ($diffA === $diffB) {
+                return $a['sisaHari'] <=> $b['sisaHari'];
+            }
+            return $diffA <=> $diffB;
         });
 
         $totalMitra   = count($mitraTagihan);
@@ -321,6 +371,28 @@ class KasirController extends Controller
 
         $mitra  = Mitra::findOrFail($request->mitra_id);
         $sender = Auth::user();
+
+        // Enforce H-3 validation
+        $transaksiList = Transaksi::where('mitra_id', $mitra->id)
+            ->where('status_pembayaran', 'Belum Dibayar')
+            ->get();
+            
+        $closestTempo = $transaksiList->whereNotNull('jatuh_tempo')
+            ->pluck('jatuh_tempo')
+            ->sort()
+            ->first();
+            
+        $canSendReminder = false;
+        if ($closestTempo) {
+            $sisaHari = (int) now()->startOfDay()->diffInDays($closestTempo, false);
+            $canSendReminder = $sisaHari <= 3;
+        }
+
+        if (!$canSendReminder) {
+            return response()->json([
+                'message' => 'Email reminder hanya dapat dikirim maksimal H-3 sebelum tanggal jatuh tempo.'
+            ], 422);
+        }
 
         $result = $reminderService->sendReminder($mitra, $sender);
 

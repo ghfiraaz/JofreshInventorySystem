@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = `fixed bottom-8 right-8 px-6 py-4 rounded-xl shadow-2xl z-[100] transform transition-all duration-500 translate-y-20 opacity-0 flex items-center gap-3 font-medium ${
-            type === 'success' ? 'bg-blue-900 text-white' : 'bg-red-600 text-white'
+            type === 'success' ? 'bg-[#522608] text-white' : 'bg-red-600 text-white'
         }`;
         
         const icon = type === 'success' 
@@ -621,32 +621,80 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const ctxTrend = document.getElementById('chartTrend');
     if (ctxTrend) {
+        const trendCtx = ctxTrend.getContext('2d');
+        const trendGradient = trendCtx.createLinearGradient(0, 0, 0, 300);
+        trendGradient.addColorStop(0, 'rgba(123, 57, 17, 0.15)');
+        trendGradient.addColorStop(1, 'rgba(123, 57, 17, 0.00)');
+
         new Chart(ctxTrend, {
             type: 'line',
             data: {
-                labels: dash.trendLabels || ['07 Apr', '08 Apr', '09 Apr', '10 Apr', '11 Apr', '12 Apr', '13 Apr'],
+                labels: dash.trendLabels || [],
                 datasets: [{ 
                     label: 'Penjualan (Rp)', 
-                    data: dash.trendData || [0,0,0,0,0,0,0], 
-                    borderColor: '#1e3a8a', 
-                    backgroundColor: 'rgba(30, 58, 138, 0.08)',
+                    data: dash.trendData || [], 
+                    borderColor: '#7B3911', 
+                    backgroundColor: trendGradient,
                     fill: true, 
-                    tension: 0.4, 
-                    pointBackgroundColor: '#1e3a8a', 
+                    tension: 0,
+                    pointBackgroundColor: '#7B3911', 
                     pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
+                    pointBorderWidth: 2.5,
                     pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#7B3911',
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 2,
                 }]
             },
             options: { 
                 responsive: true, 
                 maintainAspectRatio: false, 
-                plugins: { legend: { display: false } }, 
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        titleColor: '#ffffff',
+                        bodyColor: '#e2e8f0',
+                        padding: 12,
+                        cornerRadius: 10,
+                        displayColors: false,
+                        titleFont: { family: 'Inter', size: 12, weight: 'bold' },
+                        bodyFont: { family: 'Inter', size: 13, weight: 'bold' },
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].label;
+                            },
+                            label: function(context) {
+                                const val = context.parsed.y;
+                                if (val >= 1000000) return 'Rp ' + (val / 1000000).toLocaleString('id-ID', {maximumFractionDigits: 2}) + ' jt';
+                                if (val >= 1000) return 'Rp ' + (val / 1000).toLocaleString('id-ID', {maximumFractionDigits: 0}) + ' rb';
+                                return 'Rp ' + val.toLocaleString('id-ID');
+                            }
+                        }
+                    }
+                }, 
                 scales: { 
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { family: 'Inter', size: 10, weight: '500' },
+                            color: '#94a3b8',
+                            maxRotation: 45,
+                            callback: function(value, index, ticks) {
+                                // Show only month name without year to save space
+                                const label = this.getLabelForValue(value);
+                                return label ? label.split(' ')[0] : '';
+                            }
+                        }
+                    },
                     y: { 
                         beginAtZero: true, 
+                        grid: { color: '#f1f5f9' },
                         ticks: { 
                             maxTicksLimit: 6,
+                            font: { family: 'Inter', size: 11 },
+                            color: '#94a3b8',
                             callback: function(value) {
                                 if (value >= 1000000) return 'Rp ' + (value / 1000000).toLocaleString('id-ID', {maximumFractionDigits: 1}) + ' jt';
                                 if (value >= 1000) return 'Rp ' + (value / 1000).toLocaleString('id-ID', {maximumFractionDigits: 0}) + ' rb';
@@ -657,11 +705,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 } 
             }
         });
-    }
-
-    const ctxDist = document.getElementById('chartDist');
-    if (ctxDist) {
-        const palette = ['#1e3a8a', '#93c5fd', '#fbcfe8', '#bbf7d0', '#fed7aa', '#e9d5ff'];
+     }
+ 
+     const ctxDist = document.getElementById('chartDist');
+     if (ctxDist) {
+         const palette = ['#7B3911', '#D2691E', '#E8A361', '#C8702A', '#8B4513', '#522608'];
         const labelsData = dash.distLabels || ['Ayam Broiler', 'Ayam Kampung', 'Bebek'];
         const valData = dash.distData || [0,0,0];
         
@@ -914,21 +962,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
-    const searchRiwayat = document.getElementById('search-riwayat');
-    if (searchRiwayat) {
-        searchRiwayat.addEventListener('input', () => {
-            const q = searchRiwayat.value.toLowerCase();
-            document.querySelectorAll('.riwayat-row').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                const show = text.includes(q);
-                row.style.display = show ? '' : 'none';
-                const detail = document.querySelector(`.detail-row[data-parent="${row.dataset.id}"]`);
-                if (detail && !show) detail.classList.add('hidden');
-            });
-        });
-    }
-
     // -------------------------------------------------------
     // Kasir: Tagihan Bulanan (expand mitra sections)
     // -------------------------------------------------------
@@ -1030,7 +1063,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notifListContainer.innerHTML = '';
             data.notifications.forEach(notif => {
                 const item = document.createElement('div');
-                item.className = `p-4 flex gap-3 cursor-pointer hover:bg-slate-50 transition-colors ${notif.is_read ? 'bg-white' : 'bg-blue-50/30'}`;
+                item.className = `p-4 flex gap-3 cursor-pointer hover:bg-slate-50 transition-colors ${notif.is_read ? 'bg-white' : 'bg-[#FAF5EF]/40'}`;
                 item.setAttribute('data-id', notif.id);
                 item.innerHTML = `
                     <div class="flex-grow">
@@ -1039,7 +1072,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="text-[9px] text-slate-400 mt-2 block">${notif.time_ago}</span>
                     </div>
                     <div class="flex items-center justify-center flex-shrink-0 w-3">
-                        ${notif.is_read ? '' : '<span class="w-2.5 h-2.5 rounded-full bg-blue-600 notif-dot"></span>'}
+                        ${notif.is_read ? '' : '<span class="w-2.5 h-2.5 rounded-full bg-[#D2691E] notif-dot"></span>'}
                     </div>
                 `;
 

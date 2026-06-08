@@ -15,14 +15,14 @@
 <style>
     .badge-masuk { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; border: 1px solid #6ee7b7; }
     .badge-keluar { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; border: 1px solid #fca5a5; }
-    .badge-adj-masuk { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; border: 1px solid #93c5fd; }
+    .badge-adj-masuk { background: linear-gradient(135deg, #FAF0E6, #E8E0D8); color: #7B3911; border: 1px solid #C8702A; }
     .badge-adj-keluar { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; border: 1px solid #fbbf24; }
     .badge-tipe { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.025em; white-space: nowrap; }
 
     .stat-card { background: white; border-radius: 16px; padding: 20px 24px; border: 1px solid #e2e8f0; transition: all 0.3s ease; position: relative; overflow: hidden; }
     .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 16px 16px 0 0; }
     .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
-    .stat-card.card-total::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+    .stat-card.card-total::before { background: linear-gradient(90deg, #7B3911, #D2691E); }
     .stat-card.card-masuk::before { background: linear-gradient(90deg, #10b981, #34d399); }
     .stat-card.card-keluar::before { background: linear-gradient(90deg, #ef4444, #f87171); }
     .stat-card.card-adj::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
@@ -42,11 +42,11 @@
     .filter-bar { background: white; border-radius: 16px; padding: 20px 24px; border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
     .filter-bar label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px; }
     .filter-bar select, .filter-bar input[type="date"] { appearance: none; -webkit-appearance: none; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 0.875rem; font-family: 'Inter', sans-serif; background: #f8fafc; color: #334155; outline: none; transition: all 0.2s; min-width: 160px; }
-    .filter-bar select:focus, .filter-bar input[type="date"]:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); background: white; }
+    .filter-bar select:focus, .filter-bar input[type="date"]:focus { border-color: #A1511E; box-shadow: 0 0 0 3px rgba(123, 57, 17, 0.1); background: white; }
 
     .btn-action { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.875rem; border: none; cursor: pointer; transition: all 0.2s ease; font-family: 'Inter', sans-serif; white-space: nowrap; text-decoration: none; }
     .btn-action:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .btn-filter { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; padding: 10px 18px; }
+    .btn-filter { background: linear-gradient(135deg, #7B3911, #A1511E); color: white; padding: 10px 18px; }
     .btn-reset { background: #f1f5f9; color: #64748b; padding: 10px 18px; }
     .btn-reset:hover { background: #e2e8f0; color: #334155; }
 
@@ -57,9 +57,9 @@
     .oleh-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; }
     .oleh-badge .avatar-sm { width: 26px; height: 26px; border-radius: 50%; background: #e2e8f0; color: #475569; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.65rem; flex-shrink: 0; }
     .oleh-badge .role-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin-left: 2px; }
-    .role-admin { background: #dbeafe; color: #1e40af; }
+    .role-admin { background: #FAF0E6; color: #7B3911; }
     .role-kasir { background: #fce7f3; color: #9d174d; }
-    .role-superadmin { background: #e0e7ff; color: #3730a3; }
+    .role-superadmin { background: #FFF8F0; color: #C8702A; }
 </style>
 
 {{-- ===== STAT CARDS ===== --}}
@@ -70,8 +70,8 @@
                 <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Log Hari Ini</p>
                 <p class="text-2xl font-bold text-slate-800">{{ $totalLogHariIni }}</p>
             </div>
-            <div class="stat-icon" style="background: linear-gradient(135deg, #eef2ff, #e0e7ff);">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#6366f1" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" /></svg>
+            <div class="stat-icon" style="background: linear-gradient(135deg, #FAF5EF, #F0E0D0);">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#7B3911" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" /></svg>
             </div>
         </div>
     </div>

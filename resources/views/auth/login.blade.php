@@ -3,18 +3,18 @@
 @section('title', 'Masuk - JoFresh')
 
 @section('content')
-<div class="min-h-screen flex flex-col items-center justify-center w-full bg-slate-50 p-6">
+<div class="min-h-screen flex flex-col items-center justify-center w-full p-6" style="background: linear-gradient(135deg, #FAF8F5 0%, #FAF0E6 50%, #FFF8F0 100%);">
     
     <div class="z-10 relative w-full max-w-md">
-        <div class="text-center mb-12 auth-logo mt-6 md:mt-0">
-            <div class="jis-box">
-                <h2>J I S</h2>
+        <div class="text-center mb-8 mt-6 md:mt-0">
+            <div class="flex justify-center mb-6">
+                <img src="{{ asset('images/logo-jofresh.png') }}" alt="JoFresh Logo" class="w-[260px] h-auto object-contain drop-shadow-lg">
             </div>
-            <p class="text-slate-600 font-medium tracking-wide">Pusat Manajemen Inventori Unggas JoFresh</p>
+            <p class="font-bold text-xs tracking-widest uppercase" style="color: #7B3911; opacity: 0.85;">Pusat Manajemen Inventori Unggas JoFresh</p>
         </div>
 
-        <div class="card flex-col items-stretch auth-card">
-            <h3 class="text-blue-900 font-bold text-2xl mb-8 text-center">Masuk ke Dashboard</h3>
+        <div class="card flex-col items-stretch auth-card" style="border: 1px solid #E0D5CA; box-shadow: 0 8px 32px rgba(123, 57, 17, 0.08);">
+            <h3 class="font-bold text-2xl mb-8 text-center" style="color: #7B3911;">Masuk ke Dashboard</h3>
 
             @if(session('error'))
                 <div class="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-600 font-medium text-[0.95rem] mb-6 animate-pulse">
@@ -37,7 +37,7 @@
                     <div class="relative">
                         <input type="password" id="password" name="password" class="form-control pr-12"
                             placeholder="••••••••" required>
-                        <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors">
+                        <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 hover:text-slate-600 focus:outline-none transition-colors" style="color: #9C8B7E;">
                             <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -51,6 +51,8 @@
                 <button type="submit" class="btn btn-primary w-full mt-8 py-4 text-lg">Masuk Akun</button>
             </form>
         </div>
+
+        <p class="text-center mt-6 text-xs" style="color: #9C8B7E;">&copy; {{ date('Y') }} JoFresh — Elevating Freshness Every Day.</p>
     </div>
 </div>
 

@@ -12,7 +12,7 @@
             <div class="flex items-end gap-4">
                 <div class="flex-1">
                     <label class="block text-xs font-semibold text-gray-500 mb-1.5">Produk <span class="text-red-500">*</span></label>
-                    <select id="kasir-produk" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3E%3Cpath stroke=%27%236b7280%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27m6 8 4 4 4-4%27/%3E%3C/svg%3E'); background-position: right 12px center; background-repeat: no-repeat; background-size: 16px; padding-right: 36px;">
+                    <select id="kasir-produk" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white outline-none focus:border-[#7B3911] focus:ring-2 focus:ring-[#7B3911]/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3E%3Cpath stroke=%27%236b7280%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27m6 8 4 4 4-4%27/%3E%3C/svg%3E'); background-position: right 12px center; background-repeat: no-repeat; background-size: 16px; padding-right: 36px;">
                         <option value="">Pilih produk</option>
                         @foreach($produk as $p)
                             <option value="{{ $p->id }}" data-nama="{{ $p->nama }}" data-harga="{{ intval($p->harga) }}" data-stok="{{ intval($p->stok) }}">
@@ -20,14 +20,14 @@
                             </option>
                         @endforeach
                     </select>
-                    <div id="kasir-stok-info" class="mt-2.5 p-3 bg-blue-50/80 border border-blue-200 rounded-lg text-sm text-blue-800 font-bold hidden flex items-center gap-2 shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-blue-600 flex-shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
-                        Sisa Stok Tersedia: <span class="text-base text-blue-900 mx-0.5"></span> ekor
+                    <div id="kasir-stok-info" class="mt-2.5 p-3 bg-[#FAF5EF] border border-[#E0D5CA] rounded-lg text-sm text-[#7B3911] font-bold hidden flex items-center gap-2 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-[#7B3911] flex-shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
+                        Sisa Stok Tersedia: <span class="text-base text-[#3D1F0A] mx-0.5"></span> ekor
                     </div>
                 </div>
                 <div class="w-28">
                     <label class="block text-xs font-semibold text-gray-500 mb-1.5">Jumlah <span class="text-red-500">*</span></label>
-                    <input type="number" id="kasir-jumlah" required value="1" min="1" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-center outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                    <input type="number" id="kasir-jumlah" required value="1" min="1" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-center outline-none focus:border-[#7B3911] focus:ring-2 focus:ring-[#7B3911]/20 transition-all">
                 </div>
                 <button type="button" id="btn-tambah-keranjang" class="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-700 transition-all cursor-pointer border-none flex-shrink-0 shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
@@ -73,7 +73,7 @@
             {{-- Mitra --}}
             <div class="mb-4">
                 <label class="block text-xs font-semibold text-gray-500 mb-1.5">Mitra <span class="text-red-500">*</span></label>
-                <select id="kasir-mitra" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3E%3Cpath stroke=%27%236b7280%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27m6 8 4 4 4-4%27/%3E%3C/svg%3E'); background-position: right 12px center; background-repeat: no-repeat; background-size: 16px; padding-right: 36px;">
+                <select id="kasir-mitra" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white outline-none focus:border-[#7B3911] focus:ring-2 focus:ring-[#7B3911]/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3E%3Cpath stroke=%27%236b7280%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27m6 8 4 4 4-4%27/%3E%3C/svg%3E'); background-position: right 12px center; background-repeat: no-repeat; background-size: 16px; padding-right: 36px;">
                     <option value="">Pilih mitra</option>
                     @foreach($mitra as $m)
                         <option value="{{ $m->id }}">{{ $m->nama }}</option>
@@ -94,7 +94,7 @@
             </div>
 
             {{-- Checkout Button --}}
-            <button type="button" id="btn-checkout" disabled class="w-full py-3 bg-blue-600 text-white rounded-xl text-sm font-semibold border-none cursor-pointer transition-all hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm">
+            <button type="button" id="btn-checkout" disabled class="w-full py-3 bg-[#7B3911] hover:bg-[#5A270B] text-white rounded-xl text-sm font-semibold border-none cursor-pointer transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm">
                 Selesaikan Penjualan
             </button>
 

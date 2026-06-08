@@ -5,8 +5,7 @@
     <title>Tagihan JoFresh - {{ $mitra->nama }}</title>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1e3a5f; padding-bottom: 20px; }
-        .logo { font-size: 32px; font-weight: bold; color: #1e3a5f; margin: 0; letter-spacing: 2px; }
+        .logo { font-size: 32px; font-weight: bold; color: #7B3911; margin: 0; letter-spacing: 2px; }
         .sublogo { font-size: 14px; color: #666; margin: 5px 0 0 0; }
         .title { font-size: 20px; font-weight: bold; margin-top: 20px; color: #333; text-transform: uppercase; }
         .info-table { width: 100%; margin-bottom: 30px; }
@@ -14,21 +13,29 @@
         .label { font-weight: bold; color: #555; width: 120px; }
         .table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 14px; }
         .table th, .table td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-        .table th { background-color: #f8fafc; color: #1e3a5f; font-weight: bold; text-transform: uppercase; font-size: 12px; }
+        .table th { background-color: #FAF5EF; color: #7B3911; font-weight: bold; text-transform: uppercase; font-size: 12px; }
         .text-right { text-align: right !important; }
         .text-center { text-align: center !important; }
-        .total-row th { background-color: #e0e7ff; color: #1e3a5f; font-size: 16px; }
-        .total-row td { background-color: #e0e7ff; color: #1e3a5f; font-size: 16px; font-weight: bold; }
+        .total-row th { background-color: #FAF5EF; color: #7B3911; font-size: 16px; }
+        .total-row td { background-color: #FAF5EF; color: #7B3911; font-size: 16px; font-weight: bold; }
         .footer { margin-top: 50px; font-size: 12px; color: #777; text-align: center; border-top: 1px solid #ddd; padding-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1 class="logo">JoFresh</h1>
-        <p class="sublogo">Sistem Inventaris & Penjualan Unggas Terpercaya</p>
-        <div class="title">Rincian Tagihan Pembayaran</div>
-    </div>
+    <table style="width: 100%; border-bottom: 2px solid #7B3911; padding-bottom: 20px; margin-bottom: 30px; border-collapse: collapse;">
+        <tr>
+            <td style="width: 25%; vertical-align: middle; padding: 0;">
+                <img src="{{ public_path('images/logo-jofresh.png') }}" style="height: 14mm; width: auto; display: block;">
+            </td>
+            <td style="width: 50%; text-align: center; padding: 0; vertical-align: middle;">
+                <h1 class="logo">JoFresh</h1>
+                <p class="sublogo">Elevating Freshness Every Day</p>
+                <div class="title">Rincian Tagihan Pembayaran</div>
+            </td>
+            <td style="width: 25%; padding: 0;"></td>
+        </tr>
+    </table>
 
     <table class="info-table">
         <tr>
@@ -91,7 +98,7 @@
     </table>
 
     <div style="background: #f8fafc; padding: 15px; border-radius: 8px; font-size: 13px; border: 1px solid #e2e8f0; margin-top: 30px;">
-        <h4 style="margin-top: 0; color: #1e3a5f;">Instruksi Pembayaran:</h4>
+        <h4 style="margin-top: 0; color: #7B3911;">Instruksi Pembayaran:</h4>
         <p style="margin-bottom: 5px;">Silakan lakukan pembayaran sesuai dengan <strong>TOTAL TAGIHAN</strong> di atas. Bukti pembayaran dapat diunggah melalui link yang telah kami kirimkan ke email Anda.</p>
         <p style="margin: 0;">Jika ada pertanyaan mengenai tagihan ini, silakan hubungi kasir atau admin JoFresh.</p>
     </div>

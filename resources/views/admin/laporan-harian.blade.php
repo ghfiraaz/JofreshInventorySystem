@@ -25,28 +25,31 @@
     {{-- Actions --}}
     <div class="flex justify-end gap-3 mb-8 no-print">
         <button onclick="window.close()" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors no-underline border-none cursor-pointer">Tutup</button>
-        <button onclick="window.print()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors flex items-center gap-2 cursor-pointer border-none">
+        <button onclick="window.print()" class="px-4 py-2 text-white rounded-lg text-sm font-bold hover:opacity-90 transition-colors flex items-center gap-2 cursor-pointer border-none" style="background: linear-gradient(135deg, #7B3911, #A1511E);">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.724.092m6.524-4.31a5.25 5.25 0 0 0-5.25 5.25m5.25-5.25a5.25 5.25 0 0 1 5.25 5.25m-5.25-5.25v5.25m0-5.25a5.25 5.25 0 0 1 5.25 5.25m0 0v1.5m0-1.5c0 1.16-.311 2.247-.852 3.146M21 12c0 5.04-4.048 9.146-9.146 9.146m9.146-9.146a9.146 9.146 0 0 0-9.146-9.146M3 12c0-5.04 4.048-9.146 9.146-9.146m-9.146 9.146c0 1.16.311 2.247.852 3.146M3 12v1.5m0-1.5a5.25 5.25 0 0 0 5.25 5.25m0 0v1.5m0-1.5c.24.03.48.062.724.092" /></svg>
             Cetak / Download PDF
         </button>
     </div>
 
     {{-- Header --}}
-    <div class="flex justify-between items-start mb-10 border-b border-gray-200 pb-6">
-        <div>
-            <h1 class="text-3xl font-extrabold tracking-wide text-blue-900 mb-2">J I S</h1>
-            <p class="text-sm text-gray-500">JoFresh Inventory System<br>Laporan Harian Transaksi & Stok</p>
+    <div class="flex justify-between items-center mb-10 border-b border-gray-200 pb-6">
+        <div class="flex items-center gap-5">
+            <img src="{{ asset('images/logo-jofresh.png') }}" alt="JoFresh Logo" style="height: 14mm; width: auto; display: block; object-fit: contain;">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-wide mb-1" style="color: #7B3911;">JoFresh</h1>
+                <p class="text-xs text-gray-500">JoFresh Inventory System<br>Laporan Harian Transaksi & Stok</p>
+            </div>
         </div>
         <div class="text-right">
-            <h2 class="text-2xl font-black text-gray-800 uppercase tracking-widest mb-2">LAPORAN</h2>
+            <h2 class="text-2xl font-black text-gray-800 uppercase tracking-widest mb-1">LAPORAN</h2>
             <div class="text-sm text-gray-500">Tanggal: <span class="font-bold text-gray-800">{{ $hariIni->format('d/m/Y') }}</span></div>
         </div>
     </div>
 
     {{-- Ringkasan --}}
     <div class="grid grid-cols-3 gap-6 mb-10">
-        <div class="p-5 bg-blue-50 rounded-xl border border-blue-100">
-            <div class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">Total Transaksi</div>
+        <div class="p-5 rounded-xl border" style="background: #FAF5EF; border-color: #E0C4A8;">
+            <div class="text-xs font-bold uppercase tracking-wider mb-2" style="color: #C8702A;">Total Transaksi</div>
             <div class="font-bold text-gray-800 text-3xl">{{ count($transaksi) }} <span class="text-base text-gray-500 font-medium">transaksi</span></div>
         </div>
         <div class="p-5 bg-green-50 rounded-xl border border-green-100">
@@ -61,7 +64,7 @@
 
     {{-- Rekap Stok Keluar & Masuk --}}
     <div class="mb-10">
-        <h3 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-blue-600 pl-3">Rekapitulasi Stok Produk</h3>
+        <h3 class="text-lg font-bold text-gray-800 mb-4 pl-3" style="border-left: 4px solid #7B3911;">Rekapitulasi Stok Produk</h3>
         <table class="w-full text-left border-collapse border border-gray-200 rounded-lg overflow-hidden">
             <thead>
                 <tr class="bg-gray-100 border-b border-gray-200">
@@ -77,7 +80,7 @@
                         <td class="py-3 px-4 text-sm text-amber-600 font-bold text-center">
                             {{ intval($stokKeluar[$produk->nama] ?? 0) }} ekor
                         </td>
-                        <td class="py-3 px-4 text-sm text-blue-700 font-bold text-center">
+                        <td class="py-3 px-4 text-sm font-bold text-center" style="color: #7B3911;">
                             {{ intval($produk->stok) }} ekor
                         </td>
                     </tr>
@@ -88,7 +91,7 @@
 
     {{-- Detail Transaksi --}}
     <div>
-        <h3 class="text-lg font-bold text-gray-800 mb-4 border-l-4 border-blue-600 pl-3">Rincian Transaksi Penjualan</h3>
+        <h3 class="text-lg font-bold text-gray-800 mb-4 pl-3" style="border-left: 4px solid #7B3911;">Rincian Transaksi Penjualan</h3>
         <table class="w-full text-left border-collapse border border-gray-200 rounded-lg overflow-hidden">
             <thead>
                 <tr class="bg-gray-100 border-b border-gray-200">

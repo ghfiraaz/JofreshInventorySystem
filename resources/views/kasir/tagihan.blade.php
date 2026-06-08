@@ -15,8 +15,8 @@
             <div class="text-xs text-gray-400 font-medium mb-1">Total Mitra</div>
             <div class="text-2xl font-extrabold text-gray-800">{{ $totalMitra }}</div>
         </div>
-        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-blue-600"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" /></svg>
+        <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-brand-700"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" /></svg>
         </div>
     </div>
     <div class="bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between">
@@ -33,8 +33,8 @@
             <div class="text-xs text-gray-400 font-medium mb-1">Menunggu Validasi</div>
             <div class="text-2xl font-extrabold text-gray-800">{{ $menungguValidasi }}</div>
         </div>
-        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-indigo-600"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+        <div class="w-10 h-10 rounded-full bg-accent-100 flex items-center justify-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-accent-700"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
         </div>
     </div>
 </div>
@@ -95,7 +95,7 @@
                     {{-- Mitra Header --}}
                     <div class="tagihan-mitra-header flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-gray-50 transition-colors">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full {{ $mt['isTempoMerah'] ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700' }} flex items-center justify-center font-bold text-sm flex-shrink-0">
+                            <div class="w-9 h-9 rounded-full {{ $mt['isTempoMerah'] ? 'bg-red-100 text-red-700' : 'bg-brand-100 text-brand-700' }} flex items-center justify-center font-bold text-sm flex-shrink-0">
                                 {{ strtoupper(substr($mt['mitra']->nama, 0, 1)) }}
                             </div>
                             <div>
@@ -139,21 +139,28 @@
 
                             {{-- Reminder button --}}
                             @if($mt['mitra']->email)
-                            @php
-                                $reminderDisabled = $mt['reminderSentToday'] ?? false;
-                            @endphp
-                                <button type="button" class="btn-send-reminder px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none
-                                    {{ $reminderDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-amber-100 text-amber-700 hover:bg-amber-600 hover:text-white' }}"
-                                    data-mitra="{{ $mt['mitra']->id }}"
-                                    data-nama="{{ $mt['mitra']->nama }}"
-                                    data-email="{{ $mt['mitra']->email }}"
-                                    {{ $reminderDisabled ? 'disabled' : '' }}
-                                    onclick="event.stopPropagation(); sendReminder(this)"
-                                    title="{{ $reminderDisabled ? 'Reminder hanya bisa dikirim H-3 sebelum jatuh tempo' : 'Kirim reminder via email ke ' . $mt['mitra']->email }}">
-                                    <span class="flex items-center gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
-                                        {{ $mt['canSendReminder'] ? 'Reminder' : 'H-'.($mt['sisaHari'] ?? '?') }}
-                                    </span>
+                                @php
+                                     $reminderDisabled = ($mt['reminderSentToday'] ?? false) || !$mt['canSendReminder'];
+                                     if ($mt['reminderSentToday'] ?? false) {
+                                         $tooltip = 'Reminder sudah dikirim hari ini';
+                                     } elseif (!$mt['canSendReminder']) {
+                                         $tooltip = 'Reminder hanya bisa dikirim H-3 sebelum jatuh tempo';
+                                     } else {
+                                         $tooltip = 'Kirim reminder via email ke ' . $mt['mitra']->email;
+                                     }
+                                 @endphp
+                                 <button type="button" class="btn-send-reminder px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none
+                                     {{ $reminderDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-amber-100 text-amber-700 hover:bg-amber-600 hover:text-white' }}"
+                                     data-mitra="{{ $mt['mitra']->id }}"
+                                     data-nama="{{ $mt['mitra']->nama }}"
+                                     data-email="{{ $mt['mitra']->email }}"
+                                     {{ $reminderDisabled ? 'disabled' : '' }}
+                                     onclick="event.stopPropagation(); sendReminder(this)"
+                                     title="{{ $tooltip }}">
+                                     <span class="flex items-center gap-1">
+                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+                                         {{ $mt['canSendReminder'] ? 'Reminder' : 'H-'.($mt['sisaHari'] ?? '?') }}
+                                     </span>
                                 </button>
                             @else
                                 <span class="text-xs text-gray-400 italic">Email belum diisi</span>
@@ -184,7 +191,7 @@
                                         <td class="py-1.5 text-sm text-gray-600 text-center">{{ $tx->total_item }}</td>
                                         <td class="py-1.5 text-center">
                                             @if($tx->status_pembayaran === 'Menunggu Validasi')
-                                                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">Menunggu Validasi</span>
+                                                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-accent-100 text-accent-700">Menunggu Validasi</span>
                                             @elseif($tx->status_pembayaran === 'Ditolak')
                                                 <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">Ditolak</span>
                                             @else
@@ -193,7 +200,7 @@
                                         </td>
                                         <td class="py-1.5 text-sm font-semibold text-gray-800 text-right">Rp {{ number_format($tx->total_harga, 0, ',', '.') }}</td>
                                         <td class="py-1.5 text-center">
-                                            <a href="{{ url('/kasir/transaksi/'.$tx->id.'/invoice') }}" target="_blank" class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all" title="Lihat Detail">
+                                            <a href="{{ url('/kasir/transaksi/'.$tx->id.'/invoice') }}" target="_blank" class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-brand-50 text-brand-700 hover:bg-brand-700 hover:text-white transition-all" title="Lihat Detail">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
                                             </a>
                                         </td>
@@ -212,14 +219,14 @@
                                     $buktiUrl = url('/kasir/bukti-pembayaran/' . $buktiFilename);
                                     $isImage = preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $buktiPath);
                                 @endphp
-                                <div class="mt-4 p-4 bg-indigo-50 border border-indigo-100 rounded-lg">
-                                    <div class="text-xs font-bold text-indigo-600 mb-3">Bukti Pembayaran:</div>
+                                <div class="mt-4 p-4 bg-accent-50 border border-accent-100 rounded-lg">
+                                    <div class="text-xs font-bold text-accent-700 mb-3">Bukti Pembayaran:</div>
                                     @if($isImage)
                                         <div class="mb-3">
-                                            <img src="{{ $buktiUrl }}" alt="Bukti Pembayaran" class="max-w-xs max-h-48 rounded-lg border border-indigo-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity" onclick="window.open('{{ $buktiUrl }}', '_blank')">
+                                            <img src="{{ $buktiUrl }}" alt="Bukti Pembayaran" class="max-w-xs max-h-48 rounded-lg border border-accent-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity" onclick="window.open('{{ $buktiUrl }}', '_blank')">
                                         </div>
                                     @endif
-                                    <a href="{{ $buktiUrl }}" target="_blank" class="inline-flex items-center gap-1.5 text-sm text-indigo-700 font-semibold hover:text-indigo-900 transition-colors">
+                                    <a href="{{ $buktiUrl }}" target="_blank" class="inline-flex items-center gap-1.5 text-sm text-accent-700 font-semibold hover:text-accent-900 transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
                                         Buka Bukti Pembayaran
                                     </a>
@@ -242,7 +249,7 @@
                 <p id="toast-title" class="font-bold text-base mb-1"></p>
                 <p id="toast-message" class="text-sm opacity-80"></p>
             </div>
-            <button onclick="hideToast()" class="mt-2 px-6 py-2 rounded-xl font-semibold text-sm cursor-pointer border-none transition-all text-white" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">OK</button>
+            <button onclick="hideToast()" class="mt-2 px-6 py-2 rounded-xl font-semibold text-sm cursor-pointer border-none transition-all text-white" style="background:#7B3911;" onmouseover="this.style.background='#5A270B'" onmouseout="this.style.background='#7B3911'">OK</button>
         </div>
     </div>
 </div>
@@ -250,7 +257,6 @@
 {{-- ===== CONFIRMATION MODAL (CENTERED) ===== --}}
 <div id="modal-confirm-tagihan" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto">
     <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl relative overflow-hidden transform scale-95 transition-transform duration-300 [.active_&]:scale-100">
-        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-900 to-indigo-600"></div>
         <div class="px-8 pt-8 pb-2 flex justify-between items-start">
             <div>
                 <h3 id="confirm-tagihan-title" class="text-lg font-bold text-slate-800"></h3>
@@ -263,7 +269,7 @@
         </div>
         <div class="px-8 pb-8 pt-4 flex justify-end gap-3">
             <button type="button" id="confirm-tagihan-no" onclick="closeConfirmModal()" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer border-none">Batal</button>
-            <button type="button" id="confirm-tagihan-yes" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white border-none cursor-pointer transition-all" style="background:#1e3a5f;" onmouseover="this.style.background='#162d4a'" onmouseout="this.style.background='#1e3a5f'">Ya, Kirim</button>
+            <button type="button" id="confirm-tagihan-yes" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white border-none cursor-pointer transition-all" style="background:#7B3911;" onmouseover="this.style.background='#5A270B'" onmouseout="this.style.background='#7B3911'">Ya, Kirim</button>
         </div>
     </div>
 </div>

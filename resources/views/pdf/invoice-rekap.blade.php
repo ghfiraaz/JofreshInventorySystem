@@ -32,16 +32,10 @@
         .watermark.lunas { color: #16a34a; }
 
         /* ===== KOP SURAT ===== */
-        .kop-surat {
-            text-align: center;
-            padding-bottom: 14px;
-            border-bottom: 3px double #1e3a5f;
-            margin-bottom: 24px;
-        }
         .kop-nama {
             font-size: 28px;
             font-weight: 900;
-            color: #1e3a5f;
+            color: #7B3911;
             margin: 0;
             letter-spacing: 4px;
             text-transform: uppercase;
@@ -117,7 +111,7 @@
             font-size: 12px;
         }
         .invoice-table th {
-            background: #1e3a5f;
+            background: #7B3911;
             color: #ffffff;
             font-weight: 700;
             text-transform: uppercase;
@@ -125,7 +119,7 @@
             letter-spacing: 0.5px;
             padding: 10px 10px;
             text-align: left;
-            border: 1px solid #1e3a5f;
+            border: 1px solid #7B3911;
         }
         .invoice-table td {
             padding: 8px 10px;
@@ -153,16 +147,16 @@
         }
         .total-box .total-label {
             font-weight: 700;
-            color: #1e3a5f;
+            color: #7B3911;
             text-align: right;
-            border-top: 2px solid #1e3a5f;
+            border-top: 2px solid #7B3911;
         }
         .total-box .total-value {
             font-weight: 900;
             font-size: 16px;
-            color: #1e3a5f;
+            color: #7B3911;
             text-align: right;
-            border-top: 2px solid #1e3a5f;
+            border-top: 2px solid #7B3911;
         }
 
         /* ===== QR CODE ===== */
@@ -177,7 +171,7 @@
         .qr-section h4 {
             margin: 0 0 10px 0;
             font-size: 13px;
-            color: #1e3a5f;
+            color: #7B3911;
         }
         .qr-section p {
             margin: 8px 0 0 0;
@@ -202,7 +196,7 @@
         }
         .ttd .nama-perusahaan {
             font-weight: 800;
-            color: #1e3a5f;
+            color: #7B3911;
             margin-top: 50px;
         }
 
@@ -251,14 +245,22 @@
     <div class="watermark {{ $statusClass }}">{{ $statusLabel }}</div>
 
     {{-- ===== KOP SURAT ===== --}}
-    <div class="kop-surat">
-        <h1 class="kop-nama">JoFresh</h1>
-        <p class="kop-tagline">Supplier Unggas Segar & Terpercaya</p>
-        <p class="kop-detail">
-            Jl. Elang Mutiara, Periuk Jaya, Kota Tangerang, Banten 15131<br>
-            Telp: (021) 8888-7777 &nbsp;|&nbsp; Email: jofreshinventorys@gmail.com
-        </p>
-    </div>
+    <table style="width: 100%; border-bottom: 3px double #7B3911; padding-bottom: 14px; margin-bottom: 24px; border-collapse: collapse;">
+        <tr>
+            <td style="width: 25%; vertical-align: middle; padding: 0;">
+                <img src="{{ public_path('images/logo-jofresh.png') }}" style="height: 14mm; width: auto; display: block;">
+            </td>
+            <td style="width: 50%; text-align: center; padding: 0; vertical-align: middle;">
+                <h1 class="kop-nama">JoFresh</h1>
+                <p class="kop-tagline">Elevating Freshness Every Day</p>
+                <p class="kop-detail">
+                    Jl. Elang Mutiara, Periuk Jaya, Kota Tangerang, Banten 15131<br>
+                    Telp: (021) 8888-7777 &nbsp;|&nbsp; Email: jofreshinventorys@gmail.com
+                </p>
+            </td>
+            <td style="width: 25%; padding: 0;"></td>
+        </tr>
+    </table>
 
     {{-- ===== INFO TUJUAN ===== --}}
     <div class="surat-info">
