@@ -189,8 +189,8 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-7">
     <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-        <h4 class="font-bold text-[1.15rem] text-slate-800">Tren Penjualan Bulanan</h4>
-        <p class="text-xs text-slate-400 mt-1 mb-5">Menampilkan perkembangan total penjualan setiap bulan untuk memantau performa bisnis dari waktu ke waktu.</p>
+        <h4 class="font-bold text-[1.15rem] text-slate-800">{{ $trendChartTitle }}</h4>
+        <p class="text-xs text-slate-400 mt-1 mb-5">{{ $trendChartDesc }}</p>
         <div class="h-[280px]">
            <canvas id="chartTrend"></canvas>
         </div>

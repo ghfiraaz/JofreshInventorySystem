@@ -13,6 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
+            'no-back' => \App\Http\Middleware\PreventBackHistory::class,
+        ]);
+
+        // Prevent browser back button from showing cached pages after logout
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\PreventBackHistory::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
