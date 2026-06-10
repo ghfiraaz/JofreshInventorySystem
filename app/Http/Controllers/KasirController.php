@@ -323,6 +323,11 @@ class KasirController extends Controller
             // H-3 logic: reminder hanya boleh dikirim jika sisa hari <= 3 (termasuk lewat tempo)
             $canSendReminder = $sisaHari !== null && $sisaHari <= 3;
 
+            // Cek apakah reminder sudah dikirim hari ini untuk salah satu transaksi belum dibayar milik mitra ini
+            $reminderSentToday = $txns->contains(function ($txn) {
+                return $txn->last_reminder_sent_at && $txn->last_reminder_sent_at->isToday();
+            });
+
             $mitraTagihan[] = [
                 'mitra'              => $mitra,
                 'transaksi'          => $txns,
@@ -333,6 +338,7 @@ class KasirController extends Controller
                 'isTempoMerah'       => $isTempoMerah,
                 'isLewatTempo'       => $isLewatTempo,
                 'canSendReminder'    => $canSendReminder,
+                'reminderSentToday'  => $reminderSentToday,
             ];
         }
 

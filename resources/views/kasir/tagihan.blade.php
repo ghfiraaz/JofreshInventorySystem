@@ -139,29 +139,37 @@
 
                             {{-- Reminder button --}}
                             @if($mt['mitra']->email)
-                                @php
-                                     $reminderDisabled = ($mt['reminderSentToday'] ?? false) || !$mt['canSendReminder'];
-                                     if ($mt['reminderSentToday'] ?? false) {
-                                         $tooltip = 'Reminder sudah dikirim hari ini';
-                                     } elseif (!$mt['canSendReminder']) {
-                                         $tooltip = 'Reminder hanya bisa dikirim H-3 sebelum jatuh tempo';
-                                     } else {
-                                         $tooltip = 'Kirim reminder via email ke ' . $mt['mitra']->email;
-                                     }
-                                 @endphp
-                                 <button type="button" class="btn-send-reminder px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none
-                                     {{ $reminderDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-amber-100 text-amber-700 hover:bg-amber-600 hover:text-white' }}"
-                                     data-mitra="{{ $mt['mitra']->id }}"
-                                     data-nama="{{ $mt['mitra']->nama }}"
-                                     data-email="{{ $mt['mitra']->email }}"
-                                     {{ $reminderDisabled ? 'disabled' : '' }}
-                                     onclick="event.stopPropagation(); sendReminder(this)"
-                                     title="{{ $tooltip }}">
-                                     <span class="flex items-center gap-1">
-                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
-                                         {{ $mt['canSendReminder'] ? 'Reminder' : 'H-'.($mt['sisaHari'] ?? '?') }}
-                                     </span>
-                                </button>
+                                 @php
+                                      $reminderSentToday = $mt['reminderSentToday'] ?? false;
+                                      $reminderDisabled = $reminderSentToday || !$mt['canSendReminder'];
+                                      if ($reminderSentToday) {
+                                          $tooltip = 'Reminder sudah dikirim hari ini';
+                                          $btnClass = 'bg-emerald-100 text-emerald-700 cursor-not-allowed';
+                                      } elseif (!$mt['canSendReminder']) {
+                                          $tooltip = 'Reminder hanya bisa dikirim H-3 sebelum jatuh tempo';
+                                          $btnClass = 'bg-gray-100 text-gray-400 cursor-not-allowed';
+                                      } else {
+                                          $tooltip = 'Kirim reminder via email ke ' . $mt['mitra']->email;
+                                          $btnClass = 'bg-amber-100 text-amber-700 hover:bg-amber-600 hover:text-white';
+                                      }
+                                  @endphp
+                                  <button type="button" class="btn-send-reminder px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none {{ $btnClass }}"
+                                      data-mitra="{{ $mt['mitra']->id }}"
+                                      data-nama="{{ $mt['mitra']->nama }}"
+                                      data-email="{{ $mt['mitra']->email }}"
+                                      {{ $reminderDisabled ? 'disabled' : '' }}
+                                      onclick="event.stopPropagation(); sendReminder(this)"
+                                      title="{{ $tooltip }}">
+                                      <span class="flex items-center gap-1">
+                                          @if ($reminderSentToday)
+                                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                                              Terkirim
+                                          @else
+                                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+                                              {{ $mt['canSendReminder'] ? 'Reminder' : 'H-'.($mt['sisaHari'] ?? '?') }}
+                                          @endif
+                                      </span>
+                                 </button>
                             @else
                                 <span class="text-xs text-gray-400 italic">Email belum diisi</span>
                             @endif
