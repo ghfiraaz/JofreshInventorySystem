@@ -69,6 +69,9 @@ class LogStokController extends Controller
             'tipe_adjustment' => 'required|in:Adjustment Masuk,Adjustment Keluar',
             'jumlah'          => 'required|integer|min:1',
             'keterangan'      => 'required|string|max:500',
+        ], [
+            'jumlah.integer'  => 'Jumlah penyesuaian harus berupa angka (digit) saja, tidak boleh mengandung huruf.',
+            'jumlah.min'      => 'Jumlah penyesuaian minimal 1.',
         ]);
 
         return DB::transaction(function () use ($request) {

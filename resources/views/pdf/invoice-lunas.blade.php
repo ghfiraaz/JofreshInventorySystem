@@ -241,7 +241,7 @@
                 <p class="kop-tagline">Elevating Freshness Every Day</p>
                 <p class="kop-detail">
                     Jl. Elang Mutiara, Periuk Jaya, Kota Tangerang, Banten 15131<br>
-                    Telp: (021) 8888-7777 &nbsp;|&nbsp; Email: jofreshinventorys@gmail.com
+                    Telp: (0857-1871-9077) &nbsp;|&nbsp; Email: jofreshinventorys@gmail.com
                 </p>
             </td>
             <td style="width: 25%; padding: 0;"></td>

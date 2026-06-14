@@ -47,8 +47,8 @@
                 <h1 class="text-3xl font-black tracking-wide text-brand-700 leading-none mb-1">JoFresh</h1>
                 <p class="text-xs text-gray-400 italic mb-1">Elevating Freshness Every Day</p>
                 <p class="text-xs text-gray-500 leading-relaxed">
-                    Kawasan Pergudangan Bintaro, Blok B No. 4, Tangerang Selatan<br>
-                    Email: info@jofresh.id | Telp: (021) 745-8889
+                    Jl. Elang Mutiara, Periuk Jaya, Kota Tangerang, Banten 15131<br>
+                    Email: jofreshinventorys@gmail.com | Telp: (0857-1871-9077)
                 </p>
             </div>
         </div>

@@ -21,6 +21,8 @@ class ProdukController extends Controller
             'nama'         => 'required|string|max:255',
             'harga'        => 'required|numeric|min:0',
             'stok_minimal' => 'nullable|integer|min:0',
+        ], [
+            'stok_minimal.integer' => 'Batas stok minimal harus berupa angka (digit) saja.',
         ]);
 
         $produk = Produk::create([
@@ -50,6 +52,8 @@ class ProdukController extends Controller
             'nama'         => 'required|string|max:255',
             'harga'        => 'required|numeric|min:0',
             'stok_minimal' => 'nullable|integer|min:0',
+        ], [
+            'stok_minimal.integer' => 'Batas stok minimal harus berupa angka (digit) saja.',
         ]);
 
         $produk->update([
@@ -78,6 +82,9 @@ class ProdukController extends Controller
     {
         $request->validate([
             'jumlah' => 'required|integer|min:1',
+        ], [
+            'jumlah.integer' => 'Jumlah stok harus berupa angka (digit) saja, tidak boleh mengandung huruf.',
+            'jumlah.min'     => 'Jumlah stok minimal 1.',
         ]);
 
         $produk = Produk::findOrFail($id);

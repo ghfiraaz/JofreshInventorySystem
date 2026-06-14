@@ -178,7 +178,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalPengguna.classList.remove('active');
                 btnSubmit.disabled = false; btnSubmit.textContent = 'Simpan Pengguna';
             })
-            .catch(() => { alert("Gagal menyimpan pengguna. Pastikan email unik & password minimal 8 huruf."); btnSubmit.disabled = false; btnSubmit.textContent = 'Simpan Pengguna'; });
+            .catch((err) => {
+                let msg = "Gagal menyimpan pengguna. Pastikan email unik & password minimal 8 huruf.";
+                if (err && err.errors) {
+                    msg = Object.values(err.errors).flat().join('\n');
+                } else if (err && err.message) {
+                    msg = err.message;
+                }
+                alert(msg);
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = isEdit ? 'Simpan Perubahan' : 'Simpan Pengguna';
+            });
         });
     }
 
@@ -280,11 +290,18 @@ document.addEventListener('DOMContentLoaded', () => {
         formProduk.addEventListener('submit', (e) => {
             e.preventDefault();
             const editId  = document.getElementById('produk-edit-id').value;
+            const minimal = document.getElementById('produk-minimal').value.trim();
+
+            if (minimal && !/^[0-9]+$/.test(minimal)) {
+                alert('Batas stok minimal harus berupa angka (digit) saja, tidak boleh mengandung huruf atau karakter lain.');
+                return;
+            }
+
             const payload = {
                 nama:         document.getElementById('produk-nama').value,
                 kategori:     'Unggas',
                 stok:         editId ? undefined : 0, // Only set initially
-                stok_minimal: document.getElementById('produk-minimal').value,
+                stok_minimal: minimal,
                 satuan:       'Ekor',
                 harga:        document.getElementById('produk-harga').value,
             };
@@ -308,7 +325,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalProduk.classList.remove('active');
                 btn.disabled = false; btn.textContent = 'Simpan Produk';
             })
-            .catch(() => { alert('Gagal menyimpan produk. Cek input Anda.'); btn.disabled = false; btn.textContent = 'Simpan Produk'; });
+            .catch((err) => {
+                let msg = 'Gagal menyimpan produk. Cek input Anda.';
+                if (err && err.errors) {
+                    msg = Object.values(err.errors).flat().join('\n');
+                } else if (err && err.message) {
+                    msg = err.message;
+                }
+                alert(msg);
+                btn.disabled = false;
+                btn.textContent = editId ? 'Simpan Perubahan' : 'Simpan Produk';
+            });
         });
     }
 
@@ -323,9 +350,14 @@ document.addEventListener('DOMContentLoaded', () => {
         formTambahStok.addEventListener('submit', (e) => {
             e.preventDefault();
             const id = document.getElementById('stok-produk-id').value;
-            const jumlah = document.getElementById('stok-jumlah-input').value;
+            const jumlah = document.getElementById('stok-jumlah-input').value.trim();
             
             if (!id || !jumlah) return;
+
+            if (!/^[0-9]+$/.test(jumlah)) {
+                showToast('Jumlah stok harus berupa angka (digit) saja, tidak boleh mengandung huruf atau karakter lain.', 'error');
+                return;
+            }
 
             btnSubmitStok.disabled = true;
             btnSubmitStok.textContent = 'Menyimpan...';
@@ -344,15 +376,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const oldRow = document.querySelector(`#produkTable tr[data-id="${id}"]`);
                 if (oldRow) {
                     oldRow.replaceWith(buildProdukRow(data.produk));
-                    // re-attach local listener for the new + tambah stok button because of replaceWith
-                    // We can just rely on event delegation which is better! We'll just define logic in the listener below.
                 }
                 modalTambahStok.classList.remove('active');
                 formTambahStok.reset();
                 showToast(data.message || 'Stok berhasil ditambahkan');
             })
             .catch(err => {
-                showToast(err.message || 'Gagal menambahkan stok', 'error');
+                let msg = 'Gagal menambahkan stok';
+                if (err && err.errors) {
+                    msg = Object.values(err.errors).flat().join('\n');
+                } else if (err && err.message) {
+                    msg = err.message;
+                }
+                showToast(msg, 'error');
             })
             .finally(() => {
                 btnSubmitStok.disabled = false;
@@ -367,11 +403,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnStok = e.target.closest('.btn-tambah-stok');
 
         if (btnDelete) {
-            if (confirm('Hapus produk ini dari database?')) {
-                const tr = btnDelete.closest('tr');
+            const tr = btnDelete.closest('tr');
+            const nama = tr.querySelector('.row-nama')?.textContent || 'produk';
+            showConfirm('Hapus Produk', `Apakah Anda yakin ingin menghapus produk "${nama}"?`, () => {
                 fetch(`/admin/produk/${tr.getAttribute('data-id')}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
-                .then(r => { if (r.ok) tr.remove(); });
-            }
+                .then(r => { 
+                    if (r.ok) {
+                        tr.remove();
+                        showToast('Produk berhasil dihapus');
+                    } else {
+                        showToast('Gagal menghapus produk', 'error');
+                    }
+                })
+                .catch(() => {
+                    showToast('Terjadi kesalahan saat menghapus produk', 'error');
+                });
+            });
         }
         
         if (btnEdit) {
@@ -457,11 +504,16 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const produkId = adjProduk.value;
             const tipe = adjTipeHidden.value;
-            const jumlah = document.getElementById('adj-jumlah').value;
+            const jumlah = document.getElementById('adj-jumlah').value.trim();
             const keterangan = document.getElementById('adj-keterangan').value;
 
             if (!produkId || !tipe || !jumlah || !keterangan) {
                 showToast('Semua field wajib diisi, termasuk tipe penyesuaian.', 'error');
+                return;
+            }
+
+            if (!/^[0-9]+$/.test(jumlah)) {
+                showToast('Jumlah penyesuaian harus berupa angka (digit) saja, tidak boleh mengandung huruf atau karakter lain.', 'error');
                 return;
             }
 
@@ -495,10 +547,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Reload to update table + stock values
                     setTimeout(() => location.reload(), 800);
                 } else {
-                    showToast(data.message || 'Gagal menyimpan penyesuaian.', 'error');
+                    // Extract custom validation errors
+                    let msg = 'Gagal menyimpan penyesuaian.';
+                    if (data && data.errors) {
+                        msg = Object.values(data.errors).flat().join('\n');
+                    } else if (data && data.message) {
+                        msg = data.message;
+                    }
+                    showToast(msg, 'error');
                 }
             } catch (err) {
-                showToast('Terjadi kesalahan jaringan.', 'error');
+                let msg = 'Terjadi kesalahan jaringan.';
+                if (err && err.errors) {
+                    msg = Object.values(err.errors).flat().join('\n');
+                } else if (err && err.message) {
+                    msg = err.message;
+                }
+                showToast(msg, 'error');
             } finally {
                 if (btnSubmitAdj) btnSubmitAdj.disabled = false;
                 if (adjBtnText) adjBtnText.textContent = 'Simpan Penyesuaian';
@@ -537,6 +602,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnTambahMitra && modalMitra) {
         btnTambahMitra.addEventListener('click', () => {
             formMitra.reset();
+            document.querySelectorAll('.error-msg').forEach(el => {
+                el.textContent = '';
+                el.classList.add('hidden');
+            });
             document.getElementById('mitra-edit-id').value = '';
             document.getElementById('modal-mitra-title').textContent = 'Tambah Mitra';
             document.getElementById('btn-submit-mitra').textContent  = 'Simpan Mitra';
@@ -548,12 +617,67 @@ document.addEventListener('DOMContentLoaded', () => {
         formMitra.addEventListener('submit', (e) => {
             e.preventDefault();
             const editId  = document.getElementById('mitra-edit-id').value;
+            const nama    = document.getElementById('mitra-nama').value.trim();
+            const email   = document.getElementById('mitra-email').value.trim();
+            const kontak  = document.getElementById('mitra-kontak').value.trim();
+            const alamat  = document.getElementById('mitra-alamat').value.trim();
+            const tanggal_jatuh_tempo = document.getElementById('mitra-jatuh-tempo').value;
+
+            // Clear previous errors
+            document.querySelectorAll('.error-msg').forEach(el => {
+                el.textContent = '';
+                el.classList.add('hidden');
+            });
+
+            function showFieldError(field, message) {
+                const el = document.getElementById(`error-mitra-${field}`);
+                if (el) {
+                    el.textContent = message;
+                    el.classList.remove('hidden');
+                }
+            }
+
+            let hasError = false;
+
+            if (!nama) {
+                showFieldError('nama', 'Nama mitra wajib diisi.');
+                hasError = true;
+            }
+
+            // Frontend validation
+            if (email) {
+                if (!email.includes('@')) {
+                    showFieldError('email', 'Format email tidak valid. Email harus menggunakan domain @gmail.com.');
+                    hasError = true;
+                } else if (!email.endsWith('@gmail.com')) {
+                    showFieldError('email', 'Email mitra harus menggunakan domain @gmail.com.');
+                    hasError = true;
+                }
+            }
+
+            if (kontak) {
+                if (!/^[0-9]+$/.test(kontak)) {
+                    showFieldError('kontak', 'no telpon harus diisi dengan angka');
+                    hasError = true;
+                } else if (kontak.length < 10 || kontak.length > 13) {
+                    showFieldError('kontak', 'no telpon harus berisi 10-13 digit');
+                    hasError = true;
+                }
+            }
+
+            if (!alamat) {
+                showFieldError('alamat', 'Alamat mitra wajib diisi.');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
             const payload = {
-                nama:                document.getElementById('mitra-nama').value,
-                email:               document.getElementById('mitra-email').value,
-                kontak:              document.getElementById('mitra-kontak').value,
-                alamat:              document.getElementById('mitra-alamat').value,
-                tanggal_jatuh_tempo: document.getElementById('mitra-jatuh-tempo').value,
+                nama,
+                email,
+                kontak,
+                alamat,
+                tanggal_jatuh_tempo,
             };
             const url = editId ? `/admin/mitra/${editId}` : '/admin/mitra';
             const btn = document.getElementById('btn-submit-mitra');
@@ -575,7 +699,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalMitra.classList.remove('active');
                 btn.disabled = false; btn.textContent = 'Simpan Mitra';
             })
-            .catch(() => { alert('Gagal menyimpan mitra.'); btn.disabled = false; btn.textContent = 'Simpan Mitra'; });
+            .catch((err) => {
+                btn.disabled = false;
+                btn.textContent = editId ? 'Simpan Perubahan' : 'Simpan Mitra';
+                
+                if (err && err.errors) {
+                    for (const [field, messages] of Object.entries(err.errors)) {
+                        showFieldError(field, messages[0]);
+                    }
+                } else {
+                    alert(err.message || 'Gagal menyimpan mitra.');
+                }
+            });
         });
 
         mitraTbody.addEventListener('click', (e) => {
@@ -594,6 +729,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (e.target.closest('.btn-edit-mitra')) {
                 const tr = e.target.closest('tr');
+                document.querySelectorAll('.error-msg').forEach(el => {
+                    el.textContent = '';
+                    el.classList.add('hidden');
+                });
                 const kontak = tr.querySelector('.row-kontak').textContent.trim();
                 const alamat = tr.querySelector('.row-alamat').textContent.trim();
                 const email = tr.querySelector('.row-email').textContent.trim();

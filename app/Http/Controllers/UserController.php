@@ -25,9 +25,12 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/@jofresh\.com$/i'],
             'password' => ['required', 'string', 'min:8'],
             'role' => 'required|string|in:Kasir,Admin,Superadmin,Owner',
+        ], [
+            'email.regex' => 'Email pengguna harus menggunakan domain @jofresh.com.',
+            'email.unique' => 'Email sudah terdaftar.',
         ]);
 
         $user = User::create([
@@ -49,9 +52,12 @@ class UserController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id, 'regex:/@jofresh\.com$/i'],
             'password' => ['nullable', 'string', 'min:8'],
             'role' => 'required|string|in:Kasir,Admin,Superadmin,Owner',
+        ], [
+            'email.regex' => 'Email pengguna harus menggunakan domain @jofresh.com.',
+            'email.unique' => 'Email sudah terdaftar.',
         ]);
 
         $user->name = $request->name;

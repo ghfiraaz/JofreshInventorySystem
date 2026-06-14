@@ -20,10 +20,17 @@ class MitraController extends Controller
     {
         $request->validate([
             'nama'                => 'required|string|max:255',
-            'kontak'              => 'nullable|string|max:50',
-            'email'               => 'nullable|email|max:255',
-            'alamat'              => 'nullable|string|max:500',
+            'kontak'              => ['nullable', 'numeric', 'digits_between:10,13'],
+            'email'               => ['nullable', 'email', 'max:255', 'regex:/@gmail\.com$/i'],
+            'alamat'              => 'required|string|max:500',
             'tanggal_jatuh_tempo' => 'nullable|integer|min:1|max:31',
+        ], [
+            'nama.required'       => 'Nama mitra wajib diisi.',
+            'alamat.required'     => 'Alamat mitra wajib diisi.',
+            'kontak.numeric'      => 'no telpon harus diisi dengan angka',
+            'kontak.digits_between' => 'no telpon harus berisi 10-13 digit',
+            'email.regex'         => 'Email mitra harus menggunakan domain @gmail.com.',
+            'email.email'         => 'Format email tidak valid. Email harus menggunakan domain @gmail.com.',
         ]);
 
         $mitra = Mitra::create([
@@ -45,10 +52,17 @@ class MitraController extends Controller
 
         $request->validate([
             'nama'                => 'required|string|max:255',
-            'kontak'              => 'nullable|string|max:50',
-            'email'               => 'nullable|email|max:255',
-            'alamat'              => 'nullable|string|max:500',
+            'kontak'              => ['nullable', 'numeric', 'digits_between:10,13'],
+            'email'               => ['nullable', 'email', 'max:255', 'regex:/@gmail\.com$/i'],
+            'alamat'              => 'required|string|max:500',
             'tanggal_jatuh_tempo' => 'nullable|integer|min:1|max:31',
+        ], [
+            'nama.required'       => 'Nama mitra wajib diisi.',
+            'alamat.required'     => 'Alamat mitra wajib diisi.',
+            'kontak.numeric'      => 'no telpon harus diisi dengan angka',
+            'kontak.digits_between' => 'no telpon harus berisi 10-13 digit',
+            'email.regex'         => 'Email mitra harus menggunakan domain @gmail.com.',
+            'email.email'         => 'Format email tidak valid. Email harus menggunakan domain @gmail.com.',
         ]);
 
         $oldTanggal = $mitra->tanggal_jatuh_tempo;

@@ -22,6 +22,11 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        $user = \App\Models\User::where('email', $request->email)->first();
+        if (!$user) {
+            return back()->withErrors(['email' => 'Akun tidak ditemukan'])->withInput($request->only('email'));
+        }
+
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
@@ -29,7 +34,7 @@ class AuthController extends Controller
             return $this->redirectByRole(Auth::user()->role);
         }
 
-        return back()->with('error', 'Email/Password salah, silahkan coba lagi')->withInput($request->only('email'));
+        return back()->withErrors(['password' => 'Kata sandi salah'])->withInput($request->only('email'));
     }
 
     public function logout(Request $request)

@@ -31,11 +31,14 @@
                     <label for="email">Alamat Email</label>
                     <input type="email" id="email" name="email" class="form-control @error('email') input-error @enderror"
                         placeholder="contoh: owner@jofresh.com" value="{{ old('email') }}" required>
+                    @error('email')
+                        <div class="text-red-500 text-xs mt-1.5 font-medium">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="form-group mt-6">
                     <label for="password">Kata Sandi</label>
                     <div class="relative">
-                        <input type="password" id="password" name="password" class="form-control pr-12"
+                        <input type="password" id="password" name="password" class="form-control pr-12 @error('password') input-error @enderror"
                             placeholder="••••••••" required>
                         <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 hover:text-slate-600 focus:outline-none transition-colors" style="color: #9C8B7E;">
                             <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -47,6 +50,9 @@
                             </svg>
                         </button>
                     </div>
+                    @error('password')
+                        <div class="text-red-500 text-xs mt-1.5 font-medium">{{ $message }}</div>
+                    @enderror
                 </div>
                 <button type="submit" class="btn btn-primary w-full mt-8 py-4 text-lg">Masuk Akun</button>
             </form>

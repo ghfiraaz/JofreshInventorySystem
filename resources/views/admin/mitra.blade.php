@@ -65,15 +65,18 @@
             <div class="form-group">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Nama Mitra *</label>
                 <input type="text" id="mitra-nama" placeholder="Nama restoran / warung" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
+                <div class="error-msg text-red-500 text-xs mt-1.5 hidden" id="error-mitra-nama"></div>
             </div>
             <div class="form-group">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email Mitra</label>
-                <input type="email" id="mitra-email" placeholder="email@mitra.com" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
+                <input type="email" id="mitra-email" placeholder="email@gmail.com" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
+                <div class="error-msg text-red-500 text-xs mt-1.5 hidden" id="error-mitra-email"></div>
             </div>
             <div class="flex gap-4">
                 <div class="form-group flex-1">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Kontak / HP</label>
                     <input type="text" id="mitra-kontak" placeholder="0812-xxxx-xxxx" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
+                    <div class="error-msg text-red-500 text-xs mt-1.5 hidden" id="error-mitra-kontak"></div>
                 </div>
                 <div class="form-group flex-1">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tanggal Jatuh Tempo *</label>
@@ -85,8 +88,9 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Alamat Lengkap</label>
-                <input type="text" id="mitra-alamat" placeholder="Jl. ..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Alamat Lengkap *</label>
+                <input type="text" id="mitra-alamat" placeholder="Jl. ..." required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
+                <div class="error-msg text-red-500 text-xs mt-1.5 hidden" id="error-mitra-alamat"></div>
             </div>
             <div class="mt-8 flex justify-end gap-3">
                 <button type="button" onclick="document.getElementById('modal-mitra').classList.remove('active')" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer border-none">Batal</button>

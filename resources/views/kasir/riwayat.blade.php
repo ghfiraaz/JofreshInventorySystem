@@ -130,7 +130,7 @@
                                 </a>
                             @endif
 
-                            {{-- Download PDF (with LUNAS watermark if paid) --}}
+                            {{-- Download PDF (with wm LUNAS jika sudah dibayarkan oleh mitra) --}}
                             <a href="{{ url('/kasir/transaksi/'.$t->id.'/invoice-pdf') }}" target="_blank"
                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold no-underline transition-all border
                                {{ $t->status_pembayaran === 'Sudah Dibayar' ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : 'text-gray-600 bg-gray-50 hover:bg-gray-100 border-gray-200' }}"
