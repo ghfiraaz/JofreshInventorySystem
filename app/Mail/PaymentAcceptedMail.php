@@ -18,8 +18,8 @@ class PaymentAcceptedMail extends Mailable
     public string $kodeInvoice;
     public $transaksiList;
     public $totalTagihan;
-    public $periodeAwal;
-    public $periodeAkhir;
+    public $periodeAwal = '-';
+    public $periodeAkhir = '-';
     protected string $pdfPath;
 
     public function __construct(Mitra $mitra, string $kodeInvoice, string $pdfPath)

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mail\PaymentReminderMail;
 use App\Models\Mitra;
+use App\Models\ReminderHistory;
 use App\Models\Transaksi;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -82,11 +83,46 @@ class ReminderService
             // Unlock payment upload for the Mitra
             $mitra->update(['payment_upload_locked' => false]);
 
+            // 8. Catat histori reminder BERHASIL
+            ReminderHistory::create([
+                'mitra_id'          => $mitra->id,
+                'user_id'           => $sender->id,
+                'email_penerima'    => $mitra->email,
+                'tanggal_pengiriman'=> now(),
+                'status'            => 'berhasil',
+                'invoice_filename'  => $pdfFilename,
+                'periode_awal'      => $periodeAwal->toDateString(),
+                'periode_akhir'     => $periodeAkhir->toDateString(),
+                'total_tagihan'     => (int) $totalTagihan,
+                'jumlah_transaksi'  => $transaksiList->count(),
+            ]);
+
+            Log::info('Reminder email berhasil dikirim', [
+                'mitra_id' => $mitra->id,
+                'email'    => $mitra->email,
+                'total'    => $totalTagihan,
+            ]);
+
             return [
                 'success' => true,
                 'message' => 'Reminder berhasil dikirim ke ' . $mitra->email,
             ];
         } catch (\Exception $e) {
+            // Catat histori reminder GAGAL
+            ReminderHistory::create([
+                'mitra_id'          => $mitra->id,
+                'user_id'           => $sender->id,
+                'email_penerima'    => $mitra->email,
+                'tanggal_pengiriman'=> now(),
+                'status'            => 'gagal',
+                'error_message'     => $e->getMessage(),
+                'invoice_filename'  => $pdfFilename,
+                'periode_awal'      => $periodeAwal->toDateString(),
+                'periode_akhir'     => $periodeAkhir->toDateString(),
+                'total_tagihan'     => (int) $totalTagihan,
+                'jumlah_transaksi'  => $transaksiList->count(),
+            ]);
+
             Log::error('Gagal mengirim email reminder', [
                 'mitra_id' => $mitra->id,
                 'email'    => $mitra->email,
