@@ -67,19 +67,22 @@
             <h3 id="modal-title" class="text-xl font-bold text-slate-800">Tambah Pengguna Baru</h3>
             <p id="modal-desc" class="text-sm text-slate-600 mt-1">Buat akun pengguna baru untuk sistem (Register).</p>
         </div>
-        <form id="form-pengguna">
+        <form id="form-pengguna" novalidate>
             <input type="hidden" id="edit-row-id" value="">
             <div class="form-group">
                 <label>Nama *</label>
                 <input type="text" id="user-name" class="form-control" placeholder="Nama Lengkap" required>
+                <div class="field-error text-red-500 text-xs mt-1.5 hidden" id="error-user-name"></div>
             </div>
             <div class="form-group">
                 <label>Email *</label>
-                <input type="email" id="user-email" class="form-control" placeholder="user@jofresh.com" required>
+                <input type="text" id="user-email" class="form-control" placeholder="user@jofresh.com" required>
+                <div class="field-error text-red-500 text-xs mt-1.5 hidden" id="error-user-email"></div>
             </div>
             <div class="form-group">
                 <label>Password *</label>
-                <input type="password" id="user-password" class="form-control" placeholder="Minimal 8 karakter" required>
+                <input type="password" id="user-password" class="form-control" placeholder="Minimal 8 karakter, harus ada angka" required>
+                <div class="field-error text-red-500 text-xs mt-1.5 hidden" id="error-user-password"></div>
                 <small class="text-slate-500 mt-1" style="display:block; font-size: 0.8rem;" id="password-hint"></small>
             </div>
             <div class="form-group">

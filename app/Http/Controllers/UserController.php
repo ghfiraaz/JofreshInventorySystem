@@ -26,11 +26,13 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'regex:/@jofresh\.com$/i'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'string', 'min:8', 'regex:/[0-9]/'],
             'role' => 'required|string|in:Kasir,Admin,Superadmin,Owner',
         ], [
             'email.regex' => 'Email pengguna harus menggunakan domain @jofresh.com.',
-            'email.unique' => 'Email sudah terdaftar.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.regex' => 'Password harus mengandung minimal 1 angka.',
         ]);
 
         $user = User::create([
@@ -53,11 +55,13 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id, 'regex:/@jofresh\.com$/i'],
-            'password' => ['nullable', 'string', 'min:8'],
+            'password' => ['nullable', 'string', 'min:8', 'regex:/[0-9]/'],
             'role' => 'required|string|in:Kasir,Admin,Superadmin,Owner',
         ], [
             'email.regex' => 'Email pengguna harus menggunakan domain @jofresh.com.',
-            'email.unique' => 'Email sudah terdaftar.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.regex' => 'Password harus mengandung minimal 1 angka.',
         ]);
 
         $user->name = $request->name;

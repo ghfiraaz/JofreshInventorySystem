@@ -142,6 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (fPass) fPass.required = true;
         if (pwdHint) pwdHint.textContent = '';
         
+        // Clear inline field errors
+        document.querySelectorAll('#form-pengguna .field-error').forEach(el => {
+            el.textContent = '';
+            el.classList.add('hidden');
+        });
+
         // Ensure fields are editable for new users
         if (fName)  fName.disabled = false;
         if (fEmail) fEmail.disabled = false;
@@ -153,9 +159,82 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (formPengguna) {
+        // Helper: show/clear inline field errors for user form
+        function showUserFieldError(field, message) {
+            const el = document.getElementById(`error-user-${field}`);
+            if (el) {
+                el.textContent = message;
+                el.classList.remove('hidden');
+            }
+        }
+        function clearUserFieldErrors() {
+            document.querySelectorAll('#form-pengguna .field-error').forEach(el => {
+                el.textContent = '';
+                el.classList.add('hidden');
+            });
+        }
+
+        // Clear error on input for that specific field
+        ['user-name', 'user-email', 'user-password'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', () => {
+                    const field = id.replace('user-', '');
+                    const errorEl = document.getElementById(`error-user-${field}`);
+                    if (errorEl) { errorEl.textContent = ''; errorEl.classList.add('hidden'); }
+                });
+            }
+        });
+
         formPengguna.addEventListener('submit', (e) => {
             e.preventDefault();
+            clearUserFieldErrors();
+
             const isEdit = fId.value !== '';
+
+            // Collect client-side errors (but don't block submission)
+            const clientErrors = {};
+
+            if (!fName.value.trim()) {
+                clientErrors.name = 'Nama wajib diisi.';
+            }
+
+            const emailVal = fEmail.value.trim();
+            if (!emailVal) {
+                clientErrors.email = 'Email wajib diisi.';
+            } else if (!emailVal.includes('@') || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+                clientErrors.email = 'Masukkan email valid!';
+            } else if (!/@jofresh\.com$/i.test(emailVal)) {
+                clientErrors.email = 'Email harus menggunakan domain @jofresh.com.';
+            }
+
+            const passVal = fPass.value;
+            if (!isEdit || passVal.length > 0) {
+                if (!passVal) {
+                    clientErrors.password = 'Password wajib diisi.';
+                } else {
+                    const passErrors = [];
+                    if (passVal.length < 8) passErrors.push('Password minimal 8 karakter.');
+                    if (!/\d/.test(passVal)) passErrors.push('Password harus mengandung minimal 1 angka.');
+                    if (passErrors.length > 0) clientErrors.password = passErrors.join(' ');
+                }
+            }
+
+            // If there are basic format errors (empty, invalid format), show them and stop
+            // Only skip server call for errors the server can't provide better info on
+            const hasBasicError = clientErrors.name || 
+                (clientErrors.email && clientErrors.email !== 'Email harus menggunakan domain @jofresh.com.') ||
+                clientErrors.password;
+
+            if (hasBasicError) {
+                // Show all client errors at once
+                for (const [field, msg] of Object.entries(clientErrors)) {
+                    showUserFieldError(field, msg);
+                }
+                return;
+            }
+
+            // Always submit to server — server validates uniqueness, domain, etc.
             const url    = isEdit ? `/users/${fId.value}` : '/users';
             const method = isEdit ? 'PUT' : 'POST';
             btnSubmit.disabled = true; btnSubmit.textContent = 'Menyimpan...';
@@ -179,18 +258,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnSubmit.disabled = false; btnSubmit.textContent = 'Simpan Pengguna';
             })
             .catch((err) => {
-                let msg = "Gagal menyimpan pengguna. Pastikan email unik & password minimal 8 huruf.";
-                if (err && err.errors) {
-                    msg = Object.values(err.errors).flat().join('\n');
-                } else if (err && err.message) {
-                    msg = err.message;
-                }
-                alert(msg);
                 btnSubmit.disabled = false;
                 btnSubmit.textContent = isEdit ? 'Simpan Perubahan' : 'Simpan Pengguna';
+
+                if (err && err.errors) {
+                    // Show ALL server errors at once inline
+                    for (const [field, messages] of Object.entries(err.errors)) {
+                        let msg = messages[0];
+                        // Friendly messages
+                        if (field === 'email' && msg.toLowerCase().includes('unique')) {
+                            msg = 'Email sudah digunakan.';
+                        }
+                        if (field === 'email' && msg.toLowerCase().includes('regex')) {
+                            msg = 'Email harus menggunakan domain @jofresh.com.';
+                        }
+                        if (field === 'password' && msg.toLowerCase().includes('at least')) {
+                            msg = 'Password minimal 8 karakter.';
+                        }
+                        if (field === 'password' && msg.toLowerCase().includes('regex')) {
+                            msg = 'Password harus mengandung minimal 1 angka.';
+                        }
+                        showUserFieldError(field, msg);
+                    }
+
+                    // Also show any client-side errors for fields the server didn't report
+                    for (const [field, msg] of Object.entries(clientErrors)) {
+                        const serverHasError = err.errors[field];
+                        if (!serverHasError) {
+                            showUserFieldError(field, msg);
+                        }
+                    }
+                } else if (err && err.message) {
+                    showToast(err.message, 'error');
+                } else {
+                    showToast('Gagal menyimpan pengguna.', 'error');
+                }
             });
         });
     }
+
+
 
     document.addEventListener('click', (e) => {
         // Delete User
@@ -960,6 +1067,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!opt || !opt.value) {
                 showToast('Pilih produk terlebih dahulu', 'error');
                 sel.focus();
+                return;
+            }
+
+            if (jumlah < 1) {
+                showToast('Jumlah pembelian minimal 1 Ekor', 'error');
+                jumlahInput.focus();
                 return;
             }
 

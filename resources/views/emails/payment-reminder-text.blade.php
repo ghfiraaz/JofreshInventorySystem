@@ -18,7 +18,8 @@ Rincian Transaksi:
 Silakan kunjungi halaman berikut untuk mengunggah bukti pembayaran:
 {{ $paymentLink }}
 
-Kami juga melampirkan dokumen rekapitulasi (PDF) pada email ini untuk arsip Anda. Dokumen tersebut berisi rincian lengkap beserta kode QRIS untuk kemudahan pembayaran.
+Kami juga melampirkan dokumen rekapitulasi (PDF) pada email ini untuk arsip Anda. 
+Dokumen tersebut berisi rincian lengkap beserta kode QRIS untuk kemudahan pembayaran.
 
 Mohon kiranya dapat diselesaikan sebelum tanggal {{ $tanggalTempo }}.
 
