@@ -72,9 +72,14 @@ class KasirController extends Controller
         $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
         $startOf12Months = Carbon::now()->startOfMonth()->subMonths(11);
 
+        $isSqlite = \Illuminate\Support\Facades\DB::getDriverName() === 'sqlite';
+        $selectRaw = $isSqlite 
+            ? "strftime('%Y', created_at) as tahun, strftime('%m', created_at) as bulan, SUM(total_harga) as total"
+            : "YEAR(created_at) as tahun, MONTH(created_at) as bulan, SUM(total_harga) as total";
+
         $monthlyDataRaw = Transaksi::where('status_pembayaran', 'Sudah Dibayar')
             ->where('created_at', '>=', $startOf12Months)
-            ->selectRaw('YEAR(created_at) as tahun, MONTH(created_at) as bulan, SUM(total_harga) as total')
+            ->selectRaw($selectRaw)
             ->groupBy('tahun', 'bulan')
             ->orderBy('tahun')
             ->orderBy('bulan')

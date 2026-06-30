@@ -2,14 +2,14 @@
 @section('title', 'Transaksi Penjualan')
 @section('content')
 
-<div class="flex gap-6 items-start">
+<div class="flex flex-col lg:flex-row gap-6 items-start">
     {{-- ===== LEFT COLUMN (2/3) ===== --}}
     <div class="flex-1 flex flex-col gap-6 min-w-0">
 
         {{-- Tambah Item Card --}}
         <div class="bg-white rounded-xl border border-gray-200 p-6">
             <h3 class="text-base font-bold text-gray-800 mb-5">Tambah Item</h3>
-            <div class="flex items-end gap-4">
+            <div class="flex flex-col sm:flex-row sm:items-end gap-4">
                 <div class="flex-1">
                     <label class="block text-xs font-semibold text-gray-500 mb-1.5">Produk <span class="text-red-500">*</span></label>
                     <select id="kasir-produk" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white outline-none focus:border-[#7B3911] focus:ring-2 focus:ring-[#7B3911]/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3E%3Cpath stroke=%27%236b7280%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27m6 8 4 4 4-4%27/%3E%3C/svg%3E'); background-position: right 12px center; background-repeat: no-repeat; background-size: 16px; padding-right: 36px;">
@@ -66,7 +66,7 @@
     </div>
 
     {{-- ===== RIGHT COLUMN (checkout sidebar) ===== --}}
-    <div class="w-[280px] flex-shrink-0">
+    <div class="w-full lg:w-[280px] flex-shrink-0">
         <div class="bg-white rounded-xl border border-gray-200 p-6 sticky top-8">
             <h3 class="text-base font-bold text-gray-800 mb-5">Checkout</h3>
 

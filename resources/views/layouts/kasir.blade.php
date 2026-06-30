@@ -31,6 +31,7 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex antialiased">
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 <div class="flex w-full">
     {{-- ===== SIDEBAR ===== --}}
     <aside id="sidebar" class="w-[260px] flex-shrink-0 flex flex-col z-10 shadow-[2px_0_8px_rgba(0,0,0,0.02)] transition-all duration-300 overflow-hidden" style="background: #7B3911; border-right: 1px solid rgba(255,255,255,0.06);">
@@ -98,7 +99,7 @@
     {{-- ===== MAIN CONTENT ===== --}}
     <main class="flex-grow flex flex-col w-full min-w-0 transition-all duration-300">
         {{-- Header --}}
-        <header class="h-20 px-6 md:px-10 flex items-center justify-between bg-[#FAF6F0] flex-shrink-0 border-b border-[#E0D5CA]">
+        <header class="h-16 lg:h-20 px-4 md:px-6 lg:px-10 flex items-center justify-between bg-[#FAF6F0] flex-shrink-0 border-b border-[#E0D5CA]">
             <div class="flex items-center gap-4">
                 <button id="sidebar-toggle" class="p-2 rounded-lg transition-colors cursor-pointer border-none bg-transparent outline-none" style="color: #9C8B7E;" onmouseover="this.style.background='rgba(123,57,17,0.06)';this.style.color='#7B3911';" onmouseout="this.style.background='transparent';this.style.color='#9C8B7E';">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -108,7 +109,7 @@
                 <h2 class="text-2xl font-bold" style="color: #3D1B07;">@yield('title')</h2>
             </div>
             <div class="flex items-center gap-6">
-                <div id="header-date" class="flex items-center gap-2 px-3 py-1.5 rounded-xl shadow-sm" style="background: linear-gradient(135deg, #FAF0E6, #FFF8F0); border: 1px solid #E0C4A8;">
+                <div id="header-date" class="header-date-widget flex items-center gap-2 px-3 py-1.5 rounded-xl shadow-sm" style="background: linear-gradient(135deg, #FAF0E6, #FFF8F0); border: 1px solid #E0C4A8;">
                     <span id="hd-day" class="text-xs font-bold uppercase tracking-widest" style="color: #C8702A;"></span>
                     <span id="hd-date" class="text-sm font-bold" style="color: #3D1B07;"></span>
                     <span class="w-px h-4" style="background: #E0C4A8;"></span>
@@ -139,7 +140,7 @@
         </header>
 
         {{-- Content --}}
-        <div class="p-10 flex-grow overflow-y-auto bg-slate-50">
+        <div class="content-area p-4 sm:p-6 lg:p-10 flex-grow overflow-y-auto bg-slate-50">
             @yield('content')
         </div>
     </main>
@@ -218,6 +219,60 @@
         }
         updateClock();
         setInterval(updateClock, 1000);
+
+        // === Responsive Sidebar Toggle ===
+        (function() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (!sidebar || !toggleBtn) return;
+
+            function isMobile() {
+                return window.innerWidth < 1024;
+            }
+
+            function openMobileSidebar() {
+                sidebar.classList.add('sidebar-open');
+                if (backdrop) backdrop.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMobileSidebar() {
+                sidebar.classList.remove('sidebar-open');
+                if (backdrop) backdrop.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            toggleBtn.addEventListener('click', function() {
+                if (isMobile()) {
+                    if (sidebar.classList.contains('sidebar-open')) {
+                        closeMobileSidebar();
+                    } else {
+                        openMobileSidebar();
+                    }
+                } else {
+                    sidebar.classList.toggle('sidebar-collapsed');
+                }
+            });
+
+            if (backdrop) {
+                backdrop.addEventListener('click', closeMobileSidebar);
+            }
+
+            // Close mobile sidebar when clicking a nav link
+            sidebar.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (isMobile()) closeMobileSidebar();
+                });
+            });
+
+            // Handle resize: clean up states when crossing breakpoint
+            window.addEventListener('resize', function() {
+                if (!isMobile()) {
+                    closeMobileSidebar();
+                }
+            });
+        })();
     </script>
 </body>
 </html>

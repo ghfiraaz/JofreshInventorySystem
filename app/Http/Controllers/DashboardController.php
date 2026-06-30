@@ -100,9 +100,14 @@ class DashboardController extends Controller
                 $trendChartTitle = 'Tren Penjualan Bulanan';
                 $trendChartDesc  = 'Menampilkan perkembangan total penjualan per bulan dalam periode yang dipilih.';
 
+                $isSqlite = \Illuminate\Support\Facades\DB::getDriverName() === 'sqlite';
+                $selectRaw = $isSqlite 
+                    ? "strftime('%Y', created_at) as tahun, strftime('%m', created_at) as bulan, SUM(total_harga) as total"
+                    : "YEAR(created_at) as tahun, MONTH(created_at) as bulan, SUM(total_harga) as total";
+
                 $monthlyData = Transaksi::where('status_pembayaran', 'Sudah Dibayar')
                     ->whereBetween('created_at', [$rangeStart, $rangeEnd])
-                    ->selectRaw('YEAR(created_at) as tahun, MONTH(created_at) as bulan, SUM(total_harga) as total')
+                    ->selectRaw($selectRaw)
                     ->groupBy('tahun', 'bulan')
                     ->orderBy('tahun')
                     ->orderBy('bulan')
@@ -122,9 +127,14 @@ class DashboardController extends Controller
             // Default: show last 12 months
             $startOf12Months = Carbon::now()->startOfMonth()->subMonths(11);
 
+            $isSqlite = \Illuminate\Support\Facades\DB::getDriverName() === 'sqlite';
+            $selectRaw = $isSqlite 
+                ? "strftime('%Y', created_at) as tahun, strftime('%m', created_at) as bulan, SUM(total_harga) as total"
+                : "YEAR(created_at) as tahun, MONTH(created_at) as bulan, SUM(total_harga) as total";
+
             $monthlyData = Transaksi::where('status_pembayaran', 'Sudah Dibayar')
                 ->where('created_at', '>=', $startOf12Months)
-                ->selectRaw('YEAR(created_at) as tahun, MONTH(created_at) as bulan, SUM(total_harga) as total')
+                ->selectRaw($selectRaw)
                 ->groupBy('tahun', 'bulan')
                 ->orderBy('tahun')
                 ->orderBy('bulan')
