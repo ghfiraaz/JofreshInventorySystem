@@ -24,7 +24,7 @@ class AuthController extends Controller
 
         $user = \App\Models\User::where('email', $request->email)->first();
         if (!$user) {
-            return back()->withErrors(['email' => 'Akun tidak ditemukan'])->withInput($request->only('email'));
+            return back()->withErrors(['email' => 'Akun tidak terdaftar'])->withInput($request->only('email'));
         }
 
         $credentials = $request->only('email', 'password');

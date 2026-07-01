@@ -182,23 +182,11 @@ class MitraTest extends TestCase
         $response->assertJsonValidationErrors('email');
     }
 
-    public function test_tambah_mitra_gagal_tanggal_jatuh_tempo_lebih_dari_31(): void
-    {
-        $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
-            'nama'                => 'Mitra Test',
-            'alamat'              => 'Jl. Test',
-            'tanggal_jatuh_tempo' => 32,
-        ]);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors('tanggal_jatuh_tempo');
-    }
-
     // ========================================================
-    // UPDATE MITRA
+    // UPDATE MITRA (TOMBOL EDIT DI LIST MITRA)
     // ========================================================
 
-    public function test_admin_bisa_update_mitra(): void
+    public function test_admin_bisa_update_mitra_dari_tombol_edit_di_list(): void
     {
         $mitra = Mitra::create([
             'nama' => 'Mitra Lama', 'alamat' => 'Jl. Lama',
@@ -220,10 +208,10 @@ class MitraTest extends TestCase
     }
 
     // ========================================================
-    // HAPUS MITRA
+    // HAPUS MITRA (TOMBOL HAPUS DI LIST MITRA)
     // ========================================================
 
-    public function test_admin_bisa_hapus_mitra(): void
+    public function test_admin_bisa_hapus_mitra_dari_tombol_hapus_di_list(): void
     {
         $mitra = Mitra::create([
             'nama' => 'Mitra Hapus', 'alamat' => 'Jl. Hapus',

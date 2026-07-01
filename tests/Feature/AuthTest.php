@@ -88,14 +88,14 @@ class AuthTest extends TestCase
     // LOGIN GAGAL
     // ========================================================
 
-    public function test_login_gagal_email_tidak_ditemukan(): void
+    public function test_login_gagal_akun_tidak_terdaftar(): void
     {
         $response = $this->post('/login', [
             'email'    => 'tidakada@jofresh.com',
             'password' => 'password123',
         ]);
 
-        $response->assertSessionHasErrors('email');
+        $response->assertSessionHasErrors(['email' => 'Akun tidak terdaftar']);
         $this->assertGuest();
     }
 
