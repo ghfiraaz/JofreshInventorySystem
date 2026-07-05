@@ -119,23 +119,7 @@
                         <div class="flex items-center gap-3">
                             <span class="text-sm font-bold text-gray-800">Rp {{ number_format($mt['total'], 0, ',', '.') }}</span>
 
-                            {{-- Terima/Tolak buttons (if waiting validation) --}}
-                            @if($hasWaitingValidation)
-                                <button type="button" class="btn-validasi-mitra px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none"
-                                    data-mitra="{{ $mt['mitra']->id }}"
-                                    data-action="terima"
-                                    onclick="event.stopPropagation(); validasiMitra(this)"
-                                    title="Terima pembayaran">
-                                    ✓ Terima
-                                </button>
-                                <button type="button" class="btn-tolak-mitra px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none"
-                                    data-mitra="{{ $mt['mitra']->id }}"
-                                    data-action="tolak"
-                                    onclick="event.stopPropagation(); validasiMitra(this)"
-                                    title="Tolak pembayaran">
-                                    ✗ Tolak
-                                </button>
-                            @endif
+
 
                             {{-- Reminder button --}}
                             @if($mt['mitra']->email)
@@ -221,25 +205,62 @@
                             @php
                                 $buktiPath = $mt['transaksi']->first(fn($t) => $t->bukti_pembayaran)?->bukti_pembayaran;
                             @endphp
-                            @if($buktiPath)
-                                @php
-                                    $buktiFilename = basename($buktiPath);
-                                    $buktiUrl = url('/kasir/bukti-pembayaran/' . $buktiFilename);
-                                    $isImage = preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $buktiPath);
-                                @endphp
-                                <div class="mt-4 p-4 bg-accent-50 border border-accent-100 rounded-lg">
-                                    <div class="text-xs font-bold text-accent-700 mb-3">Bukti Pembayaran:</div>
+                            <div class="mt-4 p-4 bg-accent-50 border border-accent-100 rounded-lg">
+                                <div class="text-xs font-bold text-accent-700 mb-3">Bukti Pembayaran:</div>
+                                @if($buktiPath)
+                                    @php
+                                        $buktiFilename = basename($buktiPath);
+                                        $buktiUrl = url('/kasir/bukti-pembayaran/' . $buktiFilename);
+                                        $isImage = preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $buktiPath);
+                                    @endphp
                                     @if($isImage)
                                         <div class="mb-3">
                                             <img src="{{ $buktiUrl }}" alt="Bukti Pembayaran" class="max-w-xs max-h-48 rounded-lg border border-accent-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity" onclick="window.open('{{ $buktiUrl }}', '_blank')">
                                         </div>
                                     @endif
-                                    <a href="{{ $buktiUrl }}" target="_blank" class="inline-flex items-center gap-1.5 text-sm text-accent-700 font-semibold hover:text-accent-900 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
-                                        Buka Bukti Pembayaran
-                                    </a>
-                                </div>
-                            @endif
+                                    <div class="flex flex-wrap items-center justify-between gap-3 mt-2">
+                                        <a href="{{ $buktiUrl }}" target="_blank" class="inline-flex items-center gap-1.5 text-sm text-accent-700 font-semibold hover:text-accent-900 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                                            Buka Bukti Pembayaran
+                                        </a>
+                                        
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" class="btn-validasi-mitra px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none"
+                                                data-mitra="{{ $mt['mitra']->id }}"
+                                                data-action="terima"
+                                                onclick="event.stopPropagation(); validasiMitra(this)"
+                                                title="Terima pembayaran">
+                                                ✓ Terima
+                                            </button>
+                                            <button type="button" class="btn-tolak-mitra px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none"
+                                                data-mitra="{{ $mt['mitra']->id }}"
+                                                data-action="tolak"
+                                                onclick="event.stopPropagation(); validasiMitra(this)"
+                                                title="Tolak pembayaran">
+                                                ✗ Tolak
+                                            </button>
+                                        </div>
+                                    </div>
+                                @else
+                                    <p class="text-xs text-red-500 italic mb-3">Bukti pembayaran belum diunggah.</p>
+                                    <div class="flex gap-2">
+                                        <button type="button" class="btn-validasi-mitra px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none"
+                                            data-mitra="{{ $mt['mitra']->id }}"
+                                            data-action="terima"
+                                            onclick="event.stopPropagation(); validasiMitra(this)"
+                                            title="Terima pembayaran">
+                                            ✓ Terima Tanpa Bukti
+                                        </button>
+                                        <button type="button" class="btn-tolak-mitra px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none"
+                                            data-mitra="{{ $mt['mitra']->id }}"
+                                            data-action="tolak"
+                                            onclick="event.stopPropagation(); validasiMitra(this)"
+                                            title="Tolak pembayaran">
+                                            ✗ Tolak
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
                         @endif
                     </div>
                 </div>

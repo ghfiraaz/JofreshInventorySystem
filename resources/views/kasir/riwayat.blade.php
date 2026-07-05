@@ -44,15 +44,8 @@
     <div class="flex flex-wrap items-center justify-end gap-3">
         <form method="GET" action="{{ url('/kasir/riwayat') }}" class="flex items-center gap-2">
             <input type="date" name="date" value="{{ $filterDate }}" class="px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-brand-400 transition-all bg-white cursor-pointer">
-            <select name="status" class="px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-brand-400 transition-all bg-white cursor-pointer">
-                <option value="">Semua Status</option>
-                <option value="Belum Dibayar" {{ $filterStatus == 'Belum Dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
-                <option value="Menunggu Validasi" {{ $filterStatus == 'Menunggu Validasi' ? 'selected' : '' }}>Menunggu Validasi</option>
-                <option value="Sudah Dibayar" {{ $filterStatus == 'Sudah Dibayar' ? 'selected' : '' }}>Sudah Dibayar</option>
-                <option value="Ditolak" {{ $filterStatus == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
-            </select>
             <button type="submit" class="px-4 py-2 bg-slate-800 text-white text-sm font-semibold rounded-lg border-none cursor-pointer transition-all hover:bg-slate-700">Filter</button>
-            @if($filterDate || $filterStatus)
+            @if($filterDate)
                 <a href="{{ url('/kasir/riwayat') }}" class="px-4 py-2 bg-gray-100 text-gray-500 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-all no-underline border border-gray-200">Reset</a>
             @endif
         </form>
@@ -108,19 +101,7 @@
                     <td class="px-5 py-3.5 text-sm font-bold text-right text-gray-800">Rp {{ number_format($t->total_harga, 0, ',', '.') }}</td>
                     <td class="px-5 py-3.5 text-center" onclick="event.stopPropagation();">
                         <div class="flex items-center justify-center gap-1.5">
-                            {{-- Terima/Tolak buttons --}}
-                            @if($t->status_pembayaran === 'Menunggu Validasi')
-                                <button type="button" class="btn-validasi inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white transition-all border border-emerald-200 hover:border-emerald-600 cursor-pointer"
-                                    data-id="{{ $t->id }}" data-action="terima">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
-                                    Terima
-                                </button>
-                                <button type="button" class="btn-validasi inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-red-50 text-red-700 hover:bg-red-600 hover:text-white transition-all border border-red-200 hover:border-red-600 cursor-pointer"
-                                    data-id="{{ $t->id }}" data-action="tolak">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
-                                    Tolak
-                                </button>
-                            @endif
+
 
                             {{-- Bukti bayar link --}}
                             @if($t->bukti_pembayaran)
@@ -198,24 +179,7 @@
     </div>
 </div>
 
-{{-- ===== CONFIRMATION MODAL (CENTERED) ===== --}}
-<div id="modal-confirm-riwayat" class="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 [&.active]:opacity-100 [&.active]:pointer-events-auto">
-    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl relative overflow-hidden transform scale-95 transition-transform duration-300 [.active_&]:scale-100">
-        <div class="px-8 pt-8 pb-2 flex justify-between items-start">
-            <div>
-                <h3 id="confirm-riwayat-title" class="text-lg font-bold text-slate-800"></h3>
-            </div>
-            <button type="button" onclick="closeConfirmRiwayatModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer bg-transparent border-none leading-none mt-1">&times;</button>
-        </div>
-        <div class="px-8 pb-3">
-            <p id="confirm-riwayat-message" class="text-sm text-slate-600 leading-relaxed"></p>
-        </div>
-        <div class="px-8 pb-8 pt-4 flex justify-end gap-3">
-            <button type="button" id="confirm-riwayat-no" onclick="closeConfirmRiwayatModal()" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer border-none">Tidak</button>
-            <button type="button" id="confirm-riwayat-yes" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white border-none cursor-pointer transition-all" style="background:#7B3911;" onmouseover="this.style.background='#5A270B'" onmouseout="this.style.background='#7B3911'">Ya</button>
-        </div>
-    </div>
-</div>
+
 
 <script>
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -258,72 +222,7 @@ document.querySelectorAll('.riwayat-row').forEach(row => {
     });
 });
 
-// ========== Confirm Modal Riwayat ==========
-let _confirmRiwayatCallback = null;
 
-function showConfirmRiwayat(title, message, yesLabel, onYes, noLabel = 'Tidak') {
-    const modal = document.getElementById('modal-confirm-riwayat');
-    document.getElementById('confirm-riwayat-title').textContent = title;
-    document.getElementById('confirm-riwayat-message').textContent = message;
-    const yesBtn = document.getElementById('confirm-riwayat-yes');
-    const noBtn = document.getElementById('confirm-riwayat-no');
-    
-    yesBtn.textContent = yesLabel || 'Ya';
-    if (noBtn) {
-        noBtn.textContent = noLabel;
-    }
-    _confirmRiwayatCallback = onYes;
-    modal.classList.add('active');
-}
-
-function closeConfirmRiwayatModal() {
-    document.getElementById('modal-confirm-riwayat').classList.remove('active');
-    _confirmRiwayatCallback = null;
-}
-
-document.getElementById('confirm-riwayat-yes')?.addEventListener('click', () => {
-    if (_confirmRiwayatCallback) _confirmRiwayatCallback();
-    closeConfirmRiwayatModal();
-});
-
-document.getElementById('modal-confirm-riwayat')?.addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeConfirmRiwayatModal();
-});
-
-// Validasi individual (Terima/Tolak)
-document.querySelectorAll('.btn-validasi').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const id = this.dataset.id;
-        const action = this.dataset.action;
-        const isTerima = action === 'terima';
-        const title = isTerima ? 'Terima Pembayaran' : 'Tolak Pembayaran';
-        const confirmMsg = isTerima
-            ? 'Apakah anda yakin ingin validasi bukti pembayaran ini?'
-            : 'Apakah anda yakin ingin menolak bukti pembayaran ini?';
-
-        showConfirmRiwayat(title, confirmMsg, 'Ya', () => {
-            this.disabled = true;
-            const originalText = this.textContent;
-            this.textContent = '...';
-
-            fetch(`/kasir/transaksi/${id}/validasi`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-                body: JSON.stringify({ action: action }),
-            })
-            .then(r => r.ok ? r.json() : r.json().then(e => { throw e; }))
-            .then(data => {
-                showRiwayatToast('success', isTerima ? 'Pembayaran Diterima' : 'Pembayaran Ditolak', data.message);
-                setTimeout(() => window.location.reload(), 1500);
-            })
-            .catch(err => {
-                showRiwayatToast('error', 'Gagal', err.message || 'Terjadi kesalahan');
-                this.disabled = false;
-                this.textContent = originalText;
-            });
-        }, 'Tidak');
-    });
-});
 </script>
 
 @endsection

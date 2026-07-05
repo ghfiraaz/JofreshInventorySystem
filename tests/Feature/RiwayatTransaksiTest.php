@@ -36,7 +36,7 @@ class RiwayatTransaksiTest extends TestCase
             'total_harga' => 150000,
             'total_berat' => 3,
             'metode_pembayaran' => 'Tempo',
-            'status_pembayaran' => 'Belum Dibayar',
+            'status_pembayaran' => 'Sudah Dibayar',
             'jatuh_tempo' => now()->addDays(5)->toDateString(),
         ]);
 
@@ -176,7 +176,7 @@ class RiwayatTransaksiTest extends TestCase
             'total_harga' => 45000,
             'total_berat' => 1,
             'metode_pembayaran' => 'Tempo',
-            'status_pembayaran' => 'Belum Dibayar',
+            'status_pembayaran' => 'Sudah Dibayar',
             'bukti_pembayaran' => null,
             'jatuh_tempo' => now()->addDays(5)->toDateString(),
         ]);

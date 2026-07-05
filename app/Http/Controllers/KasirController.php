@@ -267,15 +267,11 @@ class KasirController extends Controller
     {
         $query = Transaksi::with(['mitra', 'items'])
             ->where('user_id', Auth::id())
+            ->where('status_pembayaran', 'Sudah Dibayar')
             ->orderBy('created_at', 'desc');
 
         if ($request->has('date') && $request->date != '') {
             $query->whereDate('created_at', $request->date);
-        }
-
-        // Filter by status
-        if ($request->has('status') && $request->status != '') {
-            $query->where('status_pembayaran', $request->status);
         }
 
         $transaksi = $query->get();
@@ -284,10 +280,9 @@ class KasirController extends Controller
         $totalPendapatan = $transaksi->sum('total_harga');
         $totalItemSold   = $transaksi->sum('total_berat');
         $filterDate      = $request->get('date', '');
-        $filterStatus    = $request->get('status', '');
 
         return view('kasir.riwayat', compact(
-            'transaksi', 'totalTransaksi', 'totalPendapatan', 'totalItemSold', 'filterDate', 'filterStatus'
+            'transaksi', 'totalTransaksi', 'totalPendapatan', 'totalItemSold', 'filterDate'
         ));
     }
 
