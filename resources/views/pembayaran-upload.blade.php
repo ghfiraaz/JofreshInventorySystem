@@ -116,7 +116,7 @@
                 <div class="text-center p-4 rounded-xl bg-gray-50 border border-gray-200">
                     <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">QRIS Pembayaran</div>
                     <div class="bg-white p-3 rounded-xl inline-block border border-gray-200 shadow-sm">
-                        <img src="{{ asset('images/qris-jofresh.jpg') }}" alt="QRIS JoFresh" class="w-48 h-48 object-contain">
+                        <img src="{{ asset('images/qris-jofresh.jpeg') }}" alt="QRIS JoFresh" class="w-48 h-48 object-contain">
                     </div>
                 </div>
             </div>

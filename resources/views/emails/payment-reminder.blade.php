@@ -91,7 +91,7 @@
             <div style="text-align:center;margin:28px 0;">
                 <p style="color:#6B5B4E;font-size:13px;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:1px;">Scan QR untuk Pembayaran:</p>
                 <div style="display:inline-block;padding:16px;background:#fff;border:2px solid #E0D5CA;border-radius:12px;">
-                    <img src="{{ $message->embed(public_path('images/qris-jofresh.png')) }}" alt="QRIS Pembayaran JoFresh" width="200" height="200" style="display:block;">
+                    <img src="{{ $message->embed(public_path('images/qris-jofresh.jpeg')) }}" alt="QRIS Pembayaran JoFresh" width="200" height="200" style="display:block;">
                 </div>
                 <p style="color:#9C8B7E;font-size:11px;margin:8px 0 0;">QRIS Pembayaran JoFresh</p>
             </div>

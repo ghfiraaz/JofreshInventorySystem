@@ -195,7 +195,7 @@ class ReminderService
             'totalTagihan'   => $totalTagihan,
             'periodeAwal'    => $periodeAwal->translatedFormat('d F Y'),
             'periodeAkhir'   => $periodeAkhir->translatedFormat('d F Y'),
-            'qrCodePath'     => public_path('images/qris-jofresh.png'),
+            'qrCodePath'     => public_path('images/qris-jofresh.jpeg'),
         ])->setPaper('a4', 'portrait');
 
         $pdf->save($outputPath);
