@@ -20,16 +20,18 @@ class ProdukController extends Controller
         $request->validate([
             'nama'         => 'required|string|max:255',
             'harga'        => 'required|numeric|min:0',
-            'stok_minimal' => 'nullable|integer|min:0',
+            'stok_minimal' => 'required|integer|min:1',
         ], [
-            'stok_minimal.integer' => 'Batas stok minimal harus berupa angka (digit) saja.',
+            'stok_minimal.required' => 'Batas stok minimal wajib diisi.',
+            'stok_minimal.integer'  => 'Batas stok minimal harus berupa angka (digit) saja.',
+            'stok_minimal.min'      => 'Batas stok minimal harus minimal 1.',
         ]);
 
         $produk = Produk::create([
             'nama'         => $request->nama,
             'kategori'     => 'Unggas',
             'stok'         => 0,
-            'stok_minimal' => $request->stok_minimal ?? 0,
+            'stok_minimal' => $request->stok_minimal,
             'satuan'       => 'Ekor',
             'harga'        => $request->harga,
         ]);
@@ -51,14 +53,16 @@ class ProdukController extends Controller
         $request->validate([
             'nama'         => 'required|string|max:255',
             'harga'        => 'required|numeric|min:0',
-            'stok_minimal' => 'nullable|integer|min:0',
+            'stok_minimal' => 'required|integer|min:1',
         ], [
-            'stok_minimal.integer' => 'Batas stok minimal harus berupa angka (digit) saja.',
+            'stok_minimal.required' => 'Batas stok minimal wajib diisi.',
+            'stok_minimal.integer'  => 'Batas stok minimal harus berupa angka (digit) saja.',
+            'stok_minimal.min'      => 'Batas stok minimal harus minimal 1.',
         ]);
 
         $produk->update([
             'nama'         => $request->nama,
-            'stok_minimal' => $request->stok_minimal ?? 0,
+            'stok_minimal' => $request->stok_minimal,
             'harga'        => $request->harga,
         ]);
 

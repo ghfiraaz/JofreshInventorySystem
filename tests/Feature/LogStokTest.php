@@ -70,4 +70,92 @@ class LogStokTest extends TestCase
         $response->assertSee('Restok supplier');
         $response->assertSee('Masuk');
     }
+
+    /**
+     * Melihat Log Stok Produk (Positive)
+     */
+    public function test_melihat_log_stok_produk(): void
+    {
+        LogStok::create([
+            'produk_id' => $this->produk->id,
+            'user_id' => $this->admin->id,
+            'tipe' => 'Masuk',
+            'jumlah' => 10,
+            'stok_sebelum' => 40,
+            'stok_sesudah' => 50,
+            'keterangan' => 'Restok Ayam',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get('/log-stok');
+
+        $response->assertStatus(200);
+        $response->assertSee('Restok Ayam');
+    }
+
+    /**
+     * Filter Log Berdasarkan Periode (Positive)
+     */
+    public function test_filter_log_berdasarkan_periode(): void
+    {
+        LogStok::create([
+            'produk_id' => $this->produk->id,
+            'user_id' => $this->admin->id,
+            'tipe' => 'Masuk',
+            'jumlah' => 10,
+            'stok_sebelum' => 40,
+            'stok_sesudah' => 50,
+            'keterangan' => 'Log Periode',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->admin)->get('/log-stok?tanggal_dari=' . now()->toDateString() . '&tanggal_sampai=' . now()->toDateString());
+
+        $response->assertStatus(200);
+        $response->assertSee('Log Periode');
+    }
+
+    /**
+     * Filter Log Berdasarkan Jenis (Positive)
+     */
+    public function test_filter_log_berdasarkan_jenis(): void
+    {
+        LogStok::create([
+            'produk_id' => $this->produk->id,
+            'user_id' => $this->admin->id,
+            'tipe' => 'Adjustment Masuk',
+            'jumlah' => 5,
+            'stok_sebelum' => 45,
+            'stok_sesudah' => 50,
+            'keterangan' => 'Log Jenis Adj',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get('/log-stok?tipe=Adjustment Masuk');
+
+        $response->assertStatus(200);
+        $response->assertSee('Log Jenis Adj');
+    }
+
+    /**
+     * Filter Tidak Menemukan Data (Negative)
+     */
+    public function test_filter_tidak_menemukan_data_log(): void
+    {
+        $response = $this->actingAs($this->admin)->get('/log-stok?tanggal_dari=2099-01-01');
+
+        $response->assertStatus(200);
+        $response->assertSee('Belum ada log stok yang tercatat');
+    }
+
+    /**
+     * Tanggal Awal Lebih Besar dari Tanggal Akhir (Negative)
+     */
+    public function test_tanggal_awal_lebih_besar_dari_tanggal_akhir(): void
+    {
+        $response = $this->from('/log-stok')
+            ->actingAs($this->admin)
+            ->get('/log-stok?tanggal_dari=' . now()->addDay()->toDateString() . '&tanggal_sampai=' . now()->toDateString());
+
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors('tanggal_sampai');
+    }
 }

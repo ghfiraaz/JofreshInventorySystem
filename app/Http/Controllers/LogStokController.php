@@ -15,6 +15,13 @@ class LogStokController extends Controller
      */
     public function index(Request $request)
     {
+        $request->validate([
+            'tanggal_dari'   => 'nullable|date',
+            'tanggal_sampai' => 'nullable|date|after_or_equal:tanggal_dari',
+        ], [
+            'tanggal_sampai.after_or_equal' => 'Tanggal awal tidak boleh melebihi tanggal akhir.',
+        ]);
+
         $query = LogStok::with(['produk', 'user'])->orderBy('created_at', 'desc');
 
         // Filter berdasarkan tipe transaksi

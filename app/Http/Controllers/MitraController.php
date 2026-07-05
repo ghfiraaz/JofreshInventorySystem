@@ -21,12 +21,13 @@ class MitraController extends Controller
         $request->validate([
             'nama'                => 'required|string|max:255',
             'kontak'              => ['nullable', 'numeric', 'digits_between:10,13', 'unique:mitra,kontak'],
-            'email'               => ['nullable', 'email', 'max:255', 'regex:/@gmail\.com$/i', 'unique:mitra,email'],
+            'email'               => ['required', 'email', 'max:255', 'regex:/@gmail\.com$/i', 'unique:mitra,email'],
             'alamat'              => 'required|string|max:500',
             'tanggal_jatuh_tempo' => 'nullable|integer|min:1|max:31',
         ], [
             'nama.required'       => 'Nama mitra wajib diisi.',
             'alamat.required'     => 'Alamat mitra wajib diisi.',
+            'email.required'      => 'Email mitra wajib diisi.',
             'kontak.numeric'      => 'no telpon harus diisi dengan angka',
             'kontak.digits_between' => 'no telpon harus berisi 10-13 digit',
             'kontak.unique'       => 'Nomor telepon ini sudah terdaftar oleh mitra lain.',
@@ -55,12 +56,13 @@ class MitraController extends Controller
         $request->validate([
             'nama'                => 'required|string|max:255',
             'kontak'              => ['nullable', 'numeric', 'digits_between:10,13', 'unique:mitra,kontak,' . $id],
-            'email'               => ['nullable', 'email', 'max:255', 'regex:/@gmail\.com$/i', 'unique:mitra,email,' . $id],
+            'email'               => ['required', 'email', 'max:255', 'regex:/@gmail\.com$/i', 'unique:mitra,email,' . $id],
             'alamat'              => 'required|string|max:500',
             'tanggal_jatuh_tempo' => 'nullable|integer|min:1|max:31',
         ], [
             'nama.required'       => 'Nama mitra wajib diisi.',
             'alamat.required'     => 'Alamat mitra wajib diisi.',
+            'email.required'      => 'Email mitra wajib diisi.',
             'kontak.numeric'      => 'no telpon harus diisi dengan angka',
             'kontak.digits_between' => 'no telpon harus berisi 10-13 digit',
             'kontak.unique'       => 'Nomor telepon ini sudah terdaftar oleh mitra lain.',

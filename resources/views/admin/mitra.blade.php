@@ -68,8 +68,8 @@
                 <div class="error-msg text-red-500 text-xs mt-1.5 hidden" id="error-mitra-nama"></div>
             </div>
             <div class="form-group">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email Mitra</label>
-                <input type="email" id="mitra-email" placeholder="email@gmail.com" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email Mitra *</label>
+                <input type="email" id="mitra-email" placeholder="email@gmail.com" required class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all">
                 <div class="error-msg text-red-500 text-xs mt-1.5 hidden" id="error-mitra-email"></div>
             </div>
             <div class="flex gap-4">
@@ -105,6 +105,14 @@
 document.getElementById('modal-mitra').addEventListener('click', function(e) {
     if (e.target === this) this.classList.remove('active');
 });
+
+// Restrict phone number input to digits only
+const kontakInput = document.getElementById('mitra-kontak');
+if (kontakInput) {
+    kontakInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+}
 </script>
 
 @endsection

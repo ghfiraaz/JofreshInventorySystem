@@ -68,6 +68,7 @@ class MitraTest extends TestCase
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'   => 'Mitra Minimal',
             'alamat' => 'Jl. Simpang No.1',
+            'email'  => 'minimal@gmail.com',
         ]);
 
         $response->assertStatus(201);
@@ -79,6 +80,7 @@ class MitraTest extends TestCase
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'   => 'Mitra Token',
             'alamat' => 'Jl. Token No.1',
+            'email'  => 'token@gmail.com',
         ]);
 
         $response->assertStatus(201);
@@ -190,12 +192,13 @@ class MitraTest extends TestCase
     {
         $mitra = Mitra::create([
             'nama' => 'Mitra Lama', 'alamat' => 'Jl. Lama',
-            'status' => 'Aktif', 'tanggal_jatuh_tempo' => 10,
+            'email' => 'old@gmail.com', 'status' => 'Aktif', 'tanggal_jatuh_tempo' => 10,
         ]);
 
         $response = $this->actingAs($this->admin)->putJson("/admin/mitra/{$mitra->id}", [
             'nama'                => 'Mitra Updated',
             'alamat'              => 'Jl. Baru No.10',
+            'email'               => 'updated@gmail.com',
             'tanggal_jatuh_tempo' => 20,
         ]);
 
@@ -204,6 +207,7 @@ class MitraTest extends TestCase
         $this->assertDatabaseHas('mitra', [
             'id'   => $mitra->id,
             'nama' => 'Mitra Updated',
+            'email' => 'updated@gmail.com',
         ]);
     }
 

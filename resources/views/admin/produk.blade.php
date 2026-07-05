@@ -124,9 +124,9 @@
                     <input type="number" id="produk-harga" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all" placeholder="Contoh: 45000" required min="0">
                 </div>
                 <div class="form-group flex-1">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Batas Stok Minimal *</label>
-                    <input type="number" id="produk-minimal" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all" placeholder="Contoh: 50" min="0" value="0">
-                    <small class="text-slate-400 mt-1 block">Sistem akan memberi peringatan jika stok di bawah nilai ini.</small>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Batas Stok Minimal <span class="text-red-500">*</span></label>
+                    <input type="number" id="produk-minimal" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7B3911]/20 focus:border-[#7B3911] transition-all" placeholder="Contoh: 50" min="1" required>
+                    <small id="produk-minimal-warning" class="mt-1 block text-slate-400">Sistem akan memberi peringatan jika stok di bawah nilai ini.</small>
                 </div>
             </div>
             <div class="mt-8 flex justify-end gap-3">

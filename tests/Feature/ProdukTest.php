@@ -62,18 +62,15 @@ class ProdukTest extends TestCase
         ]);
     }
 
-    public function test_tambah_produk_tanpa_stok_minimal_default_nol(): void
+    public function test_tambah_produk_tanpa_stok_minimal_gagal_validasi(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/produk', [
             'nama'  => 'Bebek Peking',
             'harga' => 70000,
         ]);
 
-        $response->assertStatus(201);
-        $this->assertDatabaseHas('produk', [
-            'nama'         => 'Bebek Peking',
-            'stok_minimal' => 0,
-        ]);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('stok_minimal');
     }
 
     // ========================================================
@@ -118,6 +115,18 @@ class ProdukTest extends TestCase
             'nama'         => 'Ayam Potong',
             'harga'        => 45000,
             'stok_minimal' => 'abc',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('stok_minimal');
+    }
+
+    public function test_tambah_produk_gagal_stok_minimal_nol(): void
+    {
+        $response = $this->actingAs($this->admin)->postJson('/admin/produk', [
+            'nama'         => 'Ayam Potong',
+            'harga'        => 45000,
+            'stok_minimal' => 0,
         ]);
 
         $response->assertStatus(422);

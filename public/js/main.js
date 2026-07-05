@@ -398,8 +398,33 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const editId  = document.getElementById('produk-edit-id').value;
             const minimal = document.getElementById('produk-minimal').value.trim();
+            const minimalWarning = document.getElementById('produk-minimal-warning');
+            const minimalInput   = document.getElementById('produk-minimal');
 
-            if (minimal && !/^[0-9]+$/.test(minimal)) {
+            // Reset warning style
+            if (minimalWarning) {
+                minimalWarning.textContent = 'Sistem akan memberi peringatan jika stok di bawah nilai ini.';
+                minimalWarning.style.color = '';
+                minimalWarning.style.fontWeight = '';
+            }
+            if (minimalInput) {
+                minimalInput.style.borderColor = '';
+            }
+
+            if (!minimal || parseInt(minimal) < 1) {
+                if (minimalWarning) {
+                    minimalWarning.textContent = '⚠️ Batas stok minimal wajib diisi dan harus minimal 1 agar sistem reminder berfungsi.';
+                    minimalWarning.style.color = '#dc2626';
+                    minimalWarning.style.fontWeight = '600';
+                }
+                if (minimalInput) {
+                    minimalInput.style.borderColor = '#dc2626';
+                    minimalInput.focus();
+                }
+                return;
+            }
+
+            if (!/^[0-9]+$/.test(minimal)) {
                 alert('Batas stok minimal harus berupa angka (digit) saja, tidak boleh mengandung huruf atau karakter lain.');
                 return;
             }
