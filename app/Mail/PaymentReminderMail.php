@@ -84,11 +84,11 @@ class PaymentReminderMail extends Mailable
         }
 
         // Attach QR Code image
-        $qrPath = public_path('images/qris-jofresh.png');
+        $qrPath = public_path('images/qris-jofresh.jpeg');
         if (file_exists($qrPath)) {
             $attachments[] = Attachment::fromPath($qrPath)
-                ->as('QRIS_Pembayaran_JoFresh.png')
-                ->withMime('image/png');
+                ->as('QRIS_Pembayaran_JoFresh.jpeg')
+                ->withMime('image/jpeg');
         }
 
         return $attachments;
