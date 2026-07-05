@@ -108,8 +108,8 @@
                 <div class="p-4 rounded-xl bg-[#FAF5EF] border border-[#E0D5CA] mb-4">
                     <div class="text-xs font-bold text-[#8B4513] uppercase tracking-wider mb-2">Transfer Bank</div>
                     <div class="text-sm text-gray-700 mb-1">Bank: <span class="font-bold">BCA</span></div>
-                    <div class="text-sm text-gray-700 mb-1">No. Rekening: <span class="font-bold">7380582030</span></div>
-                    <div class="text-sm text-gray-700">Atas Nama: <span class="font-bold">JoFresh</span></div>
+                    <div class="text-sm text-gray-700 mb-1">No. Rekening: <span class="font-bold">5875293190</span></div>
+                    <div class="text-sm text-gray-700">Atas Nama: <span class="font-bold">Muhammad Farhan</span></div>
                 </div>
 
                 {{-- QRIS --}}
