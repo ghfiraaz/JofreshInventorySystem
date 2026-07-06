@@ -69,7 +69,7 @@ Route::middleware(['role:Kasir'])->prefix('kasir')->group(function () {
     Route::get('/dashboard', [KasirController::class, 'dashboard']);
     Route::get('/transaksi', [KasirController::class, 'transaksi']);
     Route::post('/transaksi', [KasirController::class, 'storeTransaksi']);
-    Route::get('/riwayat', [KasirController::class, 'riwayat']);
+    Route::get('/riwayat', [TransaksiController::class, 'index']);
     Route::get('/transaksi/{id}/invoice', [KasirController::class, 'invoice']);
     Route::get('/tagihan', [KasirController::class, 'tagihan']);
     Route::post('/tagihan/bayar', [KasirController::class, 'bayarTagihan']);

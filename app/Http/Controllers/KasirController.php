@@ -261,32 +261,6 @@ class KasirController extends Controller
     }
 
     /**
-     * Riwayat Transaksi page.
-     */
-    public function riwayat(Request $request)
-    {
-        $query = Transaksi::with(['mitra', 'items'])
-            ->where('user_id', Auth::id())
-            ->where('status_pembayaran', 'Sudah Dibayar')
-            ->orderBy('created_at', 'desc');
-
-        if ($request->has('date') && $request->date != '') {
-            $query->whereDate('created_at', $request->date);
-        }
-
-        $transaksi = $query->get();
-
-        $totalTransaksi  = $transaksi->count();
-        $totalPendapatan = $transaksi->sum('total_harga');
-        $totalItemSold   = $transaksi->sum('total_berat');
-        $filterDate      = $request->get('date', '');
-
-        return view('riwayat-transaksi', compact(
-            'transaksi', 'totalTransaksi', 'totalPendapatan', 'totalItemSold', 'filterDate'
-        ));
-    }
-
-    /**
      * Tagihan / Belum Dibayar page.
      */
     public function tagihan(Request $request)
