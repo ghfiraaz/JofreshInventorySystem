@@ -1,4 +1,20 @@
-@extends('layouts.kasir')
+@php
+    $role = Auth::user()->role;
+    $layout = match($role) {
+        'Admin' => 'layouts.admin',
+        'Kasir' => 'layouts.kasir',
+        default => 'layouts.app',
+    };
+
+    // Determine the current page URL for filter form action
+    $filterAction = match($role) {
+        'Kasir' => url('/kasir/riwayat'),
+        'Admin' => url('/admin/transactions'),
+        default => url('/transactions'),
+    };
+@endphp
+
+@extends($layout)
 @section('title', 'Riwayat Transaksi')
 @section('content')
 
@@ -9,7 +25,7 @@
 </div>
 
 {{-- ===== SUMMARY CARDS ===== --}}
-<div class="grid grid-cols-3 gap-4 mb-6">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
     <div class="bg-white rounded-xl border border-gray-200 p-5 flex items-center justify-between">
         <div>
             <div class="text-xs text-gray-400 font-medium mb-1">Total Transaksi</div>
@@ -42,11 +58,11 @@
 {{-- ===== FILTERS ===== --}}
 <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
     <div class="flex flex-wrap items-center justify-end gap-3">
-        <form method="GET" action="{{ url('/kasir/riwayat') }}" class="flex items-center gap-2">
+        <form method="GET" action="{{ $filterAction }}" class="flex items-center gap-2">
             <input type="date" name="date" value="{{ $filterDate }}" class="px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-brand-400 transition-all bg-white cursor-pointer">
             <button type="submit" class="px-4 py-2 bg-slate-800 text-white text-sm font-semibold rounded-lg border-none cursor-pointer transition-all hover:bg-slate-700">Filter</button>
             @if($filterDate)
-                <a href="{{ url('/kasir/riwayat') }}" class="px-4 py-2 bg-gray-100 text-gray-500 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-all no-underline border border-gray-200">Reset</a>
+                <a href="{{ $filterAction }}" class="px-4 py-2 bg-gray-100 text-gray-500 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-all no-underline border border-gray-200">Reset</a>
             @endif
         </form>
     </div>
@@ -101,7 +117,6 @@
                     <td class="px-5 py-3.5 text-sm font-bold text-right text-gray-800">Rp {{ number_format($t->total_harga, 0, ',', '.') }}</td>
                     <td class="px-5 py-3.5 text-center" onclick="event.stopPropagation();">
                         <div class="flex items-center justify-center gap-1.5">
-
 
                             {{-- Bukti bayar link --}}
                             @if($t->bukti_pembayaran)
@@ -179,50 +194,51 @@
     </div>
 </div>
 
-
-
 <script>
-const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-// Toast function
-function showRiwayatToast(type, title, msg) {
-    const toast = document.getElementById('toast-riwayat');
-    const inner = document.getElementById('toast-riwayat-inner');
-    const iconEl = document.getElementById('toast-riwayat-icon');
-    const titleEl = document.getElementById('toast-riwayat-title');
-    const msgEl = document.getElementById('toast-riwayat-msg');
+    // Toast function
+    window.showRiwayatToast = function(type, title, msg) {
+        const toast = document.getElementById('toast-riwayat');
+        const inner = document.getElementById('toast-riwayat-inner');
+        const iconEl = document.getElementById('toast-riwayat-icon');
+        const titleEl = document.getElementById('toast-riwayat-title');
+        const msgEl = document.getElementById('toast-riwayat-msg');
 
-    titleEl.textContent = title;
-    msgEl.textContent = msg;
+        titleEl.textContent = title;
+        msgEl.textContent = msg;
 
-    if (type === 'success') {
-        inner.className = 'flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-lg border bg-emerald-50 border-emerald-200';
-        titleEl.className = 'text-sm font-bold text-emerald-800';
-        iconEl.innerHTML = '<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="white" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg></div>';
-    } else {
-        inner.className = 'flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-lg border bg-red-50 border-red-200';
-        titleEl.className = 'text-sm font-bold text-red-800';
-        iconEl.innerHTML = '<div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="white" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg></div>';
-    }
-
-    toast.classList.remove('hidden');
-    setTimeout(() => toast.classList.add('hidden'), 4000);
-}
-
-// Row expand
-document.querySelectorAll('.riwayat-row').forEach(row => {
-    row.addEventListener('click', function() {
-        const id = this.dataset.id;
-        const detail = document.querySelector('.detail-row[data-parent="'+id+'"]');
-        const icon = this.querySelector('.expand-icon');
-        if (detail) {
-            detail.classList.toggle('hidden');
-            if (icon) icon.classList.toggle('rotate-180');
+        if (type === 'success') {
+            inner.className = 'flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-lg border bg-emerald-50 border-emerald-200';
+            titleEl.className = 'text-sm font-bold text-emerald-800';
+            iconEl.innerHTML = '<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="white" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg></div>';
+        } else {
+            inner.className = 'flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-lg border bg-red-50 border-red-200';
+            titleEl.className = 'text-sm font-bold text-red-800';
+            iconEl.innerHTML = '<div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="white" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg></div>';
         }
+
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 4000);
+    };
+
+    // Row expand
+    document.querySelectorAll('.riwayat-row').forEach(row => {
+        row.addEventListener('click', function(e) {
+            // Don't expand if clicking on action buttons/links
+            if (e.target.closest('a') || e.target.closest('button')) return;
+            
+            const id = this.dataset.id;
+            const detail = document.querySelector('.detail-row[data-parent="'+id+'"]');
+            const icon = this.querySelector('.expand-icon');
+            if (detail) {
+                detail.classList.toggle('hidden');
+                if (icon) icon.classList.toggle('rotate-180');
+            }
+        });
     });
 });
-
-
 </script>
 
 @endsection

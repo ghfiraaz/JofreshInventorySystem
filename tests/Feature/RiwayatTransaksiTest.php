@@ -150,7 +150,7 @@ class RiwayatTransaksiTest extends TestCase
 
         Storage::disk('public')->put('bukti-pembayaran/receipt.png', 'fake image content');
 
-        $response = $this->actingAs($kasir)->get('/kasir/bukti-pembayaran/receipt.png');
+        $response = $this->actingAs($kasir)->get('/bukti-pembayaran/receipt.png');
         $response->assertStatus(200);
     }
 
@@ -184,7 +184,7 @@ class RiwayatTransaksiTest extends TestCase
         $response = $this->actingAs($kasir)->get('/kasir/riwayat');
         $response->assertStatus(200);
         
-        $response->assertDontSee('/kasir/bukti-pembayaran/JFR-NOBUKTI-001');
+        $response->assertDontSee('/bukti-pembayaran/JFR-NOBUKTI-001');
         
         $responseInvoice = $this->actingAs($kasir)->get("/kasir/transaksi/{$transaksi->id}/invoice");
         $responseInvoice->assertStatus(200);
@@ -217,7 +217,7 @@ class RiwayatTransaksiTest extends TestCase
             'jatuh_tempo' => now()->addDays(5)->toDateString(),
         ]);
 
-        $response = $this->actingAs($kasir)->get("/kasir/transaksi/{$transaksi->id}/invoice-pdf");
+        $response = $this->actingAs($kasir)->get("/transaksi/{$transaksi->id}/invoice-pdf");
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/pdf');
     }

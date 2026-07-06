@@ -281,7 +281,7 @@ class KasirController extends Controller
         $totalItemSold   = $transaksi->sum('total_berat');
         $filterDate      = $request->get('date', '');
 
-        return view('kasir.riwayat', compact(
+        return view('riwayat-transaksi', compact(
             'transaksi', 'totalTransaksi', 'totalPendapatan', 'totalItemSold', 'filterDate'
         ));
     }

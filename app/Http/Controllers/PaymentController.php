@@ -64,28 +64,4 @@ class PaymentController extends Controller
         return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload. Terima kasih!');
     }
 
-    /**
-     * Download PDF tagihan (public, via token)
-     */
-    public function downloadTagihanPdf($token)
-    {
-        $mitra = Mitra::where('payment_token', $token)->firstOrFail();
-
-        $transaksiUnpaid = Transaksi::with('items')
-            ->where('mitra_id', $mitra->id)
-            ->whereIn('status_pembayaran', ['Belum Dibayar', 'Menunggu Validasi'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        if ($transaksiUnpaid->isEmpty()) {
-            abort(404, 'Tidak ada tagihan.');
-        }
-
-        $totalTagihan = $transaksiUnpaid->sum('total_harga');
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.tagihan', compact('mitra', 'transaksiUnpaid', 'totalTagihan'))
-            ->setPaper('a4', 'portrait');
-
-        return $pdf->stream('Tagihan_JoFresh_' . str_replace(' ', '_', $mitra->nama) . '.pdf');
-    }
 }

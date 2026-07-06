@@ -67,7 +67,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[22px] h-[22px] mr-3.5 transition-transform duration-400">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
-                Belum Dibayar
+                Kelola Tagihan
             </a>
             <a href="{{ url('/kasir/riwayat') }}" class="flex items-center px-5 py-3.5 rounded-xl font-medium transition-all duration-200 text-base {{ Request::is('kasir/riwayat') ? 'font-bold' : 'hover:translate-x-1' }}" style="{{ Request::is('kasir/riwayat') ? 'background: #8E4416; color: #ffffff;' : 'color: rgba(255,255,255,0.7);' }}" onmouseover="if(!this.classList.contains('font-bold')){this.style.background='rgba(255,255,255,0.08)';this.style.color='#ffffff';}" onmouseout="if(!this.classList.contains('font-bold')){this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[22px] h-[22px] mr-3.5 transition-transform duration-400">

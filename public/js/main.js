@@ -94,16 +94,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------------------------------------------
-    // Sidebar Toggle Logic
+    // Sidebar Toggle Logic (Handled in each layout's script block to support responsive/mobile correctly)
     // -------------------------------------------------------
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const sidebar = document.getElementById('sidebar');
-    if (sidebarToggle && sidebar) {
-        // Initial state for sidebar transition speed is handled in tailwind
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('sidebar-collapsed');
-        });
-    }
+    // const sidebarToggle = document.getElementById('sidebar-toggle');
+    // const sidebar = document.getElementById('sidebar');
+    // if (sidebarToggle && sidebar) {
+    //     // Initial state for sidebar transition speed is handled in tailwind
+    //     sidebarToggle.addEventListener('click', () => {
+    //         sidebar.classList.toggle('sidebar-collapsed');
+    //     });
+    // }
 
     // -------------------------------------------------------
     // Shared Modal Logic (close on button / backdrop click)

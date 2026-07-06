@@ -85,35 +85,53 @@
                 $itemsJson = json_encode($trx->items->map(function($i){
                     return ['nama'=>$i->nama_produk,'qty'=>$i->jumlah,'harga'=>$i->harga_satuan,'subtotal'=>$i->subtotal];
                 })->values());
-            @endphp
-            <tr class="trx-row {{ $rowBg }} hover:bg-[#FAF5EF]/50 transition-colors"
-                data-search="{{ strtolower($trx->no_transaksi.' '.($trx->user->name??'').' '.($trx->mitra->nama??'')) }}"
-                data-no="{{ $trx->no_transaksi }}"
-                data-tanggal="{{ $trx->created_at->format('d/m/Y H:i') }}"
-                data-mitra="{{ $trx->mitra->nama ?? '-' }}"
-                data-mitra-alamat="{{ $trx->mitra->alamat ?? '-' }}"
-                data-mitra-kontak="{{ $trx->mitra->kontak ?? '-' }}"
-                data-kasir="{{ $trx->user->name ?? 'Kasir' }}"
-                data-status="{{ $trx->status_pembayaran }}"
-                data-total="Rp {{ number_format($trx->total_harga,0,',','.') }}"
-                data-items='{{ $itemsJson }}'>
-                <td class="py-3.5 px-5 text-sm text-slate-600 whitespace-nowrap">{{ $trx->created_at->format('d/m/Y H:i') }}</td>
-                <td class="py-3.5 px-5"><span class="font-bold text-[#7B3911] text-sm">{{ $trx->no_transaksi }}</span></td>
-                <td class="py-3.5 px-5 text-sm text-slate-600">{{ $trx->mitra->nama ?? '-' }}</td>
-                <td class="py-3.5 px-5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#FAF5EF;color:#7B3911;">{{ $trx->total_item }} item</span></td>
-                <td class="py-3.5 px-5">
-                    @if($trx->status_pembayaran === 'Sudah Dibayar')
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#dcfce7;color:#15803d;">Lunas</span>
-                    @else
-                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#fef9c3;color:#b45309;">Belum Dibayar</span>
-                    @endif
-                </td>
-                <td class="py-3.5 px-5 text-sm font-bold" style="color:#15803d;">Rp {{ number_format($trx->total_harga,0,',','.') }}</td>
-                <td class="py-3.5 px-5 text-center">
-                    <button onclick="showTrxDetail(this.closest('tr'))" class="p-2 text-slate-400 hover:text-[#7B3911] hover:bg-[#FAF5EF] rounded-lg transition-colors cursor-pointer border-none bg-transparent" title="Detail Transaksi">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px]"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                    </button>
-                </td>
+            @endphp             <tr class="trx-row {{ $rowBg }} hover:bg-[#FAF5EF]/50 transition-colors"
+                 data-search="{{ strtolower($trx->no_transaksi.' '.($trx->user->name??'').' '.($trx->mitra->nama??'')) }}"
+                 data-id="{{ $trx->id }}"
+                 data-no="{{ $trx->no_transaksi }}"
+                 data-tanggal="{{ $trx->created_at->format('d/m/Y H:i') }}"
+                 data-mitra="{{ $trx->mitra->nama ?? '-' }}"
+                 data-mitra-alamat="{{ $trx->mitra->alamat ?? '-' }}"
+                 data-mitra-kontak="{{ $trx->mitra->kontak ?? '-' }}"
+                 data-kasir="{{ $trx->user->name ?? 'Kasir' }}"
+                 data-status="{{ $trx->status_pembayaran }}"
+                 data-total="Rp {{ number_format($trx->total_harga,0,',','.') }}"
+                 data-items='{{ $itemsJson }}'>
+                 <td class="py-3.5 px-5 text-sm text-slate-600 whitespace-nowrap">{{ $trx->created_at->format('d/m/Y H:i') }}</td>
+                 <td class="py-3.5 px-5"><span class="font-bold text-[#7B3911] text-sm">{{ $trx->no_transaksi }}</span></td>
+                 <td class="py-3.5 px-5 text-sm text-slate-600">{{ $trx->mitra->nama ?? '-' }}</td>
+                 <td class="py-3.5 px-5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#FAF5EF;color:#7B3911;">{{ $trx->total_item }} item</span></td>
+                 <td class="py-3.5 px-5">
+                     @if($trx->status_pembayaran === 'Sudah Dibayar')
+                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#dcfce7;color:#15803d;">Lunas</span>
+                     @else
+                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#fef9c3;color:#b45309;">Belum Dibayar</span>
+                     @endif
+                 </td>
+                 <td class="py-3.5 px-5 text-sm font-bold" style="color:#15803d;">Rp {{ number_format($trx->total_harga,0,',','.') }}</td>
+                 <td class="py-3.5 px-5 text-center">
+                     <div class="flex items-center justify-center gap-1.5">
+                         <button onclick="showTrxDetail(this.closest('tr'))" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 cursor-pointer" title="Detail Transaksi">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                             Detail
+                         </button>
+
+                         @if($trx->bukti_pembayaran)
+                             <a href="{{ url('/bukti-pembayaran/' . basename($trx->bukti_pembayaran)) }}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 no-underline transition-all border border-gray-200" title="Buka Bukti Pembayaran">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                                 Bukti
+                             </a>
+                         @endif
+
+                         <a href="{{ url('/transaksi/'.$trx->id.'/invoice-pdf') }}" target="_blank"
+                            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold no-underline transition-all border
+                            {{ $trx->status_pembayaran === 'Sudah Dibayar' ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : 'text-gray-600 bg-gray-50 hover:bg-gray-100 border-gray-200' }}"
+                            title="{{ $trx->status_pembayaran === 'Sudah Dibayar' ? 'Cetak Invoice LUNAS (PDF)' : 'Cetak Invoice (PDF)' }}">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                             Cetak Invoice
+                         </a>
+                     </div>
+                 </td>>
             </tr>
             @empty
             <tr><td colspan="7" class="py-16 text-center text-slate-400 text-sm">Belum ada riwayat transaksi.</td></tr>
@@ -171,7 +189,11 @@ function showTrxDetail(row){
                 <span class="font-bold text-slate-700">Total</span>
                 <span class="font-black text-xl" style="color:#7B3911;">${total}</span>
             </div>
-            <div class="mt-4 flex justify-end">
+            <div class="mt-4 flex justify-end gap-2.5">
+                <a href="/transaksi/${row.dataset.id}/invoice-pdf" target="_blank" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-semibold text-sm no-underline transition-all border ${isPaid ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : 'text-gray-600 bg-gray-50 hover:bg-gray-100 border-gray-200'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                    Cetak Invoice
+                </a>
                 <button onclick="document.getElementById('trx-detail-modal').classList.remove('active')" class="px-6 py-2.5 rounded-xl font-semibold text-slate-500 bg-slate-100 hover:bg-slate-200 text-sm border-none cursor-pointer transition-all">Tutup</button>
             </div>
         </div>`;

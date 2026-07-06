@@ -1,5 +1,5 @@
 @extends('layouts.kasir')
-@section('title', 'Belum Dibayar')
+@section('title', 'Kelola Tagihan')
 @section('content')
 
 {{-- ===== HEADING ===== --}}
@@ -210,27 +210,51 @@
                                 @if($buktiPath)
                                     @php
                                         $buktiFilename = basename($buktiPath);
-                                        $buktiUrl = url('/kasir/bukti-pembayaran/' . $buktiFilename);
+                                        $buktiUrl = url('/bukti-pembayaran/' . $buktiFilename);
                                         $isImage = preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $buktiPath);
+                                        $fileExists = \Illuminate\Support\Facades\Storage::disk('public')->exists($buktiPath);
                                     @endphp
-                                    @if($isImage)
-                                        <div class="mb-3">
-                                            <img src="{{ $buktiUrl }}" alt="Bukti Pembayaran" class="max-w-xs max-h-48 rounded-lg border border-accent-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity" onclick="window.open('{{ $buktiUrl }}', '_blank')">
+                                    @if($fileExists)
+                                        @if($isImage)
+                                            <div class="mb-3">
+                                                <img src="{{ $buktiUrl }}" alt="Bukti Pembayaran" class="max-w-xs max-h-48 rounded-lg border border-accent-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity" onclick="window.open('{{ $buktiUrl }}', '_blank')">
+                                            </div>
+                                        @endif
+                                        <div class="flex flex-wrap items-center justify-between gap-3 mt-2">
+                                            <a href="{{ $buktiUrl }}" target="_blank" class="inline-flex items-center gap-1.5 text-sm text-accent-700 font-semibold hover:text-accent-900 transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                                                Buka Bukti Pembayaran
+                                            </a>
+                                            
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" class="btn-validasi-mitra px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none"
+                                                    data-mitra="{{ $mt['mitra']->id }}"
+                                                    data-action="terima"
+                                                    onclick="event.stopPropagation(); validasiMitra(this)"
+                                                    title="Terima pembayaran">
+                                                    ✓ Terima
+                                                </button>
+                                                <button type="button" class="btn-tolak-mitra px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none"
+                                                    data-mitra="{{ $mt['mitra']->id }}"
+                                                    data-action="tolak"
+                                                    onclick="event.stopPropagation(); validasiMitra(this)"
+                                                    title="Tolak pembayaran">
+                                                    ✗ Tolak
+                                                </button>
+                                            </div>
                                         </div>
-                                    @endif
-                                    <div class="flex flex-wrap items-center justify-between gap-3 mt-2">
-                                        <a href="{{ $buktiUrl }}" target="_blank" class="inline-flex items-center gap-1.5 text-sm text-accent-700 font-semibold hover:text-accent-900 transition-colors">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
-                                            Buka Bukti Pembayaran
-                                        </a>
-                                        
-                                        <div class="flex items-center gap-2">
+                                    @else
+                                        <p class="text-xs text-amber-600 font-semibold mb-3 flex items-center gap-1 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-amber-500"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+                                            File bukti pembayaran tidak ditemukan di server.
+                                        </p>
+                                        <div class="flex gap-2">
                                             <button type="button" class="btn-validasi-mitra px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none"
                                                 data-mitra="{{ $mt['mitra']->id }}"
                                                 data-action="terima"
                                                 onclick="event.stopPropagation(); validasiMitra(this)"
                                                 title="Terima pembayaran">
-                                                ✓ Terima
+                                                ✓ Terima Tanpa Bukti
                                             </button>
                                             <button type="button" class="btn-tolak-mitra px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-600 hover:text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer border-none"
                                                 data-mitra="{{ $mt['mitra']->id }}"
@@ -240,7 +264,7 @@
                                                 ✗ Tolak
                                             </button>
                                         </div>
-                                    </div>
+                                    @endif
                                 @else
                                     <p class="text-xs text-red-500 italic mb-3">Bukti pembayaran belum diunggah.</p>
                                     <div class="flex gap-2">

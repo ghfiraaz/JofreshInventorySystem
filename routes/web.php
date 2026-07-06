@@ -23,14 +23,16 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Public payment routes (no auth required)
 Route::get('/pembayaran/{token}', [PaymentController::class, 'showUploadForm'])->name('pembayaran.upload');
 Route::post('/pembayaran/{token}', [PaymentController::class, 'uploadBuktiBayar'])->name('pembayaran.store');
-Route::get('/pembayaran/{token}/pdf', [PaymentController::class, 'downloadTagihanPdf'])->name('pembayaran.pdf');
 
-// Log Stok — semua role bisa lihat (view-only)
 Route::middleware(['role:Admin,Kasir,Superadmin'])->group(function () {
     Route::get('/log-stok', [LogStokController::class, 'index'])->name('log-stok.index');
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::get('/transaksi/{id}/invoice-pdf', [TransaksiController::class, 'downloadInvoicePdf']);
+    Route::get('/bukti-pembayaran/{filename}', [KasirController::class, 'showBuktiPembayaran'])
+        ->where('filename', '.*')
+        ->name('kasir.bukti-pembayaran');
 });
 
 // Superadmin routes
@@ -73,9 +75,5 @@ Route::middleware(['role:Kasir'])->prefix('kasir')->group(function () {
     Route::post('/tagihan/bayar', [KasirController::class, 'bayarTagihan']);
     Route::post('/tagihan/send-reminder', [KasirController::class, 'sendReminder']);
     Route::post('/transaksi/{id}/validasi', [KasirController::class, 'validasiBuktiPembayaran']);
-    Route::get('/transaksi/{id}/invoice-pdf', [KasirController::class, 'downloadInvoicePdf']);
     Route::post('/tagihan/validasi-mitra', [KasirController::class, 'validasiBuktiPerMitra']);
-    Route::get('/bukti-pembayaran/{filename}', [KasirController::class, 'showBuktiPembayaran'])
-        ->where('filename', '.*')
-        ->name('kasir.bukti-pembayaran');
 });
