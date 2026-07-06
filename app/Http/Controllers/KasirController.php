@@ -354,7 +354,7 @@ class KasirController extends Controller
 
         // Enforce H-3 validation
         $transaksiList = Transaksi::where('mitra_id', $mitra->id)
-            ->where('status_pembayaran', 'Belum Dibayar')
+            ->whereIn('status_pembayaran', ['Belum Dibayar', 'Ditolak'])
             ->get();
             
         $closestTempo = $transaksiList->whereNotNull('jatuh_tempo')

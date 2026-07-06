@@ -13,12 +13,6 @@ class TransaksiController extends Controller
         $query = Transaksi::with(['user', 'mitra', 'items'])
             ->orderBy('created_at', 'desc');
 
-        // Kasir hanya melihat transaksi miliknya sendiri yang sudah lunas
-        if (auth()->user()->role === 'Kasir') {
-            $query->where('user_id', auth()->id())
-                  ->where('status_pembayaran', 'Sudah Dibayar');
-        }
-
         if ($request->has('date') && $request->date != '') {
             $query->whereDate('created_at', $request->date);
         }
