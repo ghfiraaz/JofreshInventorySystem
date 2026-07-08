@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanTransaksiController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\PaymentController;
@@ -39,8 +40,8 @@ Route::middleware(['role:Admin,Kasir,Superadmin'])->group(function () {
 Route::middleware(['role:Superadmin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/transactions', [TransaksiController::class, 'index']);
-    Route::get('/owner/laporan-harian', [DashboardController::class, 'laporanHarian']);
-    Route::get('/owner/laporan-transaksi', [DashboardController::class, 'laporanTransaksi']);
+    Route::get('/owner/laporan-harian', [LaporanTransaksiController::class, 'laporanHarian']);
+    Route::get('/owner/laporan-transaksi', [LaporanTransaksiController::class, 'laporanTransaksi']);
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{id}', [UserController::class, 'update']);
