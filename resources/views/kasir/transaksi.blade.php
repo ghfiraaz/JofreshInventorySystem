@@ -9,8 +9,8 @@
         {{-- Tambah Item Card --}}
         <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-sm">
             <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-5">Tambah Item</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
-                <div class="sm:col-span-6 w-full">
+            <div class="flex flex-col sm:flex-row sm:items-end gap-4">
+                <div class="flex-1 w-full">
                     <label class="block text-xs sm:text-sm font-semibold text-gray-500 mb-1.5">Produk <span class="text-red-500">*</span></label>
                     <select id="kasir-produk" required class="w-full h-11 px-4 border border-gray-300 rounded-xl text-sm bg-white outline-none focus:border-[#7B3911] focus:ring-2 focus:ring-[#7B3911]/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27none%27 viewBox=%270 0 20 20%27%3E%3Cpath stroke=%27%236b7280%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%271.5%27 d=%27m6 8 4 4 4-4%27/%3E%3C/svg%3E'); background-position: right 12px center; background-repeat: no-repeat; background-size: 16px; padding-right: 36px;">
                         <option value="">Pilih produk</option>
@@ -25,14 +25,13 @@
                         Sisa Stok Tersedia: <span class="text-sm sm:text-base text-[#3D1F0A] mx-0.5"></span> ekor
                     </div>
                 </div>
-                <div class="sm:col-span-2 w-full">
-                    <label class="block text-xs sm:text-sm font-semibold text-gray-500 mb-1.5">Jumlah <span class="text-red-500">*</span></label>
-                    <input type="number" id="kasir-jumlah" required value="1" min="1" class="w-full h-11 px-4 border border-gray-300 rounded-xl text-sm text-center outline-none focus:border-[#7B3911] focus:ring-2 focus:ring-[#7B3911]/20 transition-all">
-                </div>
-                <div class="sm:col-span-4 w-full">
-                    <button type="button" id="btn-tambah-keranjang" class="w-full h-11 px-5 rounded-xl text-white flex items-center justify-center gap-2 font-semibold text-sm hover:opacity-90 transition-all cursor-pointer border-none shadow-sm" style="background: #7B3911;" onmouseover="this.style.background='#5A270B'" onmouseout="this.style.background='#7B3911'">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                        <span>Tambah</span>
+                <div class="flex items-end gap-3 w-full sm:w-auto flex-shrink-0">
+                    <div class="w-28 flex-1 sm:flex-initial">
+                        <label class="block text-xs sm:text-sm font-semibold text-gray-500 mb-1.5">Jumlah <span class="text-red-500">*</span></label>
+                        <input type="number" id="kasir-jumlah" required value="1" min="1" class="w-full h-11 px-4 border border-gray-300 rounded-xl text-sm text-center outline-none focus:border-[#7B3911] focus:ring-2 focus:ring-[#7B3911]/20 transition-all">
+                    </div>
+                    <button type="button" id="btn-tambah-keranjang" class="w-11 h-11 rounded-full bg-[#0F172A] hover:bg-[#1E293B] text-white flex items-center justify-center transition-all cursor-pointer border-none flex-shrink-0 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                     </button>
                 </div>
             </div>

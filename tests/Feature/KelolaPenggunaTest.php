@@ -247,4 +247,21 @@ class KelolaPenggunaTest extends TestCase
         $response->assertStatus(201);
         $this->assertDatabaseHas('users', ['email' => 'nana@jofresh.com']);
     }
+
+    /**
+     * Password Tidak Mengandung Angka (Negative)
+     * Menolak password yang tidak mengandung minimal satu angka.
+     */
+    public function test_password_tidak_mengandung_angka(): void
+    {
+        $response = $this->actingAs($this->superadmin)->postJson('/users', [
+            'name'     => 'User Valid',
+            'email'    => 'nana@jofresh.com',
+            'password' => 'abcdefgh', // 8 karakter tanpa angka
+            'role'     => 'Kasir',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('password');
+    }
 }

@@ -20,10 +20,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-001: Tambah Mitra (Positive)
+     *  Tambah Mitra (Positive)
      * Berhasil menyimpan data mitra baru jika seluruh data valid.
      */
-    public function test_tc_kmt_001_tambah_mitra(): void
+    public function test_tambah_mitra(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'                => 'Mitra Sukses',
@@ -44,10 +44,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-002: Tambah Mitra dengan Data Tidak Lengkap (Negative)
+     * Tambah Mitra dengan Data Tidak Lengkap (Negative)
      * Menampilkan pesan validasi jika field wajib (seperti nama) dikosongkan.
      */
-    public function test_tc_kmt_002_tambah_mitra_dengan_data_tidak_lengkap(): void
+    public function test_tambah_mitra_dengan_data_tidak_lengkap(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'                => '', // Kosong
@@ -61,11 +61,11 @@ class KelolaMitraTest extends TestCase
         $response->assertJsonValidationErrors('nama');
     }
 
-    /**
-     * TC-KMT-003: Melihat Data Mitra (Positive)
+    /** 
+     * Melihat Data Mitra (Positive)
      * Menampilkan seluruh data mitra yang tersimpan pada sistem.
      */
-    public function test_tc_kmt_003_melihat_data_mitra(): void
+    public function test_melihat_data_mitra(): void
     {
         Mitra::create([
             'nama'                => 'Mitra A',
@@ -83,10 +83,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-004: Melihat Data Mitra Saat Belum Ada Data (Positive)
+     * Melihat Data Mitra Saat Belum Ada Data (Positive)
      * Menampilkan pesan "Belum ada mitra terdaftar." jika database kosong.
      */
-    public function test_tc_kmt_004_melihat_data_mitra_saat_belum_ada_data(): void
+    public function test_melihat_data_mitra_saat_belum_ada_data(): void
     {
         $response = $this->actingAs($this->admin)->get('/admin/mitra');
 
@@ -95,10 +95,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-005: Mengubah Data Mitra (Positive)
+     * Mengubah Data Mitra (Positive)
      * Berhasil memperbarui data mitra sesuai perubahan yang dilakukan.
      */
-    public function test_tc_kmt_005_mengubah_data_mitra(): void
+    public function test_mengubah_data_mitra(): void
     {
         $mitra = Mitra::create([
             'nama'                => 'Mitra Lama',
@@ -127,10 +127,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-006: Menyimpan Tanpa Perubahan Data (Positive)
+     * Menyimpan Tanpa Perubahan Data (Positive)
      * Tetap menyimpan data meskipun tidak ada informasi yang diubah.
      */
-    public function test_tc_kmt_006_menyimpan_tanpa_perubahan_data(): void
+    public function test_menyimpan_tanpa_perubahan_data(): void
     {
         $mitra = Mitra::create([
             'nama'                => 'Mitra Tetap',
@@ -157,10 +157,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-007: Hapus Mitra (Positive)
+     * Hapus Mitra (Positive)
      * Berhasil menghapus data mitra dari sistem.
      */
-    public function test_tc_kmt_007_hapus_mitra(): void
+    public function test_hapus_mitra(): void
     {
         $mitra = Mitra::create([
             'nama'                => 'Mitra Hapus',
@@ -179,10 +179,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-008: Membatalkan Hapus Mitra (Negative)
+     * Membatalkan Hapus Mitra (Negative)
      * Data mitra tetap tersimpan jika penghapusan dibatalkan (simulasi dengan tidak memanggil request DELETE).
      */
-    public function test_tc_kmt_008_membatalkan_hapus_mitra(): void
+    public function test_membatalkan_hapus_mitra(): void
     {
         $mitra = Mitra::create([
             'nama'                => 'Mitra Aman',
@@ -200,10 +200,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-009: Nomor Telepon 9 Digit (Negative / BVA)
+     * Nomor Telepon 9 Digit
      * Menolak nomor telepon yang kurang dari 10 digit.
      */
-    public function test_tc_kmt_009_nomor_telepon_9_digit(): void
+    public function test_nomor_telepon_9_digit(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'                => 'Mitra Kontak',
@@ -218,10 +218,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-010: Nomor Telepon 10 Digit (Positive / BVA)
+     * Nomor Telepon 10 Digit
      * Berhasil jika nomor telepon tepat 10 digit.
      */
-    public function test_tc_kmt_010_nomor_telepon_10_digit(): void
+    public function test_nomor_telepon_10_digit(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'                => 'Mitra Kontak',
@@ -236,10 +236,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-011: Nomor Telepon 13 Digit (Max) (Positive / BVA)
+     * Nomor Telepon 13 Digit
      * Berhasil jika nomor telepon tepat 13 digit.
      */
-    public function test_tc_kmt_011_nomor_telepon_13_digit(): void
+    public function test_nomor_telepon_13_digit(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'                => 'Mitra Kontak',
@@ -254,10 +254,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-012: Nomor Telepon 14 Digit (Negative / BVA)
+     * Nomor Telepon 14 Digit
      * Menolak nomor telepon yang lebih dari 13 digit.
      */
-    public function test_tc_kmt_012_nomor_telepon_14_digit(): void
+    public function test_nomor_telepon_14_digit(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'                => 'Mitra Kontak',
@@ -272,10 +272,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-013: Nomor Telepon Mengandung Huruf (Negative)
+     * Nomor Telepon Mengandung Huruf
      * Menolak nomor telepon yang mengandung karakter huruf.
      */
-    public function test_tc_kmt_013_nomor_telepon_mengandung_huruf(): void
+    public function test_nomor_telepon_mengandung_huruf(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'                => 'Mitra Kontak',
@@ -290,10 +290,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-014: Nomor Telepon Mengandung Karakter Khusus (Negative)
+     * Nomor Telepon Mengandung Karakter Khusus
      * Menolak nomor telepon yang mengandung karakter khusus.
      */
-    public function test_tc_kmt_014_nomor_telepon_mengandung_karakter_khusus(): void
+    public function test_nomor_telepon_mengandung_karakter_khusus(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'                => 'Mitra Kontak',
@@ -308,10 +308,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-015: Format Email Tidak Valid (Negative)
+     * Format Email Tidak Valid
      * Menolak format email yang tidak valid.
      */
-    public function test_tc_kmt_015_format_email_tidak_valid(): void
+    public function test_format_email_tidak_valid(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'                => 'Mitra Email',
@@ -326,10 +326,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-016: Email Kosong (Negative)
+     * Email Kosong
      * Menolak jika email mitra dikosongkan.
      */
-    public function test_tc_kmt_016_email_kosong(): void
+    public function test_email_kosong(): void
     {
         $response = $this->actingAs($this->admin)->postJson('/admin/mitra', [
             'nama'                => 'Mitra Email',
@@ -344,10 +344,10 @@ class KelolaMitraTest extends TestCase
     }
 
     /**
-     * TC-KMT-017: Email Duplikat (Negative)
+     * Email Duplikat
      * Menolak email yang sudah terdaftar oleh mitra lain.
      */
-    public function test_tc_kmt_017_email_duplikat(): void
+    public function test_email_duplikat(): void
     {
         Mitra::create([
             'nama'                => 'Mitra Pertama',

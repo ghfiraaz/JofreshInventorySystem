@@ -11,10 +11,10 @@ class LogoutTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * TC-LOGOUT-001: Logout Berhasil
+     * Logout Berhasil
      * Menghapus sesi dan mengarahkan pengguna kembali ke halaman login.
      */
-    public function test_tc_logout_001_logout_berhasil(): void
+    public function test_logout_berhasil(): void
     {
         $user = User::factory()->create(['role' => 'Superadmin']);
 
@@ -26,10 +26,10 @@ class LogoutTest extends TestCase
     }
 
     /**
-     * TC-LOGOUT-002: Membatalkan Logout
+     * Membatalkan Logout
      * Sesi tetap dipertahankan dan pengguna tetap berstatus Logged In jika logout dibatalkan.
      */
-    public function test_tc_logout_002_membatalkan_logout(): void
+    public function test_membatalkan_logout(): void
     {
         $user = User::factory()->create(['role' => 'Superadmin']);
 
@@ -41,10 +41,10 @@ class LogoutTest extends TestCase
     }
 
     /**
-     * TC-LOGOUT-003: Akses Dashboard Setelah Logout (Back Browser)
+     * Akses Dashboard Setelah Logout
      * Pengguna tidak bisa mengakses dashboard kembali via history browser setelah logout.
      */
-    public function test_tc_logout_003_akses_dashboard_setelah_logout(): void
+    public function test_akses_dashboard_setelah_logout(): void
     {
         $user = User::factory()->create(['role' => 'Superadmin']);
 

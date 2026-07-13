@@ -11,10 +11,10 @@ class LoginTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * TC-LOGIN-001: Login Valid
+     * Login Valid
      * Admin/User memasukkan email dan password yang terdaftar kemudian diarahkan ke dashboard sesuai role.
      */
-    public function test_tc_login_001_login_valid(): void
+    public function test_login_valid(): void
     {
         $password = 'password123';
         
@@ -63,10 +63,10 @@ class LoginTest extends TestCase
     }
 
     /**
-     * TC-LOGIN-002: Password Salah
+     * Password Salah
      * Memasukkan email terdaftar namun password salah.
      */
-    public function test_tc_login_002_password_salah(): void
+    public function test_password_salah(): void
     {
         $user = User::factory()->create([
             'email' => 'owner@jofresh.com',
@@ -85,10 +85,10 @@ class LoginTest extends TestCase
     }
 
     /**
-     * TC-LOGIN-003: Akun Tidak Terdaftar
+     * Akun Tidak Terdaftar
      * Mencoba login menggunakan email yang tidak terdaftar pada sistem.
      */
-    public function test_tc_login_003_akun_tidak_terdaftar(): void
+    public function test_akun_tidak_terdaftar(): void
     {
         $response = $this->from('/')
             ->post('/login', [
@@ -102,10 +102,10 @@ class LoginTest extends TestCase
     }
 
     /**
-     * TC-LOGIN-004: Format Email Tidak Valid
+     * Format Email Tidak Valid
      * Memasukkan email dengan format yang tidak valid (tanpa domain / @).
      */
-    public function test_tc_login_004_format_email_tidak_valid(): void
+    public function test_format_email_tidak_valid(): void
     {
         $response = $this->from('/')
             ->post('/login', [
@@ -119,10 +119,10 @@ class LoginTest extends TestCase
     }
 
     /**
-     * TC-LOGIN-005: Password 7 Karakter (BVA)
+     * Password 7 Karakter
      * Menggunakan password sepanjang 7 karakter yang salah untuk akun terdaftar.
      */
-    public function test_tc_login_005_password_7_karakter(): void
+    public function test_password_7_karakter(): void
     {
         $user = User::factory()->create([
             'email' => 'owner@jofresh.com',
@@ -141,10 +141,10 @@ class LoginTest extends TestCase
     }
 
     /**
-     * TC-LOGIN-006: Password 8 Karakter (Min) (BVA)
+     *  Password 8 Karakter
      * Menggunakan password sepanjang 8 karakter yang tepat untuk masuk ke sistem.
      */
-    public function test_tc_login_006_password_8_karakter_min(): void
+    public function test_password_8_karakter(): void
     {
         $password = '12345678';
         $user = User::factory()->create([
@@ -163,10 +163,10 @@ class LoginTest extends TestCase
     }
 
     /**
-     * TC-LOGIN-007: Password 9 Karakter (BVA)
+     * Password 9 Karakter
      * Menggunakan password sepanjang 9 karakter yang tepat untuk masuk ke sistem.
      */
-    public function test_tc_login_007_password_9_karakter(): void
+    public function test_password_9_karakter(): void
     {
         $password = '123456789';
         $user = User::factory()->create([

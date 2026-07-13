@@ -20,7 +20,7 @@ class NotifikasiTest extends TestCase
     }
 
     /**
-     * TC-NTF-001: Melihat Daftar Notifikasi (Positive)
+     * Melihat Daftar Notifikasi (Positive)
      */
     public function test_melihat_daftar_notifikasi(): void
     {
@@ -43,7 +43,7 @@ class NotifikasiTest extends TestCase
     }
 
     /**
-     * TC-NTF-002: Melihat Detail Notifikasi (Positive)
+     * Melihat Detail Notifikasi (Positive)
      */
     public function test_melihat_detail_notifikasi(): void
     {
@@ -62,7 +62,7 @@ class NotifikasiTest extends TestCase
     }
 
     /**
-     * TC-NTF-003: Tandai Semua Sudah Dibaca (Positive)
+     * Tandai Semua Sudah Dibaca (Positive)
      */
     public function test_tandai_semua_sudah_dibaca(): void
     {
@@ -89,7 +89,7 @@ class NotifikasiTest extends TestCase
     }
 
     /**
-     * TC-NTF-004: Tidak Ada Notifikasi (Negative)
+     * Tidak Ada Notifikasi (Negative)
      */
     public function test_tidak_ada_notifikasi(): void
     {
@@ -103,7 +103,7 @@ class NotifikasiTest extends TestCase
     }
 
     /**
-     * TC-NTF-005: Tandai Semua Sudah Dibaca Saat Semua Notifikasi Sudah Dibaca (Negative)
+     * Tandai Semua Sudah Dibaca Saat Semua Notifikasi Sudah Dibaca (Negative)
      */
     public function test_tandai_semua_sudah_dibaca_saat_semua_notifikasi_sudah_dibaca(): void
     {
