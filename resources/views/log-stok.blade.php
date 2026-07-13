@@ -39,9 +39,21 @@
     .stok-change.up .arrow { background: #d1fae5; color: #065f46; }
     .stok-change.down .arrow { background: #fee2e2; color: #991b1b; }
 
-    .filter-bar { background: white; border-radius: 16px; padding: 20px 24px; border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+    .filter-bar { background: white; border-radius: 16px; padding: 20px 24px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 16px; }
+    @media (min-width: 640px) {
+        .filter-bar { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
+    }
     .filter-bar label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px; }
-    .filter-bar select, .filter-bar input[type="date"] { appearance: none; -webkit-appearance: none; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 0.875rem; font-family: 'Inter', sans-serif; background: #f8fafc; color: #334155; outline: none; transition: all 0.2s; min-width: 160px; }
+
+    .filter-bar > div { width: 100%; }
+    @media (min-width: 640px) {
+        .filter-bar > div { width: auto; }
+    }
+
+    .filter-bar select, .filter-bar input[type="date"] { appearance: none; -webkit-appearance: none; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 0.875rem; font-family: 'Inter', sans-serif; background: #f8fafc; color: #334155; outline: none; transition: all 0.2s; width: 100%; }
+    @media (min-width: 640px) {
+        .filter-bar select, .filter-bar input[type="date"] { width: auto; min-width: 160px; }
+    }
     .filter-bar select:focus, .filter-bar input[type="date"]:focus { border-color: #A1511E; box-shadow: 0 0 0 3px rgba(123, 57, 17, 0.1); background: white; }
 
     .btn-action { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 0.875rem; border: none; cursor: pointer; transition: all 0.2s ease; font-family: 'Inter', sans-serif; white-space: nowrap; text-decoration: none; }
@@ -131,13 +143,13 @@
             <label>Sampai Tanggal</label>
             <input type="date" name="tanggal_sampai" value="{{ $filterTanggalSampai }}" id="filter-sampai">
         </div>
-        <div class="flex gap-2">
-            <button type="submit" class="btn-action btn-filter" id="btn-filter">
+        <div class="flex gap-2 w-full sm:w-auto">
+            <button type="submit" class="btn-action btn-filter flex-1 sm:flex-none justify-center" id="btn-filter">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" /></svg>
                 Filter
             </button>
             @if($filterTipe || $filterTanggalDari || $filterTanggalSampai)
-            <a href="{{ url('/log-stok') }}" class="btn-action btn-reset" id="btn-reset-filter">
+            <a href="{{ url('/log-stok') }}" class="btn-action btn-reset flex-1 sm:flex-none justify-center" id="btn-reset-filter">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
                 Reset
             </a>

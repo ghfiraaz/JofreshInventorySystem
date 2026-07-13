@@ -99,17 +99,17 @@
     {{-- ===== MAIN CONTENT ===== --}}
     <main class="flex-grow flex flex-col w-full min-w-0 transition-all duration-300">
         {{-- Header --}}
-        <header class="h-16 lg:h-20 px-4 md:px-6 lg:px-10 flex items-center justify-between bg-[#FAF6F0] flex-shrink-0 border-b border-[#E0D5CA]">
+        <header class="h-14 lg:h-20 px-4 md:px-6 lg:px-10 flex items-center justify-between bg-[#FAF6F0] flex-shrink-0 border-b border-[#E0D5CA]">
             <div class="flex items-center gap-4">
                 <button id="sidebar-toggle" class="p-2 rounded-lg transition-colors cursor-pointer border-none bg-transparent outline-none" style="color: #9C8B7E;" onmouseover="this.style.background='rgba(123,57,17,0.06)';this.style.color='#7B3911';" onmouseout="this.style.background='transparent';this.style.color='#9C8B7E';">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                     </svg>
                 </button>
-                <h2 class="text-2xl font-bold" style="color: #3D1B07;">@yield('title')</h2>
+                <h2 class="text-lg sm:text-2xl font-bold" style="color: #3D1B07;">@yield('title')</h2>
             </div>
             <div class="flex items-center gap-6">
-                <div id="header-date" class="header-date-widget flex items-center gap-2 px-3 py-1.5 rounded-xl shadow-sm" style="background: linear-gradient(135deg, #FAF0E6, #FFF8F0); border: 1px solid #E0C4A8;">
+                <div id="header-date" class="header-date-widget hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl shadow-sm" style="background: linear-gradient(135deg, #FAF0E6, #FFF8F0); border: 1px solid #E0C4A8;">
                     <span id="hd-day" class="text-xs font-bold uppercase tracking-widest" style="color: #C8702A;"></span>
                     <span id="hd-date" class="text-sm font-bold" style="color: #3D1B07;"></span>
                     <span class="w-px h-4" style="background: #E0C4A8;"></span>

@@ -291,19 +291,101 @@
 }
 
 /* --- Responsive Modal --- */
-@media (max-width: 480px) {
-    #modal-logout .modal-content,
-    #modal-confirm > div {
-        margin-left: 1rem;
-        margin-right: 1rem;
-        padding: 1.5rem;
+@media (max-width: 640px) {
+    /* Apply responsive layout to all modal boxes inside overlay */
+    .modal-overlay > div,
+    [id^="modal-"] > div {
+        margin-left: 1rem !important;
+        margin-right: 1rem !important;
+        padding: 1.5rem !important;
+        max-width: calc(100vw - 2rem) !important;
     }
 
     #modal-logout .modal-content h3,
-    #modal-confirm h3 {
-        font-size: 1.25rem;
+    #modal-confirm h3,
+    [id^="modal-"] h3 {
+        font-size: 1.25rem !important;
+    }
+
+    /* Responsive card padding on mobile */
+    .card,
+    .bg-white.rounded-2xl.p-8,
+    .bg-white.border.border-slate-200.rounded-2xl.p-6,
+    .stat-card {
+        padding: 1.25rem !important;
     }
 }
+
+/* Ensure all tables inside table containers or scrollable wrappers fit on mobile with proper wrapping rules */
+@media (max-width: 767px) {
+    .table-container,
+    .overflow-x-auto {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .table-container table,
+    .overflow-x-auto table {
+        width: 100% !important;
+        min-width: auto !important;
+        table-layout: auto !important;
+    }
+
+    .table-container th,
+    .overflow-x-auto th {
+        white-space: nowrap !important;
+    }
+
+    .table-container td,
+    .overflow-x-auto td {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        padding-top: 0.6rem !important;
+        padding-bottom: 0.6rem !important;
+        font-size: 0.72rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* Wrap only long text columns naturally */
+    .table-container td[class*="row-nama"],
+    .table-container td[class*="row-name"],
+    .table-container td[class*="row-alamat"],
+    .table-container td[class*="row-keterangan"],
+    .table-container td[class*="row-email"],
+    .overflow-x-auto td[class*="row-nama"],
+    .overflow-x-auto td[class*="row-name"],
+    .overflow-x-auto td[class*="row-alamat"],
+    .overflow-x-auto td[class*="row-keterangan"],
+    .overflow-x-auto td[class*="row-email"] {
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+    
+    /* Keep badges, action buttons, and small icons from wrapping awkwardly */
+    .table-container td span,
+    .table-container td a,
+    .table-container td button,
+    .overflow-x-auto td span,
+    .overflow-x-auto td a,
+    .overflow-x-auto td button {
+        white-space: nowrap !important;
+    }
+}
+
+/* --- Responsive calendar popup --- */
+@media (max-width: 350px) {
+    .trx-cal-popup,
+    #lp-cal-popup {
+        width: 280px !important;
+    }
+    .trx-cal-day,
+    .lp-cal-day {
+        font-size: 0.75rem !important;
+    }
+}
+
 
 /* --- Smooth sidebar scrollbar (global) --- */
 #sidebar::-webkit-scrollbar { width: 3px; }

@@ -16,17 +16,15 @@
 </div>
 @endif
 
-<div class="flex justify-end items-center mb-6">
-    <div class="flex items-center gap-3">
-        <button id="btn-buka-penyesuaian" class="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-semibold text-sm cursor-pointer border-none transition-all shadow-sm" style="background:#eab308;" onmouseover="this.style.background='#ca8a04'" onmouseout="this.style.background='#eab308'">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg>
-            Penyesuaian Stok
-        </button>
-        <button id="btn-tambah-produk" class="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-semibold text-sm cursor-pointer border-none transition-all" style="background:#7B3911;" onmouseover="this.style.background='#5A270B'" onmouseout="this.style.background='#7B3911'">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-            Tambah Produk
-        </button>
-    </div>
+<div class="flex justify-end items-center gap-2 mb-6">
+    <button id="btn-buka-penyesuaian" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2.5 text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm cursor-pointer border-none transition-all shadow-sm" style="background:#eab308;" onmouseover="this.style.background='#ca8a04'" onmouseout="this.style.background='#eab308'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 sm:w-4 sm:h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg>
+        <span class="hidden sm:inline">Penyesuaian Stok</span><span class="inline sm:hidden">Penyesuaian</span>
+    </button>
+    <button id="btn-tambah-produk" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2.5 text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm cursor-pointer border-none transition-all" style="background:#7B3911;" onmouseover="this.style.background='#5A270B'" onmouseout="this.style.background='#7B3911'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 sm:w-4 sm:h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        <span class="hidden sm:inline">Tambah Produk</span><span class="inline sm:hidden">Tambah</span>
+    </button>
 </div>
 
 <div class="table-container">
@@ -35,9 +33,9 @@
             <tr>
                 <th>Nama Produk</th>
                 <th>Stok Saat Ini</th>
-                <th>Stok Minimal</th>
+                <th class="hidden sm:table-cell">Stok Minimal</th>
                 <th>Harga (per ekor)</th>
-                <th>Status</th>
+                <th class="hidden sm:table-cell">Status</th>
                 <th class="text-center">Aksi</th>
             </tr>
         </thead>
@@ -46,19 +44,20 @@
             <tr data-id="{{ $p->id }}">
                 <td class="font-bold row-nama">{{ $p->nama }}</td>
                 <td class="row-stok">{{ intval($p->stok) }}</td>
-                <td class="row-minimal">{{ intval($p->stok_minimal) }}</td>
+                <td class="row-minimal hidden sm:table-cell">{{ intval($p->stok_minimal) }}</td>
                 <td class="row-harga">{{ $p->harga_format }}</td>
-                <td><span class="px-3 py-1.5 rounded-full text-xs font-semibold {{ $p->status === 'Tersedia' ? 'bg-green-100 text-green-700' : ($p->status === 'Stok Rendah' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">{{ $p->status }}</span></td>
+                <td class="hidden sm:table-cell"><span class="px-3 py-1.5 rounded-full text-xs font-semibold {{ $p->status === 'Tersedia' ? 'bg-green-100 text-green-700' : ($p->status === 'Stok Rendah' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">{{ $p->status }}</span></td>
                 <td>
-                    <div class="flex items-center justify-center gap-1.5">
-                        <button class="p-2 text-slate-400 hover:text-[#7B3911] hover:bg-[#FAF5EF] rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-produk" title="Edit">
+                    <div class="flex items-center justify-center gap-1">
+                        <button class="p-1 sm:p-2 text-slate-400 hover:text-[#7B3911] hover:bg-[#FAF5EF] rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit-produk" title="Edit">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/></svg>
                         </button>
-                        <button class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-delete-produk" title="Hapus">
+                        <button class="p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-delete-produk" title="Hapus">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
                         </button>
-                        <button class="bg-[#FAF5EF] text-[#7B3911] hover:bg-[#FAF5EF] hover:text-[#5A270B] px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer border border-[#E0D5CA] btn-tambah-stok">
-                            + Tambah Stok
+                        <button class="bg-[#FAF5EF] text-[#7B3911] hover:bg-[#FAF5EF]/80 hover:text-[#5A270B] p-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors cursor-pointer border border-[#E0D5CA] btn-tambah-stok flex items-center justify-center" title="Tambah Stok">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:14px;height:14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                            <span class="hidden sm:inline ml-1">Tambah Stok</span>
                         </button>
                     </div>
                 </td>

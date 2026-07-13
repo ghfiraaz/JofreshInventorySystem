@@ -47,7 +47,7 @@
     </div>
 
     {{-- Ringkasan --}}
-    <div class="grid grid-cols-3 gap-6 mb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
         <div class="p-5 rounded-xl border" style="background: #FAF5EF; border-color: #E0C4A8;">
             <div class="text-xs font-bold uppercase tracking-wider mb-2" style="color: #C8702A;">Total Transaksi</div>
             <div class="font-bold text-gray-800 text-3xl">{{ count($transaksi) }} <span class="text-base text-gray-500 font-medium">transaksi</span></div>
@@ -65,59 +65,63 @@
     {{-- Rekap Stok Keluar & Masuk --}}
     <div class="mb-10">
         <h3 class="text-lg font-bold text-gray-800 mb-4 pl-3" style="border-left: 4px solid #7B3911;">Rekapitulasi Stok Produk</h3>
-        <table class="w-full text-left border-collapse border border-gray-200 rounded-lg overflow-hidden">
-            <thead>
-                <tr class="bg-gray-100 border-b border-gray-200">
-                    <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Produk</th>
-                    <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Stok Terjual / Keluar</th>
-                    <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Sisa Stok Akhir</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($stokTersedia as $produk)
-                    <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                        <td class="py-3 px-4 text-sm font-semibold text-gray-800">{{ $produk->nama }}</td>
-                        <td class="py-3 px-4 text-sm text-amber-600 font-bold text-center">
-                            {{ intval($stokKeluar[$produk->nama] ?? 0) }} ekor
-                        </td>
-                        <td class="py-3 px-4 text-sm font-bold text-center" style="color: #7B3911;">
-                            {{ intval($produk->stok) }} ekor
-                        </td>
+        <div class="table-container shadow-sm">
+            <table class="w-full text-left border-collapse border border-gray-200 rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-100 border-b border-gray-200">
+                        <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Produk</th>
+                        <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Stok Terjual / Keluar</th>
+                        <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Sisa Stok Akhir</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach($stokTersedia as $produk)
+                        <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-sm font-semibold text-gray-800">{{ $produk->nama }}</td>
+                            <td class="py-3 px-4 text-sm text-amber-600 font-bold text-center">
+                                {{ intval($stokKeluar[$produk->nama] ?? 0) }} ekor
+                            </td>
+                            <td class="py-3 px-4 text-sm font-bold text-center" style="color: #7B3911;">
+                                {{ intval($produk->stok) }} ekor
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 
     {{-- Detail Transaksi --}}
     <div>
         <h3 class="text-lg font-bold text-gray-800 mb-4 pl-3" style="border-left: 4px solid #7B3911;">Rincian Transaksi Penjualan</h3>
-        <table class="w-full text-left border-collapse border border-gray-200 rounded-lg overflow-hidden">
-            <thead>
-                <tr class="bg-gray-100 border-b border-gray-200">
-                    <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Waktu</th>
-                    <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">No. Transaksi</th>
-                    <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Mitra</th>
-                    <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-right">Total Item</th>
-                    <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-right">Nilai Transaksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($transaksi as $tx)
-                    <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                        <td class="py-3 px-4 text-sm text-gray-600">{{ $tx->created_at->format('H:i') }} WIB</td>
-                        <td class="py-3 px-4 text-sm font-semibold text-gray-800">{{ $tx->no_transaksi }}</td>
-                        <td class="py-3 px-4 text-sm text-gray-600">{{ $tx->mitra->nama ?? 'N/A' }}</td>
-                        <td class="py-3 px-4 text-sm text-gray-600 text-right">{{ intval($tx->total_item) }}</td>
-                        <td class="py-3 px-4 text-sm font-bold text-gray-800 text-right">Rp {{ number_format($tx->total_harga, 0, ',', '.') }}</td>
+        <div class="table-container shadow-sm">
+            <table class="w-full text-left border-collapse border border-gray-200 rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-100 border-b border-gray-200">
+                        <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Waktu</th>
+                        <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">No. Transaksi</th>
+                        <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Mitra</th>
+                        <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-right">Total Item</th>
+                        <th class="py-3 px-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-right">Nilai Transaksi</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="py-8 text-center text-gray-400 text-sm italic">Tidak ada transaksi lunas hari ini.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse($transaksi as $tx)
+                        <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-sm text-gray-600">{{ $tx->created_at->format('H:i') }} WIB</td>
+                            <td class="py-3 px-4 text-sm font-semibold text-gray-800">{{ $tx->no_transaksi }}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">{{ $tx->mitra->nama ?? 'N/A' }}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600 text-right">{{ intval($tx->total_item) }}</td>
+                            <td class="py-3 px-4 text-sm font-bold text-gray-800 text-right">Rp {{ number_format($tx->total_harga, 0, ',', '.') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-8 text-center text-gray-400 text-sm italic">Tidak ada transaksi lunas hari ini.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
     {{-- Footer --}}

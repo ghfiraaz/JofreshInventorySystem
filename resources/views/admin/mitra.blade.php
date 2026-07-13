@@ -2,22 +2,22 @@
 @section('title', 'Mitra')
 @section('content')
 
-<div class="flex justify-end items-center mb-6">
-    <button id="btn-tambah-mitra" class="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl font-semibold text-sm cursor-pointer border-none transition-all" style="background:#7B3911;" onmouseover="this.style.background='#5A270B'" onmouseout="this.style.background='#7B3911'">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-        Tambah Mitra
+<div class="flex justify-end items-center gap-2 mb-6">
+    <button id="btn-tambah-mitra" class="flex items-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2.5 text-white rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm cursor-pointer border-none transition-all" style="background:#7B3911;" onmouseover="this.style.background='#5A270B'" onmouseout="this.style.background='#7B3911'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 sm:w-4 sm:h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        <span class="hidden sm:inline">Tambah Mitra</span><span class="inline sm:hidden">Tambah</span>
     </button>
 </div>
 
-<div class="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+<div class="table-container shadow-sm">
     <table class="w-full" id="mitraTable">
         <thead>
             <tr style="background:linear-gradient(135deg,#f8fafc,#f1f5f9);">
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Nama Mitra</th>
-                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Email</th>
-                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Kontak</th>
+                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:table-cell">Email</th>
+                <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500 hidden sm:table-cell">Kontak</th>
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Alamat</th>
-                <th class="py-3.5 px-5 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Jatuh Tempo</th>
+                <th class="py-3.5 px-5 text-center text-xs font-bold uppercase tracking-wider text-slate-500 hidden sm:table-cell">Jatuh Tempo</th>
                 <th class="py-3.5 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Aksi</th>
             </tr>
         </thead>
@@ -25,10 +25,10 @@
             @forelse($mitra as $m)
             <tr data-id="{{ $m->id }}" class="hover:bg-slate-50/60 transition-colors">
                 <td class="py-3.5 px-5 font-semibold text-slate-800 text-sm row-nama-mitra">{{ $m->nama }}</td>
-                <td class="py-3.5 px-5 text-sm text-slate-600 row-email">{{ $m->email ?? '-' }}</td>
-                <td class="py-3.5 px-5 text-sm text-slate-600 row-kontak">{{ $m->kontak ?? '-' }}</td>
+                <td class="py-3.5 px-5 text-sm text-slate-600 row-email hidden md:table-cell">{{ $m->email ?? '-' }}</td>
+                <td class="py-3.5 px-5 text-sm text-slate-600 row-kontak hidden sm:table-cell">{{ $m->kontak ?? '-' }}</td>
                 <td class="py-3.5 px-5 text-sm text-slate-600 row-alamat">{{ $m->alamat ?? '-' }}</td>
-                <td class="py-3.5 px-5 text-sm text-center row-jatuh-tempo">
+                <td class="py-3.5 px-5 text-sm text-center row-jatuh-tempo hidden sm:table-cell">
                     <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[#FAF0E6] text-[#7B3911]">Tgl {{ $m->tanggal_jatuh_tempo }}</span>
                 </td>
                 <td class="py-3.5 px-5">

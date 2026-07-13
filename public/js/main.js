@@ -1033,11 +1033,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cartItems) cartItems.classList.add('hidden');
             if (btnClearCart) btnClearCart.classList.add('hidden');
             if (btnCheckout) btnCheckout.disabled = true;
+            
+            // Mobile sticky bar sync
+            const stickyBar = document.getElementById('sticky-checkout-bar');
+            if (stickyBar) stickyBar.classList.add('translate-y-full');
         } else {
             if (cartEmpty) cartEmpty.classList.add('hidden');
             if (cartItems) cartItems.classList.remove('hidden');
             if (btnClearCart) btnClearCart.classList.remove('hidden');
             if (btnCheckout) btnCheckout.disabled = false;
+
+            // Mobile sticky bar sync
+            const stickyBar = document.getElementById('sticky-checkout-bar');
+            const stickyTotal = document.getElementById('sticky-total');
+            if (stickyBar) {
+                stickyBar.classList.remove('translate-y-full');
+                if (stickyTotal) stickyTotal.textContent = formatRupiah(total);
+            }
         }
 
         cartTbody.innerHTML = '';

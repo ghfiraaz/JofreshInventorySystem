@@ -3,12 +3,12 @@
 @section('title', 'Kelola Pengguna')
 
 @section('content')
-<div class="flex justify-end items-center mb-6">
-    <button class="btn btn-primary flex items-center" id="btn-tambah-pengguna">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-[18px] h-[18px] mr-2">
+<div class="flex justify-end items-center gap-2 mb-6">
+    <button class="btn btn-primary flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm cursor-pointer border-none transition-all" id="btn-tambah-pengguna">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] mr-1">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
-        Tambah Pengguna
+        <span class="hidden sm:inline">Tambah Pengguna</span><span class="inline sm:hidden">Tambah</span>
     </button>
 </div>
 
@@ -17,9 +17,9 @@
         <thead>
             <tr>
                 <th>Nama</th>
-                <th>Email</th>
+                <th class="hidden md:table-cell">Email</th>
                 <th>Role</th>
-                <th>Dibuat</th>
+                <th class="hidden sm:table-cell">Dibuat</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -27,13 +27,13 @@
             @foreach($users as $user)
             <tr data-id="{{ $user->id }}">
                 <td class="font-bold row-name">{{ $user->name }}</td>
-                <td class="row-email">{{ $user->email }}</td>
+                <td class="row-email hidden md:table-cell">{{ $user->email }}</td>
                 <td>
                     <span class="px-3 py-1.5 rounded-full text-xs font-semibold {{ $user->role === 'Admin' ? 'bg-[#FAF0E6] text-[#7B3911]' : 'bg-green-100 text-green-700' }} row-role">
                         {{ $user->role }}
                     </span>
                 </td>
-                <td class="row-date">{{ $user->created_at->format('d/m/Y') }}</td>
+                <td class="row-date hidden sm:table-cell">{{ $user->created_at->format('d/m/Y') }}</td>
                 <td>
                     <button class="p-2 text-slate-500 hover:text-[#7B3911] hover:bg-[#FAF5EF] rounded-lg transition-colors cursor-pointer border-none bg-transparent btn-edit" title="Edit">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px]">

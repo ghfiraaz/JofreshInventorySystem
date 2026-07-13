@@ -68,11 +68,11 @@
     <table class="w-full" id="trx-table">
         <thead>
             <tr>
-                <th>Tanggal</th>
+                <th class="hidden sm:table-cell">Tanggal</th>
                 <th>No. Transaksi</th>
                 <th>Mitra</th>
-                <th>Item</th>
-                <th>Status</th>
+                <th class="hidden sm:table-cell">Item</th>
+                <th class="hidden md:table-cell">Status</th>
                 <th>Total</th>
                 <th>Aksi</th>
             </tr>
@@ -97,11 +97,11 @@
                  data-status="{{ $trx->status_pembayaran }}"
                  data-total="Rp {{ number_format($trx->total_harga,0,',','.') }}"
                  data-items='{{ $itemsJson }}'>
-                 <td class="py-3.5 px-5 text-sm text-slate-600 whitespace-nowrap">{{ $trx->created_at->format('d/m/Y H:i') }}</td>
+                 <td class="py-3.5 px-5 text-sm text-slate-600 whitespace-nowrap hidden sm:table-cell">{{ $trx->created_at->format('d/m/Y H:i') }}</td>
                  <td class="py-3.5 px-5"><span class="font-bold text-[#7B3911] text-sm">{{ $trx->no_transaksi }}</span></td>
                  <td class="py-3.5 px-5 text-sm text-slate-600">{{ $trx->mitra->nama ?? '-' }}</td>
-                 <td class="py-3.5 px-5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#FAF5EF;color:#7B3911;">{{ $trx->total_item }} item</span></td>
-                 <td class="py-3.5 px-5">
+                 <td class="py-3.5 px-5 hidden sm:table-cell"><span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#FAF5EF;color:#7B3911;">{{ $trx->total_item }} item</span></td>
+                 <td class="py-3.5 px-5 hidden md:table-cell">
                      @if($trx->status_pembayaran === 'Sudah Dibayar')
                          <span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:#dcfce7;color:#15803d;">Lunas</span>
                      @else
@@ -110,28 +110,28 @@
                  </td>
                  <td class="py-3.5 px-5 text-sm font-bold" style="color:#15803d;">Rp {{ number_format($trx->total_harga,0,',','.') }}</td>
                  <td class="py-3.5 px-5 text-center">
-                     <div class="flex items-center justify-center gap-1.5">
-                         <button onclick="showTrxDetail(this.closest('tr'))" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 cursor-pointer" title="Detail Transaksi">
+                     <div class="flex items-center justify-center gap-1">
+                         <button onclick="showTrxDetail(this.closest('tr'))" class="inline-flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 cursor-pointer" title="Detail Transaksi">
                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                             Detail
+                             <span class="hidden sm:inline">Detail</span>
                          </button>
 
                          @if($trx->bukti_pembayaran)
-                             <a href="{{ url('/bukti-pembayaran/' . basename($trx->bukti_pembayaran)) }}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 no-underline transition-all border border-gray-200" title="Buka Bukti Pembayaran">
+                             <a href="{{ url('/bukti-pembayaran/' . basename($trx->bukti_pembayaran)) }}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 no-underline transition-all border border-gray-200" title="Buka Bukti Pembayaran">
                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
-                                 Bukti
+                                 <span class="hidden sm:inline">Bukti</span>
                              </a>
                          @endif
 
                          <a href="{{ url('/transaksi/'.$trx->id.'/invoice-pdf') }}" target="_blank"
-                            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold no-underline transition-all border
+                            class="inline-flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-xs font-semibold no-underline transition-all border
                             {{ $trx->status_pembayaran === 'Sudah Dibayar' ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : 'text-gray-600 bg-gray-50 hover:bg-gray-100 border-gray-200' }}"
                             title="{{ $trx->status_pembayaran === 'Sudah Dibayar' ? 'Cetak Invoice LUNAS (PDF)' : 'Cetak Invoice (PDF)' }}">
                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
-                             Cetak Invoice
+                             <span class="hidden sm:inline">Cetak Invoice</span><span class="inline sm:hidden">Cetak</span>
                          </a>
                      </div>
-                 </td>>
+                 </td>
             </tr>
             @empty
             <tr><td colspan="7" class="py-16 text-center text-slate-400 text-sm">Belum ada riwayat transaksi.</td></tr>
