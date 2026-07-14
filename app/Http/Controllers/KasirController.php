@@ -295,7 +295,11 @@ class KasirController extends Controller
             }
 
             // H-3 logic: reminder hanya boleh dikirim jika sisa hari <= 3 (termasuk lewat tempo)
-            $canSendReminder = $sisaHari !== null && $sisaHari <= 3;
+            // dan harus ada transaksi yang perlu di-remind (Belum Dibayar / Ditolak)
+            $hasRemindableTransaksi = $txns->contains(function ($txn) {
+                return in_array($txn->status_pembayaran, ['Belum Dibayar', 'Ditolak']);
+            });
+            $canSendReminder = $sisaHari !== null && $sisaHari <= 3 && $hasRemindableTransaksi;
 
             // Cek apakah reminder sudah dikirim hari ini untuk salah satu transaksi belum dibayar milik mitra ini
             $reminderSentToday = $txns->contains(function ($txn) {
@@ -354,7 +358,7 @@ class KasirController extends Controller
 
         // Enforce H-3 validation
         $transaksiList = Transaksi::where('mitra_id', $mitra->id)
-            ->whereIn('status_pembayaran', ['Belum Dibayar', 'Ditolak'])
+            ->whereIn('status_pembayaran', ['Belum Dibayar', 'Menunggu Validasi', 'Ditolak'])
             ->get();
             
         $closestTempo = $transaksiList->whereNotNull('jatuh_tempo')

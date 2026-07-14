@@ -128,7 +128,11 @@
                                               $tooltip = 'Reminder sudah dikirim hari ini';
                                               $btnClass = 'bg-emerald-100 text-emerald-700 cursor-not-allowed';
                                           } elseif (!$mt['canSendReminder']) {
-                                              $tooltip = 'Reminder hanya bisa dikirim H-3 sebelum jatuh tempo';
+                                              // Cek alasan: semua transaksi Menunggu Validasi atau belum masuk zona H-3
+                                              $allMenungguValidasi = $mt['transaksi']->every(fn($t) => $t->status_pembayaran === 'Menunggu Validasi');
+                                              $tooltip = $allMenungguValidasi
+                                                  ? 'Semua tagihan sudah menunggu validasi pembayaran'
+                                                  : 'Reminder hanya bisa dikirim H-3 sebelum jatuh tempo';
                                               $btnClass = 'bg-gray-100 text-gray-400 cursor-not-allowed';
                                           } else {
                                               $tooltip = 'Kirim reminder via email ke ' . $mt['mitra']->email;
