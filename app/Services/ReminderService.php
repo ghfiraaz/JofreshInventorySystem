@@ -12,10 +12,16 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Service Reminder Pembayaran
+ * Mengelola pengiriman email reminder tagihan pembayaran ke mitra.
+ * Termasuk perhitungan periode, generate PDF invoice, dan pencatatan histori.
+ */
 class ReminderService
 {
     /**
-     * Kirim reminder pembayaran ke mitra.
+     * Mengirim reminder pembayaran ke mitra.
+     * Proses: validasi email → hitung periode → ambil transaksi → generate PDF → kirim email → catat histori.
      *
      * @return array{success: bool, message: string}
      */
@@ -29,10 +35,10 @@ class ReminderService
             ];
         }
 
-        // 2. Hitung periode berdasarkan tanggal_jatuh_tempo mitra
+        // 2. Hitung periode rekapitulasi berdasarkan tanggal jatuh tempo mitra
         [$periodeAwal, $periodeAkhir] = $this->hitungPeriode($mitra->tanggal_jatuh_tempo);
 
-        // 3. Ambil transaksi dalam periode (belum dibayar)
+        // 3. Ambil transaksi dalam periode yang belum dibayar
         $transaksiList = Transaksi::with('items')
             ->where('mitra_id', $mitra->id)
             ->where('status_pembayaran', 'Belum Dibayar')
@@ -43,6 +49,7 @@ class ReminderService
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Jika tidak ada tagihan, kembalikan pesan error
         if ($transaksiList->isEmpty()) {
             return [
                 'success' => false,
@@ -50,9 +57,10 @@ class ReminderService
             ];
         }
 
+        // Hitung total tagihan
         $totalTagihan = $transaksiList->sum('total_harga');
 
-        // 4. Build data
+        // 4. Siapkan data untuk email
         $paymentLink  = url('/pembayaran/' . $mitra->payment_token);
         $tanggalTempo = $periodeAkhir->translatedFormat('d F Y');
 
@@ -62,7 +70,7 @@ class ReminderService
 
         $this->generateInvoicePdf($mitra, $transaksiList, $totalTagihan, $periodeAwal, $periodeAkhir, $pdfPath);
 
-        // 6. Kirim email
+        // 6. Kirim email reminder
         try {
             Mail::to($mitra->email)->send(new PaymentReminderMail(
                 $mitra,
@@ -75,12 +83,12 @@ class ReminderService
                 $pdfPath
             ));
 
-            // 7. Update last_reminder_sent_at di transaksi
+            // 7. Update tanggal terakhir reminder dikirim di semua transaksi
             Transaksi::where('mitra_id', $mitra->id)
                 ->where('status_pembayaran', 'Belum Dibayar')
                 ->update(['last_reminder_sent_at' => now()]);
 
-            // Unlock payment upload for the Mitra
+            // Buka kunci upload pembayaran untuk mitra
             $mitra->update(['payment_upload_locked' => false]);
 
             // 8. Catat histori reminder BERHASIL
@@ -137,7 +145,7 @@ class ReminderService
     }
 
     /**
-     * Hitung periode rekapitulasi berdasarkan tanggal_jatuh_tempo mitra.
+     * Menghitung periode rekapitulasi berdasarkan tanggal jatuh tempo mitra.
      *
      * Contoh: jatuh tempo = 15
      *   → periode = 16 bulan lalu s/d 15 bulan ini
@@ -161,7 +169,7 @@ class ReminderService
         $bulanSebelum = $periodeAkhir->copy()->subMonth();
         $tanggalAwal  = $tanggalJatuhTempo + 1;
 
-        // Handle overflow (misal jatuh tempo 31, awal = 32 → adjust)
+        // Handle overflow (misal jatuh tempo 31, awal = 32 → sesuaikan)
         if ($tanggalAwal > $bulanSebelum->daysInMonth) {
             // Jika tanggal awal melebihi jumlah hari bulan, pakai hari pertama bulan periode akhir
             $periodeAwal = $periodeAkhir->copy()->startOfMonth();
@@ -173,7 +181,8 @@ class ReminderService
     }
 
     /**
-     * Generate PDF invoice rekapitulasi bulanan.
+     * Membuat file PDF invoice rekapitulasi bulanan.
+     * Menyimpan PDF ke path yang ditentukan.
      */
     protected function generateInvoicePdf(
         Mitra $mitra,
@@ -183,12 +192,13 @@ class ReminderService
         Carbon $periodeAkhir,
         string $outputPath
     ): void {
-        // Pastikan directory ada
+        // Pastikan direktori penyimpanan ada
         $dir = dirname($outputPath);
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
 
+        // Generate PDF dari view
         $pdf = Pdf::loadView('pdf.invoice-rekap', [
             'mitra'          => $mitra,
             'transaksiList'  => $transaksiList,
@@ -198,6 +208,7 @@ class ReminderService
             'qrCodePath'     => public_path('images/qris-jofresh.jpeg'),
         ])->setPaper('a4', 'portrait');
 
+        // Simpan PDF ke file
         $pdf->save($outputPath);
     }
 }

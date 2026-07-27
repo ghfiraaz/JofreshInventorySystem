@@ -6,8 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
+/**
+ * Model Notifikasi
+ * Mengelola notifikasi sistem untuk setiap pengguna.
+ * Mendukung notifikasi stok rendah, bukti pembayaran, laporan harian, dan jatuh tempo.
+ */
 class Notification extends Model
 {
+    // Kolom yang boleh diisi secara massal
     protected $fillable = [
         'user_id',
         'title',
@@ -17,12 +23,13 @@ class Notification extends Model
         'is_read',
     ];
 
+    // Casting tipe data
     protected $casts = [
         'is_read' => 'boolean',
     ];
 
     /**
-     * Relationship to the user who owns this notification.
+     * Relasi ke user pemilik notifikasi.
      */
     public function user(): BelongsTo
     {
@@ -30,7 +37,8 @@ class Notification extends Model
     }
 
     /**
-     * Accessor for formatted time.
+     * Accessor: menampilkan waktu notifikasi dalam format relatif.
+     * Contoh: "2 jam yang lalu"
      */
     public function getTimeAgoAttribute(): string
     {
@@ -38,12 +46,15 @@ class Notification extends Model
     }
 
     /**
-     * Send notification to all users of a specific role (checks for duplicates).
+     * Mengirim notifikasi ke semua pengguna dengan role tertentu.
+     * Mengecek duplikasi berdasarkan type dan source_id.
      */
     public static function sendToRole(string $role, string $title, string $message, string $type = null, string $sourceId = null)
     {
+        // Ambil semua user dengan role yang ditentukan
         $users = User::where('role', $role)->get();
         foreach ($users as $user) {
+            // Cek duplikasi jika ada type dan sourceId
             if ($type && $sourceId) {
                 $exists = self::where('user_id', $user->id)
                     ->where('type', $type)
@@ -54,6 +65,7 @@ class Notification extends Model
                 }
             }
 
+            // Buat notifikasi baru
             self::create([
                 'user_id'   => $user->id,
                 'title'     => $title,
@@ -66,7 +78,8 @@ class Notification extends Model
     }
 
     /**
-     * Low stock alert trigger.
+     * Trigger notifikasi stok rendah untuk Admin.
+     * Dipanggil ketika stok produk menyentuh atau melewati batas minimal.
      */
     public static function triggerLowStockAlert(Produk $produk)
     {
@@ -78,7 +91,8 @@ class Notification extends Model
     }
 
     /**
-     * Partner uploaded proof of payment trigger.
+     * Trigger notifikasi bukti pembayaran untuk Kasir.
+     * Dipanggil ketika mitra mengunggah bukti pembayaran.
      */
     public static function triggerBuktiPembayaran(Mitra $mitra)
     {
@@ -88,11 +102,14 @@ class Notification extends Model
     }
 
     /**
-     * Daily sales report trigger (completed transaction).
+     * Trigger notifikasi laporan penjualan harian untuk Superadmin.
+     * Dipanggil ketika ada transaksi yang selesai dibayar.
      */
     public static function triggerLaporanPenjualan()
     {
         $today = today();
+
+        // Hitung total pendapatan hari ini
         $totalPendapatan = Transaksi::whereDate('created_at', $today)
             ->where('status_pembayaran', 'Sudah Dibayar')
             ->sum('total_harga');
@@ -103,10 +120,12 @@ class Notification extends Model
     }
 
     /**
-     * Dynamic check for H-3 due dates (run on notification fetch).
+     * Pengecekan dinamis jatuh tempo H-3 (dijalankan saat notifikasi diambil).
+     * Membuat notifikasi untuk Kasir jika ada tagihan yang mendekati jatuh tempo.
      */
     public static function checkJatuhTempoReminders()
     {
+        // Ambil semua transaksi belum dibayar yang jatuh tempo dalam 3 hari ke depan
         $mendesakList = Transaksi::with('mitra')
             ->where('status_pembayaran', 'Belum Dibayar')
             ->whereNotNull('jatuh_tempo')
@@ -114,12 +133,15 @@ class Notification extends Model
             ->get();
 
         foreach ($mendesakList as $transaksi) {
+            // Hitung sisa hari
             $daysRemaining = (int) now()->startOfDay()->diffInDays(Carbon::parse($transaksi->jatuh_tempo), false);
             $dayText = $daysRemaining === 0 ? "hari ini" : "dalam {$daysRemaining} hari";
             
             $title = "[{$transaksi->mitra->nama}] H-{$daysRemaining}, Segera Kirim Email Reminder!";
             
             $message = "Tagihan {$transaksi->no_transaksi} untuk Mitra {$transaksi->mitra->nama} jatuh tempo {$dayText} (Tgl " . Carbon::parse($transaksi->jatuh_tempo)->format('d-m-Y') . "). Segera kirimkan email tagihan.";
+
+            // Kirim notifikasi ke semua Kasir
             self::sendToRole('Kasir', $title, $message, 'jatuh_tempo', $transaksi->id);
         }
     }

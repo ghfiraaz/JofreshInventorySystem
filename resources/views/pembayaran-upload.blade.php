@@ -13,6 +13,7 @@
         .upload-zone { border: 2px dashed #E0C4A8; border-radius: 16px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: #FAF8F5; }
         .upload-zone:hover, .upload-zone.dragover { border-color: #7B3911; background: #FAF5EF; }
         .upload-zone.has-file { border-color: #22c55e; background: #f0fdf4; }
+        .upload-zone.has-error { border-color: #ef4444; background: #fef2f2; }
     </style>
 </head>
 <body class="antialiased">
@@ -181,12 +182,73 @@ const preview = document.getElementById('upload-preview');
 const fileName = document.getElementById('file-name');
 const btnSubmit = document.getElementById('btn-submit');
 
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
+const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'pdf'];
+const MAX_SIZE_MB = 5;
+const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+function getFileExtension(name) {
+    return name.split('.').pop().toLowerCase();
+}
+
+function validateFile(file) {
+    const ext = getFileExtension(file.name);
+
+    if (!ALLOWED_EXTENSIONS.includes(ext) && !ALLOWED_TYPES.includes(file.type)) {
+        return 'Format file tidak didukung. Hanya JPG, PNG, dan PDF yang diperbolehkan.';
+    }
+    if (file.size > MAX_SIZE_BYTES) {
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+        return `Ukuran file terlalu besar (${sizeMB} MB). Maksimal ${MAX_SIZE_MB} MB.`;
+    }
+    return null;
+}
+
+function showFileError(message) {
+    // Reset to placeholder state
+    placeholder.classList.remove('hidden');
+    preview.classList.add('hidden');
+    zone.classList.remove('has-file');
+    zone.classList.add('has-error');
+    btnSubmit.disabled = true;
+
+    // Remove existing error
+    let existingError = document.getElementById('file-error');
+    if (existingError) existingError.remove();
+
+    // Show error below zone
+    const errorEl = document.createElement('p');
+    errorEl.id = 'file-error';
+    errorEl.className = 'text-sm text-red-500 mt-2 font-medium';
+    errorEl.textContent = message;
+    zone.parentNode.insertBefore(errorEl, zone.nextSibling);
+
+    // Clear the file input
+    fileInput.value = '';
+}
+
+function clearFileError() {
+    zone.classList.remove('has-error');
+    let existingError = document.getElementById('file-error');
+    if (existingError) existingError.remove();
+}
+
 if (fileInput) {
     fileInput.addEventListener('change', function() {
+        clearFileError();
+
         if (this.files.length > 0) {
+            const file = this.files[0];
+            const error = validateFile(file);
+
+            if (error) {
+                showFileError(error);
+                return;
+            }
+
             placeholder.classList.add('hidden');
             preview.classList.remove('hidden');
-            fileName.textContent = this.files[0].name;
+            fileName.textContent = file.name;
             zone.classList.add('has-file');
             btnSubmit.disabled = false;
         }

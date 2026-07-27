@@ -7,20 +7,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Middleware Cek Role Pengguna
+ * Memastikan pengguna yang login memiliki role yang sesuai
+ * untuk mengakses halaman/route tertentu.
+ */
 class CheckRole
 {
     /**
-     * Handle an incoming request.
-     * $roles can be a single role string or an array of roles.
+     * Menangani request yang masuk.
+     * Memeriksa apakah pengguna sudah login dan memiliki role yang diizinkan.
+     * 
+     * @param string ...$roles Daftar role yang diizinkan (bisa lebih dari satu)
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        // Not logged in at all
+        // Jika pengguna belum login, redirect ke halaman login
         if (!Auth::check()) {
             return redirect('/')->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        // Logged in but doesn't have the required role
+        // Jika pengguna tidak memiliki role yang diizinkan, tolak akses
         if (!in_array(Auth::user()->role, $roles)) {
             return redirect('/')->with('error', 'Anda tidak memiliki akses ke halaman tersebut.');
         }

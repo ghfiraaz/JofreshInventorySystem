@@ -11,6 +11,11 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 
+/**
+ * Email Reminder Pembayaran
+ * Mengirim email pengingat tagihan pembayaran ke mitra.
+ * Berisi detail transaksi, total tagihan, link pembayaran, dan lampiran PDF invoice.
+ */
 class PaymentReminderMail extends Mailable
 {
     use Queueable, SerializesModels;
@@ -26,7 +31,7 @@ class PaymentReminderMail extends Mailable
     protected string $pdfPath;
 
     /**
-     * Create a new message instance.
+     * Membuat instance email reminder pembayaran.
      */
     public function __construct(
         Mitra $mitra,
@@ -49,7 +54,7 @@ class PaymentReminderMail extends Mailable
     }
 
     /**
-     * Get the message envelope.
+     * Menentukan subjek email.
      */
     public function envelope(): Envelope
     {
@@ -59,7 +64,7 @@ class PaymentReminderMail extends Mailable
     }
 
     /**
-     * Get the message content definition.
+     * Menentukan konten/template email.
      */
     public function content(): Content
     {
@@ -70,20 +75,21 @@ class PaymentReminderMail extends Mailable
     }
 
     /**
-     * Get the attachments for the message.
+     * Menentukan lampiran email.
+     * Melampirkan PDF invoice rekapitulasi dan gambar QRIS.
      */
     public function attachments(): array
     {
         $attachments = [];
 
-        // Attach PDF invoice
+        // Lampirkan PDF invoice rekapitulasi
         if (file_exists($this->pdfPath)) {
             $attachments[] = Attachment::fromPath($this->pdfPath)
                 ->as('Invoice_Rekap_JoFresh_' . str_replace(' ', '_', $this->mitra->nama) . '.pdf')
                 ->withMime('application/pdf');
         }
 
-        // Attach QR Code image
+        // Lampirkan gambar QR Code pembayaran
         $qrPath = public_path('images/qris-jofresh.jpeg');
         if (file_exists($qrPath)) {
             $attachments[] = Attachment::fromPath($qrPath)

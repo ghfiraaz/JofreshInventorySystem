@@ -4,10 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Model Riwayat Reminder
+ * Mencatat histori pengiriman email reminder pembayaran ke mitra.
+ * Menyimpan status berhasil/gagal beserta detail invoice dan periode.
+ */
 class ReminderHistory extends Model
 {
+    // Nama tabel di database
     protected $table = 'reminder_histories';
 
+    // Kolom yang boleh diisi secara massal
     protected $fillable = [
         'mitra_id',
         'user_id',
@@ -22,6 +29,7 @@ class ReminderHistory extends Model
         'jumlah_transaksi',
     ];
 
+    // Casting tipe data
     protected $casts = [
         'tanggal_pengiriman' => 'datetime',
         'periode_awal'       => 'date',
@@ -30,11 +38,17 @@ class ReminderHistory extends Model
         'jumlah_transaksi'   => 'integer',
     ];
 
+    /**
+     * Relasi ke mitra yang menerima reminder.
+     */
     public function mitra()
     {
         return $this->belongsTo(Mitra::class);
     }
 
+    /**
+     * Relasi ke user yang mengirim reminder.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);

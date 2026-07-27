@@ -8,13 +8,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Controller Log Stok
+ * Mengelola riwayat perubahan stok dan penyesuaian (adjustment) stok produk.
+ */
 class LogStokController extends Controller
 {
     /**
-     * Halaman riwayat log stok — bisa dilihat semua role (view-only).
+     * Menampilkan halaman riwayat log stok.
+     * Bisa dilihat semua role (view-only), mendukung filter tipe dan tanggal.
      */
     public function index(Request $request)
     {
+        // Validasi input filter tanggal
         $request->validate([
             'tanggal_dari'   => 'nullable|date',
             'tanggal_sampai' => 'nullable|date|after_or_equal:tanggal_dari',
@@ -22,17 +28,20 @@ class LogStokController extends Controller
             'tanggal_sampai.after_or_equal' => 'Tanggal awal tidak boleh melebihi tanggal akhir.',
         ]);
 
+        // Query dasar: ambil semua log stok dengan relasi produk dan user
         $query = LogStok::with(['produk', 'user'])->orderBy('created_at', 'desc');
 
-        // Filter berdasarkan tipe transaksi
+        // Filter berdasarkan tipe transaksi (Masuk/Keluar/Adjustment)
         if ($request->filled('tipe') && $request->tipe !== '') {
             $query->where('tipe', $request->tipe);
         }
 
-        // Filter berdasarkan tanggal (range)
+        // Filter berdasarkan tanggal awal
         if ($request->filled('tanggal_dari')) {
             $query->whereDate('created_at', '>=', $request->tanggal_dari);
         }
+
+        // Filter berdasarkan tanggal akhir
         if ($request->filled('tanggal_sampai')) {
             $query->whereDate('created_at', '<=', $request->tanggal_sampai);
         }
@@ -43,12 +52,13 @@ class LogStokController extends Controller
         $today = today();
         $logHariIni = LogStok::whereDate('created_at', $today)->get();
 
+        // Hitung total masing-masing tipe log hari ini
         $totalLogHariIni = $logHariIni->count();
         $totalMasuk      = $logHariIni->where('tipe', 'Masuk')->sum('jumlah');
         $totalKeluar     = $logHariIni->where('tipe', 'Keluar')->sum('jumlah');
         $totalAdjustment = $logHariIni->whereIn('tipe', ['Adjustment Masuk', 'Adjustment Keluar'])->count();
 
-        // Filter state
+        // Simpan state filter untuk view
         $filterTipe          = $request->get('tipe', '');
         $filterTanggalDari   = $request->get('tanggal_dari', '');
         $filterTanggalSampai = $request->get('tanggal_sampai', '');
@@ -67,10 +77,12 @@ class LogStokController extends Controller
 
 
     /**
-     * Simpan adjustment stok (hanya Admin — POST).
+     * Menyimpan penyesuaian (adjustment) stok produk.
+     * Hanya Admin yang bisa melakukan adjustment. Mendukung Adjustment Masuk dan Keluar.
      */
     public function storeAdjustment(Request $request)
     {
+        // Validasi input adjustment
         $request->validate([
             'produk_id'       => 'required|exists:produk,id',
             'tipe_adjustment' => 'required|in:Adjustment Masuk,Adjustment Keluar',
@@ -82,13 +94,15 @@ class LogStokController extends Controller
         ]);
 
         return DB::transaction(function () use ($request) {
+            // Cari produk dan simpan stok sebelum adjustment
             $produk = Produk::findOrFail($request->produk_id);
             $stokSebelum = $produk->stok;
 
             if ($request->tipe_adjustment === 'Adjustment Masuk') {
+                // Tambah stok
                 $produk->stok += $request->jumlah;
             } else {
-                // Adjustment Keluar — validasi stok cukup
+                // Kurangi stok — validasi stok cukup
                 if ($produk->stok < $request->jumlah) {
                     return response()->json([
                         'message' => "Stok {$produk->nama} tidak cukup untuk dikurangi. Stok saat ini: {$produk->stok}."
@@ -97,11 +111,13 @@ class LogStokController extends Controller
                 $produk->stok -= $request->jumlah;
             }
 
+            // Simpan perubahan stok
             $produk->save();
 
-            // Trigger low stock alert for Admin
+            // Trigger notifikasi stok rendah untuk Admin
             \App\Models\Notification::triggerLowStockAlert($produk);
 
+            // Catat log penyesuaian stok
             $log = LogStok::create([
                 'produk_id'    => $produk->id,
                 'user_id'      => Auth::id(),
@@ -123,4 +139,3 @@ class LogStokController extends Controller
         });
     }
 }
-

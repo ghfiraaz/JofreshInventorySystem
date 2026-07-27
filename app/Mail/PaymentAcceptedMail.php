@@ -10,6 +10,11 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Email Pembayaran Diterima
+ * Mengirim email konfirmasi bahwa bukti pembayaran mitra telah diverifikasi dan diterima.
+ * Melampirkan PDF invoice LUNAS sebagai bukti.
+ */
 class PaymentAcceptedMail extends Mailable
 {
     use Queueable, SerializesModels;
@@ -22,16 +27,22 @@ class PaymentAcceptedMail extends Mailable
     public $periodeAkhir = '-';
     protected string $pdfPath;
 
+    /**
+     * Membuat instance email pembayaran diterima.
+     * Mengambil data transaksi berdasarkan kode invoice untuk menghitung total dan periode.
+     */
     public function __construct(Mitra $mitra, string $kodeInvoice, string $pdfPath)
     {
         $this->mitra = $mitra;
         $this->kodeInvoice = $kodeInvoice;
         $this->pdfPath = $pdfPath;
 
+        // Ambil data transaksi berdasarkan kode invoice
         $invoiceCodes = array_map('trim', explode(',', $kodeInvoice));
         $this->transaksiList = \App\Models\Transaksi::whereIn('no_transaksi', $invoiceCodes)->get();
         $this->totalTagihan = $this->transaksiList->sum('total_harga');
 
+        // Hitung periode berdasarkan tanggal transaksi
         if ($this->transaksiList->isNotEmpty()) {
             $minDate = $this->transaksiList->min('created_at');
             $maxDate = $this->transaksiList->max('created_at');
@@ -43,6 +54,9 @@ class PaymentAcceptedMail extends Mailable
         }
     }
 
+    /**
+     * Menentukan subjek email.
+     */
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -50,6 +64,9 @@ class PaymentAcceptedMail extends Mailable
         );
     }
 
+    /**
+     * Menentukan konten/template email.
+     */
     public function content(): Content
     {
         return new Content(
@@ -57,12 +74,16 @@ class PaymentAcceptedMail extends Mailable
         );
     }
 
+    /**
+     * Menentukan lampiran email.
+     * Melampirkan PDF invoice LUNAS.
+     */
     public function attachments(): array
     {
         $attachments = [];
 
+        // Lampirkan PDF invoice LUNAS jika file ada
         if (file_exists($this->pdfPath)) {
-            // Extract invoice code for filename
             $invoiceCode = str_replace(', ', '_', $this->kodeInvoice);
             $attachments[] = Attachment::fromPath($this->pdfPath)
                 ->as('Invoice-LUNAS-' . $invoiceCode . '.pdf')

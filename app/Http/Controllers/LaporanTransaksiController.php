@@ -7,17 +7,28 @@ use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
+/**
+ * Controller Laporan Transaksi
+ * Mengelola laporan penjualan harian dan riwayat transaksi bulanan.
+ */
 class LaporanTransaksiController extends Controller
 {
+    /**
+     * Menampilkan laporan penjualan harian.
+     * Menampilkan ringkasan stok keluar per produk, stok tersedia, dan total pendapatan.
+     */
     public function laporanHarian(Request $request)
     {
+        // Tentukan tanggal laporan (default: hari ini)
         $hariIni = $request->has('date') ? Carbon::parse($request->date) : today();
         
+        // Ambil transaksi yang sudah dibayar pada tanggal tersebut
         $transaksi = Transaksi::with(['items', 'mitra'])
             ->whereDate('created_at', $hariIni)
             ->where('status_pembayaran', 'Sudah Dibayar')
             ->get();
             
+        // Hitung total stok keluar per produk
         $stokKeluar = [];
         foreach($transaksi as $tx) {
             foreach($tx->items as $item) {
@@ -29,26 +40,37 @@ class LaporanTransaksiController extends Controller
             }
         }
         
+        // Ambil daftar stok tersedia dan hitung total pendapatan
         $stokTersedia = Produk::orderBy('nama')->get();
         $totalPendapatan = $transaksi->sum('total_harga');
 
         return view('admin.laporan-harian', compact('transaksi', 'stokKeluar', 'stokTersedia', 'totalPendapatan', 'hariIni'));
     }
 
+    /**
+     * Menampilkan riwayat transaksi bulanan.
+     * Mendukung filter berdasarkan bulan, tahun, atau tanggal tertentu.
+     * Data dikelompokkan berdasarkan tanggal.
+     */
     public function laporanTransaksi(Request $request)
     {
+        // Ambil parameter filter
         $bulan = $request->input('bulan', '');
         $tahun = $request->input('tahun', date('Y'));
         $filterDate = $request->input('filter_date', '');
 
+        // Query dasar: transaksi yang sudah dibayar
         $query = Transaksi::with(['mitra', 'items'])->where('status_pembayaran', 'Sudah Dibayar');
         
+        // Filter berdasarkan tanggal spesifik
         if (!empty($filterDate)) {
             $query->whereDate('created_at', $filterDate);
         } else {
+            // Filter berdasarkan bulan
             if (!empty($bulan) && $bulan !== 'all') {
                 $query->whereMonth('created_at', $bulan);
             }
+            // Filter berdasarkan tahun
             if (!empty($tahun)) {
                 $query->whereYear('created_at', $tahun);
             }
@@ -56,7 +78,7 @@ class LaporanTransaksiController extends Controller
 
         $transaksiRaw = $query->orderBy('created_at', 'desc')->get();
 
-        // Group by date
+        // Kelompokkan transaksi berdasarkan tanggal
         $grouped = [];
         foreach ($transaksiRaw as $tx) {
             $dateKey = $tx->created_at->format('Y-m-d');

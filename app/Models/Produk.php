@@ -4,10 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Model Produk
+ * Merepresentasikan data produk dalam sistem inventori.
+ * Memiliki accessor untuk status stok, badge, dan format harga.
+ */
 class Produk extends Model
 {
+    // Nama tabel di database
     protected $table = 'produk';
 
+    // Kolom yang boleh diisi secara massal
     protected $fillable = [
         'nama',
         'kategori',
@@ -17,13 +24,15 @@ class Produk extends Model
         'harga',
     ];
 
+    // Casting tipe data
     protected $casts = [
         'stok' => 'integer',
         'stok_minimal' => 'integer',
     ];
 
     /**
-     * Compute the stock status based on stok vs stok_minimal.
+     * Menentukan status stok berdasarkan perbandingan stok vs stok_minimal.
+     * Return: 'Stok Habis', 'Stok Rendah', atau 'Tersedia'.
      */
     public function getStatusAttribute(): string
     {
@@ -32,6 +41,9 @@ class Produk extends Model
         return 'Tersedia';
     }
 
+    /**
+     * Menentukan CSS class badge berdasarkan status stok.
+     */
     public function getStatusBadgeAttribute(): string
     {
         return match ($this->status) {
@@ -41,6 +53,9 @@ class Produk extends Model
         };
     }
 
+    /**
+     * Menampilkan harga dalam format Rupiah (contoh: Rp 15.000).
+     */
     public function getHargaFormatAttribute(): string
     {
         return 'Rp ' . number_format($this->harga, 0, ',', '.');

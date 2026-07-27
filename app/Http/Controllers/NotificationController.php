@@ -6,17 +6,22 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Controller Notifikasi
+ * Mengelola notifikasi pengguna: menampilkan, menandai dibaca, dan menandai semua dibaca.
+ */
 class NotificationController extends Controller
 {
     /**
-     * Get all notifications for the authenticated user.
+     * Mengambil semua notifikasi untuk pengguna yang sedang login.
+     * Juga menjalankan pengecekan jatuh tempo secara dinamis.
      */
     public function index()
     {
-        // 1. Run dynamic checks for due dates
+        // 1. Jalankan pengecekan dinamis untuk jatuh tempo yang mendesak
         Notification::checkJatuhTempoReminders();
 
-        // 2. Fetch notifications for current user
+        // 2. Ambil semua notifikasi milik pengguna yang login
         $notifications = Notification::where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get()
@@ -32,6 +37,7 @@ class NotificationController extends Controller
                 ];
             });
 
+        // Hitung jumlah notifikasi yang belum dibaca
         $unreadCount = Notification::where('user_id', Auth::id())
             ->where('is_read', false)
             ->count();
@@ -43,10 +49,11 @@ class NotificationController extends Controller
     }
 
     /**
-     * Mark a specific notification as read.
+     * Menandai satu notifikasi sebagai sudah dibaca.
      */
     public function markAsRead($id)
     {
+        // Cari notifikasi milik pengguna yang login
         $notification = Notification::where('user_id', Auth::id())->findOrFail($id);
         $notification->update(['is_read' => true]);
 
@@ -57,10 +64,11 @@ class NotificationController extends Controller
     }
 
     /**
-     * Mark all notifications of the user as read.
+     * Menandai semua notifikasi pengguna sebagai sudah dibaca.
      */
     public function markAllAsRead()
     {
+        // Update semua notifikasi yang belum dibaca menjadi sudah dibaca
         Notification::where('user_id', Auth::id())
             ->where('is_read', false)
             ->update(['is_read' => true]);

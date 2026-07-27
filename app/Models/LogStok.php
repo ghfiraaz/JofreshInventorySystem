@@ -4,10 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Model Log Stok
+ * Merepresentasikan catatan perubahan stok produk.
+ * Mencatat setiap aktivitas stok: Masuk, Keluar, Adjustment Masuk, dan Adjustment Keluar.
+ */
 class LogStok extends Model
 {
+    // Nama tabel di database
     protected $table = 'log_stok';
 
+    // Kolom yang boleh diisi secara massal
     protected $fillable = [
         'produk_id',
         'user_id',
@@ -18,6 +25,7 @@ class LogStok extends Model
         'keterangan',
     ];
 
+    // Casting tipe data
     protected $casts = [
         'jumlah' => 'integer',
         'stok_sebelum' => 'integer',
@@ -25,7 +33,7 @@ class LogStok extends Model
     ];
 
     /**
-     * Relasi ke produk.
+     * Relasi ke produk yang stoknya berubah.
      */
     public function produk()
     {
@@ -33,7 +41,7 @@ class LogStok extends Model
     }
 
     /**
-     * Relasi ke user yang melakukan aksi.
+     * Relasi ke user yang melakukan perubahan stok.
      */
     public function user()
     {
@@ -41,7 +49,8 @@ class LogStok extends Model
     }
 
     /**
-     * Accessor: "Nama (Role)" — e.g. "Fira (Admin)"
+     * Accessor: menampilkan nama user beserta role-nya.
+     * Contoh: "Fira (Admin)"
      */
     public function getOlehAttribute(): string
     {
@@ -52,7 +61,7 @@ class LogStok extends Model
     }
 
     /**
-     * Accessor: badge CSS class per tipe transaksi.
+     * Accessor: menentukan CSS class badge berdasarkan tipe log stok.
      */
     public function getTipeBadgeAttribute(): string
     {

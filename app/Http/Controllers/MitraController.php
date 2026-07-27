@@ -8,16 +8,29 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 
+/**
+ * Controller Mitra
+ * Mengelola data mitra: menampilkan, menambah, mengubah, dan menghapus mitra.
+ */
 class MitraController extends Controller
 {
+    /**
+     * Menampilkan daftar semua mitra.
+     */
     public function index()
     {
+        // Ambil semua mitra, urutkan berdasarkan terbaru
         $mitra = Mitra::orderBy('created_at', 'desc')->get();
         return view('admin.mitra', compact('mitra'));
     }
 
+    /**
+     * Menambah mitra baru.
+     * Validasi input, generate payment token, lalu simpan ke database.
+     */
     public function store(Request $request)
     {
+        // Validasi input mitra
         $request->validate([
             'nama'                => 'required|string|max:255',
             'kontak'              => ['nullable', 'numeric', 'digits_between:10,13', 'unique:mitra,kontak'],
@@ -36,6 +49,7 @@ class MitraController extends Controller
             'email.unique'        => 'Email ini sudah terdaftar oleh mitra lain.',
         ]);
 
+        // Simpan mitra baru ke database dengan payment token unik
         $mitra = Mitra::create([
             'nama'                => $request->nama,
             'kontak'              => $request->kontak,
@@ -49,10 +63,16 @@ class MitraController extends Controller
         return response()->json(['message' => 'Mitra berhasil ditambahkan', 'mitra' => $mitra], 201);
     }
 
+    /**
+     * Mengubah data mitra yang sudah ada.
+     * Jika tanggal jatuh tempo berubah, sinkronkan ke transaksi yang belum dibayar.
+     */
     public function update(Request $request, $id)
     {
+        // Cari mitra berdasarkan ID
         $mitra = Mitra::findOrFail($id);
 
+        // Validasi input mitra
         $request->validate([
             'nama'                => 'required|string|max:255',
             'kontak'              => ['nullable', 'numeric', 'digits_between:10,13', 'unique:mitra,kontak,' . $id],
@@ -71,10 +91,13 @@ class MitraController extends Controller
             'email.unique'        => 'Email ini sudah terdaftar oleh mitra lain.',
         ]);
 
+        // Simpan tanggal jatuh tempo lama untuk perbandingan
         $oldTanggal = $mitra->tanggal_jatuh_tempo;
+
+        // Update data mitra
         $mitra->update($request->only('nama', 'kontak', 'email', 'alamat', 'tanggal_jatuh_tempo'));
 
-        // Sync jatuh_tempo on unpaid transaksi if tanggal changed
+        // Sinkronkan jatuh tempo transaksi jika tanggal berubah
         $newTanggal = $mitra->tanggal_jatuh_tempo;
         if ($oldTanggal != $newTanggal) {
             $this->syncJatuhTempo($mitra, $newTanggal);
@@ -84,25 +107,31 @@ class MitraController extends Controller
     }
 
     /**
-     * Recalculate jatuh_tempo for all unpaid transaksi of a mitra
+     * Hitung ulang jatuh tempo untuk semua transaksi belum dibayar milik mitra.
+     * Dipanggil ketika tanggal jatuh tempo mitra diubah.
      */
     private function syncJatuhTempo(Mitra $mitra, int $tanggal): void
     {
         $now = now();
         $bulanIni = $now->copy()->day(min($tanggal, $now->daysInMonth));
         
-        if ($bulanIni->lte($now)) {
+        // Jika tanggal jatuh tempo bulan ini sudah lewat, pakai bulan depan
+        if ($bulanIni->lt($now)) {
             $bulanDepan = $now->copy()->addMonth();
             $newDate = $bulanDepan->day(min($tanggal, $bulanDepan->daysInMonth));
         } else {
             $newDate = $bulanIni;
         }
 
+        // Update jatuh tempo semua transaksi belum dibayar milik mitra ini
         Transaksi::where('mitra_id', $mitra->id)
             ->whereIn('status_pembayaran', ['Belum Dibayar', 'Menunggu Validasi'])
             ->update(['jatuh_tempo' => $newDate->toDateString()]);
     }
 
+    /**
+     * Menghapus mitra berdasarkan ID.
+     */
     public function destroy($id)
     {
         Mitra::findOrFail($id)->delete();
